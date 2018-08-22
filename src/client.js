@@ -1,7 +1,7 @@
 class Client {
   constructor() {
     this.pressing = false;
-    this.mouse = [];
+    this.mouse = [0, 0];
 
     this.addEvents();
   }

@@ -1,14 +1,12 @@
 import Display from './display';
-import User from './client';
-// import run from './run';
+import Client from './client';
+import Particles from './particles';
+import run from './run';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const canvas = document.querySelector('canvas');
-  const display = new Display(canvas);
+  const display = new Display(document.querySelector('canvas'));
+  const particles = Particles.randomStart(1000, display.width, display.height);
+  const client = new Client();
 
-  const user = new User();
-
-  // testing
-  window.display = display;
-  window.user = user;
+  run(display, client, particles);
 });

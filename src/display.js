@@ -15,20 +15,24 @@ class Display {
   }
 
   reset() {
-    this.clearRect(0, 0, this.width, this.height);
+    this.ctx.clearRect(0, 0, this.width, this.height);
   }
 
   render(dots) {
-    dots.forEach(dot => this.fillRect(dot.x, dot.y, 1, 1));
+    this.ctx.fillStyle = 'rgba(255,255,255,1)';
+    dots.forEach(dot => this.ctx.fillRect((dot.x), (dot.y), 1, 1));
   }
 
   randomDots(numDots) {
-    this.ctx.fillStyle = 'rgba(255,255,255,.25)';
+    const dots = [];
     for (let i = 0; i < numDots; i += 1) {
-      const x = Math.round(Math.random() * this.width);
-      const y = Math.round(Math.random() * this.height);
-      this.ctx.fillRect(x, y, 1, 1);
+      dots.push([
+        Math.round(Math.random() * this.width),
+        Math.round(Math.random() * this.height),
+      ]);
     }
+
+    this.render(dots);
   }
 }
 
