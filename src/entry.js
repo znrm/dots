@@ -1,15 +1,14 @@
-import firstDots from './first_dots';
+import Display from './display';
+import User from './client';
+// import run from './run';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-
   const canvas = document.querySelector('canvas');
-  canvas.width = width;
-  canvas.height = height;
+  const display = new Display(canvas);
 
-  const ctx = canvas.getContext('2d', { alpha: false });
-  ctx.fillRect(0, 0, width, height);
+  const user = new User();
 
-  firstDots(ctx, width, height);
+  // testing
+  window.display = display;
+  window.user = user;
 });
