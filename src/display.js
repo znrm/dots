@@ -20,19 +20,8 @@ class Display {
 
   render(dots) {
     this.ctx.fillStyle = 'rgba(255,255,255,1)';
-    dots.forEach(dot => this.ctx.fillRect((dot.x), (dot.y), 1, 1));
-  }
-
-  randomDots(numDots) {
-    const dots = [];
-    for (let i = 0; i < numDots; i += 1) {
-      dots.push([
-        Math.round(Math.random() * this.width),
-        Math.round(Math.random() * this.height),
-      ]);
-    }
-
-    this.render(dots);
+    dots.forEach(dot =>
+      this.ctx.fillRect(dot.pos.x * this.width, dot.pos.y * this.height, 1, 1));
   }
 }
 
