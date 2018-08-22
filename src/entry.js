@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const display = new Display(document.querySelector('canvas'));
   const particles = Particle.randomStart(1000, display.width, display.height);
 
-  const client = new Client();
+  const client = new Client(particles);
 
   run(display, client, particles);
 });

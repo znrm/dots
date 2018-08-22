@@ -1,53 +1,61 @@
 import Vector from './vector';
 
-const inverseSquare = (sourcePos, targetPos, magnitude) => {
-  const distanceSqr = sourcePos.distanceSqr(targetPos);
+const inverseSquare = (source, target, magnitude) => {
+  const distanceSqr = source.pos.distanceSqr(target.pos);
 
   if (distanceSqr < 0.00001) {
     return new Vector(0, 0);
   }
 
-  return Vector.clone(sourcePos)
-    .subtract(targetPos)
-    .scale(magnitude / distanceSqr);
+  return Vector.clone(source.pos)
+    .subtract(target.pos)
+    .scale((target.mass * magnitude) / distanceSqr);
 };
 
 class Particle {
-  constructor(pos, vel, acc, id) {
+  constructor(pos, vel, acc, id, mass) {
     this.id = id;
-    this.pos = pos || new Vector(0, 0);
-    this.vel = vel || new Vector(0, 0);
-    this.acc = acc || new Vector(0, 0);
+    this.pos = pos || new Vector();
+    this.vel = vel || new Vector();
+    this.acc = acc || new Vector();
+    this.mass = mass || 1;
+    this.keep = true;
   }
 
   interact(particle) {
-    this.acc.add(particle.field(this));
+    this.acc.add(this.field(particle));
   }
 
   accelerate(amount) {
     this.acc.add(amount);
   }
 
+  momentum() {
+    return Vector.clone(this.vel).scale(this.mass);
+  }
+
   field(target) {
-    return inverseSquare(this.pos, target.pos, 0.00000001);
+    return inverseSquare(this, target, -0.00000001);
   }
 
   update() {
-    this.vel.add(this.acc);
+    if (this.keep) {
+      this.vel.add(this.acc);
+    }
     this.pos.add(this.vel);
     this.acc = new Vector(0, 0);
   }
 
-  static randomStart() {
+  static randomStart(nParticles) {
     const particles = [];
-    for (let i = 0; i < 500; i += 1) {
-      const pos = Vector.random().scale(0.5).add(new Vector(0.25, 0.25));
+    for (let i = 0; i < nParticles; i += 1) {
+      const pos = Vector.random();
       const vel = Vector.random();
 
       vel.scale(
         new Vector(
-          Math.random() > 0.5 ? -0.001 : 0.001,
-          Math.random() > 0.5 ? -0.001 : 0.001,
+          Math.random() > 0.5 ? -0.0001 : 0.0001,
+          Math.random() > 0.5 ? -0.0001 : 0.0001,
         ),
       );
 
