@@ -11,9 +11,12 @@ class Client {
 
   addEvents() {
     document.onmousedown = e => {
-      this.mouse = (new Vector((e.clientX / window.innerWidth), (e.clientY / window.innerHeight)));
+      this.mouse = new Vector(
+        e.clientX / window.innerWidth,
+        e.clientY / window.innerHeight,
+      );
       this.pressing = true;
-      this.particles.push(new Particle(this.mouse));
+      this.particles.push(Particle.random(this.mouse));
     };
 
     document.onmousemove = e => {

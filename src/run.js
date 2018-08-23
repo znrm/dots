@@ -1,18 +1,10 @@
 const run = function run(display, client, particles) {
   display.reset();
 
-  particles.forEach(particle => {
-    particles.forEach(otherParticle => {
-      if (particle !== otherParticle) {
-        particle.interact(otherParticle);
-      }
-    });
-  });
-
-  particles.forEach(particle => particle.update());
-
-  display.render(particles);
-
+  const { length } = particles;
+  for (let i = 0; i < length; i += 1) {
+    display.render(particles[i].update());
+  }
 
   window.requestAnimationFrame(() => run(display, client, particles));
 };

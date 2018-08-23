@@ -1,7 +1,12 @@
 class Vector {
   constructor(x, y) {
-    this.x = x || 0;
-    this.y = y || 0;
+    this.x = x;
+    this.y = y;
+  }
+
+  moveTo(x, y) {
+    this.x = x;
+    this.y = y;
   }
 
   add(that) {
@@ -22,13 +27,7 @@ class Vector {
     return this;
   }
 
-  distanceTo(that) {
-    const dX = this.x - that.x;
-    const dY = this.y - that.y;
-    return Math.hypot(dX, dY);
-  }
-
-  distanceSqr(that) {
+  sqDist(that) {
     const dX = this.x - that.x;
     const dY = this.y - that.y;
     return dX * dX + dY * dY;

@@ -5,9 +5,10 @@ import run from './run';
 
 document.addEventListener('DOMContentLoaded', () => {
   const display = new Display(document.querySelector('canvas'));
-  const particles = Particle.randomStart(1000, display.width, display.height);
+  const particles = Particle.randomStart(10000);
 
   const client = new Client(particles);
+  window.disp = display;
 
   run(display, client, particles);
 });

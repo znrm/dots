@@ -3,6 +3,7 @@ class Display {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d', { alpha: false });
     this.resize.bind(this)();
+    this.ctx.fillStyle = 'rgba(255,255,255,1)';
 
     window.onresize = () => this.resize();
   }
@@ -12,16 +13,15 @@ class Display {
     this.height = window.innerHeight;
     this.canvas.width = this.width;
     this.canvas.height = this.height;
+    this.ctx.fillStyle = 'rgba(255,255,255,1)';
   }
 
   reset() {
     this.ctx.clearRect(0, 0, this.width, this.height);
   }
 
-  render(dots) {
-    this.ctx.fillStyle = 'rgba(255,255,255,1)';
-    dots.forEach(dot =>
-      this.ctx.fillRect(dot.pos.x * this.width, dot.pos.y * this.height, 1, 1));
+  render({ x, y }) {
+    this.ctx.fillRect(x * this.width, y * this.height, 1, 1);
   }
 }
 
