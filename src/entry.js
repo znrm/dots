@@ -2,6 +2,7 @@ import Display from './display';
 import Client from './client';
 import Particle from './particle';
 import Vector from './vector';
+import walls from './environment';
 
 document.addEventListener('DOMContentLoaded', () => {
   const display = new Display(document.querySelector('canvas'));
@@ -20,15 +21,23 @@ document.addEventListener('DOMContentLoaded', () => {
         client.mouseField.interact(particles[i]);
       }
 
+      if (client.wall) {
+        walls(particles[i]);
+      }
+
       display.dot(particles[i].update());
     }
 
     for (let i = 0; i < nFields; i += 1) {
       display.circle(fields[i].update());
+      if (client.pressing) {
+        client.mouseField.interact(fields[i]);
+      }
     }
 
     display.line(client.mouse, client.pointer);
     display.mouse(client.mouse);
+    client.resetMouse();
     window.requestAnimationFrame(run);
   };
 

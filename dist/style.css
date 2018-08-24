@@ -17,7 +17,7 @@ canvas {
   cursor: none;
 }
 
-.hover-nav {
+.options {
   cursor: initial;
   display:inline-block;
   height: 80%;
@@ -27,11 +27,11 @@ canvas {
   transition: all 0.25s cubic-bezier(0.1, 0.65, 0.3, 1);
 }
 
-.hover-nav:hover {
+.options:hover {
   right: 0;
 }
 
-.hover-nav ul {
+.options ul {
   display: flex;
   justify-content: space-around;
   flex-direction: column;
@@ -47,12 +47,12 @@ canvas {
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-.hover-nav:hover ul {
-  background-color: rgba(255, 255, 255, 0.15);
+.options:hover ul {
+  background-color: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-.nav-text {
+.options-text {
   color: rgba(255, 255, 255, 0.6);
   text-align: center;
   padding: 15px 5px;

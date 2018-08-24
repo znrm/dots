@@ -19,6 +19,17 @@ class Field extends Particle {
     return this.pos.dist(pos) < this.radius;
   }
 
+  noEffect() {
+    return this.fieldType;
+  }
+
+  grab(particle) {
+    if (this.pos.dist(particle.pos) < 0.03) {
+      const { x, y } = this.pos;
+      particle.pos.moveTo(x, y);
+    }
+  }
+
   radialPush(particle) {
     particle.moveAwayFrom(this.radius - this.pos.dist(particle.pos), this.pos);
   }
