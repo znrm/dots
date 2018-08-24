@@ -1,10 +1,58 @@
-html, body {
+html,
+body {
   overflow: hidden;
   margin: 0;
   height: 100vh;
   width: 100vw;
+  cursor: crosshair;
+  font-family: 'Courier New', Courier, monospace;
 }
 
-html:hover {
-  cursor: crosshair;
+li, ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+
+.hover-nav {
+  cursor: initial;
+  display:inline-block;
+  height: 80%;
+  position: absolute;
+  right: -80px;
+  top: 10%;
+  transition: all 0.25s cubic-bezier(0.1, 0.65, 0.3, 1);
+}
+
+.hover-nav:hover {
+  right: 0;
+}
+
+.hover-nav ul {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+  align-content: center;
+  height: 100%;
+  width: 80px;
+  padding: 20px 5px;
+  margin: 10px;
+  box-sizing: border-box;
+
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hover-nav:hover ul {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.nav-text {
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: 15px 5px;
+  cursor: pointer;
 }
