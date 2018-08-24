@@ -5,7 +5,10 @@ import Field from './field';
 class Client {
   constructor(particles, fields) {
     this.mouse = new Vector(0, 0);
+    this.mouseDir = new Vector(0, 0);
+    this.arrow = new Vector(0, 0);
     this.pressing = false;
+    this.previousMouse = [];
 
     this.particles = particles;
     this.fields = fields;
@@ -31,8 +34,8 @@ class Client {
   createMouseField() {
     this.mouseField = new Field({
       pos: this.mouse,
-      fieldType: 'constRadialAcc',
-      radius: 0.02,
+      fieldType: 'radialPush',
+      radius: 0.05,
     });
   }
 
@@ -46,9 +49,16 @@ class Client {
     };
 
     document.onmousemove = e => {
+      this.previousMouse.push(this.mouse);
       this.mouse.moveTo(
         e.clientX / window.innerWidth,
         e.clientY / window.innerHeight,
+      );
+      this.arrow = Vector.clone(this.mouse).add(
+        Vector.clone(this.mouse)
+          .subtract(this.previousMouse[this.previousMouse.length - 1])
+          .normalize()
+          .scale(0.05),
       );
     };
 

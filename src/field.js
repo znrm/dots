@@ -10,13 +10,21 @@ class Field extends Particle {
   }
 
   interact(particle) {
-    this[this.fieldType](particle);
+    if (this.isInRadius(particle)) {
+      this[this.fieldType](particle);
+    }
+  }
+
+  isInRadius({ pos }) {
+    return this.pos.dist(pos) < this.radius;
+  }
+
+  radialPush(particle) {
+    particle.moveAwayFrom(this.radius - this.pos.dist(particle.pos), this.pos);
   }
 
   constRadialAcc(particle) {
-    if (this.pos.dist(particle.pos) < this.radius) {
-      particle.receiveFrom(RADIAL_CONSTANT, this.pos);
-    }
+    particle.receiveFrom(RADIAL_CONSTANT, this.pos);
   }
 }
 

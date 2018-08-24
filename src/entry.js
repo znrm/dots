@@ -5,13 +5,12 @@ import Vector from './vector';
 
 document.addEventListener('DOMContentLoaded', () => {
   const display = new Display(document.querySelector('canvas'));
-  const particles = Particle.randomStart(10000);
+  const particles = Particle.randomStart(1000);
   const fields = [];
   const client = new Client(particles, fields);
 
   const run = () => {
     display.reset();
-
     const nParticles = particles.length;
     const nFields = fields.length;
 
@@ -26,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let i = 0; i < nFields; i += 1) {
       display.circle(fields[i].update());
     }
-
+    display.line(client.mouse, client.arrow);
     window.requestAnimationFrame(run);
   };
 

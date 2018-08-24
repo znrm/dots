@@ -4,6 +4,7 @@ class Display {
     this.ctx = canvas.getContext('2d', { alpha: false });
     this.resize.bind(this)();
     this.ctx.fillStyle = 'rgba(255,255,255,1)';
+    this.ctx.strokeStyle = 'rgba(255,255,255,1)';
 
     window.onresize = () => this.resize();
   }
@@ -14,10 +15,18 @@ class Display {
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.ctx.fillStyle = 'rgba(255,255,255,1)';
+    this.ctx.strokeStyle = 'rgba(255,255,255,1)';
   }
 
   reset() {
     this.ctx.clearRect(0, 0, this.width, this.height);
+  }
+
+  line(from, to) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(from.x * this.width, from.y * this.height);
+    this.ctx.lineTo(to.x * this.width, to.y * this.height);
+    this.ctx.stroke();
   }
 
   circle({ x, y }) {

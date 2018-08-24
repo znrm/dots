@@ -60,6 +60,11 @@ class Vector {
       .normalize();
   }
 
+  static randomDir(scale = 1) {
+    return new Vector(Math.random() - Math.random(),
+      Math.random() - Math.random()).normalize().scale(scale);
+  }
+
   static clone(vector) {
     return new Vector(vector.x, vector.y);
   }

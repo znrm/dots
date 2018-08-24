@@ -23,16 +23,13 @@ class Particle {
     this.acc.add(Vector.direction(this.pos, location).scale(amount));
   }
 
+  moveAwayFrom(distance, location) {
+    this.pos.add(Vector.direction(this.pos, location).scale(distance));
+  }
+
   static random(initial) {
     const pos = initial || Vector.random();
-    const vel = Vector.random();
-
-    vel.scale(
-      new Vector(
-        Math.random() > 0.5 ? -0.0005 : 0.0005,
-        Math.random() > 0.5 ? -0.0005 : 0.0005,
-      ),
-    );
+    const vel = Vector.randomDir(0.001);
 
     return new Particle({ pos, vel });
   }
