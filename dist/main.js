@@ -310,7 +310,7 @@ __webpack_require__.r(__webpack_exports__);
 
 document.addEventListener('DOMContentLoaded', () => {
   const display = new _display__WEBPACK_IMPORTED_MODULE_0__["default"](document.querySelector('canvas'));
-  const particles = _particle__WEBPACK_IMPORTED_MODULE_2__["default"].randomStart(100);
+  const particles = _particle__WEBPACK_IMPORTED_MODULE_2__["default"].randomStart(1000);
   const fields = [];
   const client = new _client__WEBPACK_IMPORTED_MODULE_1__["default"](particles, fields);
 
@@ -507,7 +507,7 @@ class Particle {
 
   static random(initial) {
     const pos = initial || _vector__WEBPACK_IMPORTED_MODULE_0__["default"].random();
-    const vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.0001);
+    const vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005);
 
     return new Particle({ pos, vel });
   }

@@ -6,7 +6,7 @@ import walls from './environment';
 
 document.addEventListener('DOMContentLoaded', () => {
   const display = new Display(document.querySelector('canvas'));
-  const particles = Particle.randomStart(100);
+  const particles = Particle.randomStart(1000);
   const fields = [];
   const client = new Client(particles, fields);
 
