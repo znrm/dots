@@ -4,11 +4,6 @@ class Vector {
     this.y = y;
   }
 
-  moveTo(x, y) {
-    this.x = x;
-    this.y = y;
-  }
-
   add(that) {
     this.x += that.x;
     this.y += that.y;
@@ -27,14 +22,10 @@ class Vector {
     return this;
   }
 
-  sqDist(that) {
-    const dX = this.x - that.x;
-    const dY = this.y - that.y;
-    return dX * dX + dY * dY;
-  }
-
-  magnitude() {
-    return Math.hypot(this.x, this.y);
+  moveTo(x, y) {
+    this.x = x;
+    this.y = y;
+    return this;
   }
 
   normalize() {
@@ -46,6 +37,27 @@ class Vector {
       this.scale({ x: 1 / magnitude, y: 1 / magnitude });
     }
     return this;
+  }
+
+  sqDist(that) {
+    const dX = this.x - that.x;
+    const dY = this.y - that.y;
+    return dX * dX + dY * dY;
+  }
+
+  dist(that) {
+    return Math.hypot(this.x - that.x, this.y - that.y);
+  }
+
+  magnitude() {
+    return Math.hypot(this.x, this.y);
+  }
+
+  static direction(from, to) {
+    return new Vector(0, 0)
+      .add(from)
+      .subtract(to)
+      .normalize();
   }
 
   static clone(vector) {

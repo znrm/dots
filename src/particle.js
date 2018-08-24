@@ -1,11 +1,12 @@
 import Vector from './vector';
 
 class Particle {
-  constructor(pos, vel, acc, mass) {
+  constructor({ pos, vel, acc, mass, charge }) {
     this.pos = pos || new Vector(0, 0);
     this.vel = vel || new Vector(0, 0);
     this.acc = acc || new Vector(0, 0);
     this.mass = mass || 1;
+    this.charge = charge || 0;
   }
 
   update() {
@@ -18,8 +19,8 @@ class Particle {
     return Vector.clone(this.vel).scale(this.mass);
   }
 
-  applyForce(amount) {
-    this.acc.add(amount / this.mass);
+  receiveFrom(amount, location) {
+    this.acc.add(Vector.direction(this.pos, location).scale(amount));
   }
 
   static random(initial) {
@@ -33,7 +34,7 @@ class Particle {
       ),
     );
 
-    return new Particle(pos, vel, new Vector(0, 0));
+    return new Particle({ pos, vel });
   }
 
   static randomStart(nParticles) {

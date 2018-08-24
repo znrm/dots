@@ -1,14 +1,17 @@
 import Vector from './vector';
 import Particle from './particle';
-import Gravity from './field';
+import Field from './field';
 
 class Client {
   constructor(particles, fields) {
-    this.pressing = false;
     this.mouse = new Vector(0, 0);
+    this.pressing = false;
+
     this.particles = particles;
     this.fields = fields;
+
     this.addEvents();
+    this.createMouseField();
   }
 
   newParticle() {
@@ -16,21 +19,37 @@ class Client {
   }
 
   newGravityField() {
-    this.fields.push(new Gravity('', this.mouse));
+    this.fields.push(
+      new Field({
+        fieldType: 'gravity',
+        mass: 1 + 10 * Math.random(),
+        pos: this.mouse,
+      }),
+    );
+  }
+
+  createMouseField() {
+    this.mouseField = new Field({
+      pos: this.mouse,
+      fieldType: 'constRadialAcc',
+      radius: 0.02,
+    });
   }
 
   addEvents() {
     document.onmousedown = e => {
-      this.mouse = new Vector(
+      this.mouse.moveTo(
         e.clientX / window.innerWidth,
         e.clientY / window.innerHeight,
       );
       this.pressing = true;
-      this.newGravityField();
     };
 
     document.onmousemove = e => {
-      this.mouse = new Vector(e.clientX, e.clientY);
+      this.mouse.moveTo(
+        e.clientX / window.innerWidth,
+        e.clientY / window.innerHeight,
+      );
     };
 
     document.onmouseup = () => {
