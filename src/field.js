@@ -1,6 +1,7 @@
 import Particle from './particle';
 
 const RADIAL_CONSTANT = 1e-3;
+const GRAVITATIONAL_CONSTANT = -1e-8;
 
 class Field extends Particle {
   constructor({ pos, vel, acc, mass, charge, fieldType, radius }) {
@@ -16,7 +17,9 @@ class Field extends Particle {
   }
 
   isInRadius({ pos }) {
-    return this.pos.dist(pos) < this.radius;
+    const distance = this.pos.dist(pos);
+
+    return distance && distance < this.radius;
   }
 
   noEffect() {
@@ -36,6 +39,15 @@ class Field extends Particle {
 
   constRadialAcc(particle) {
     particle.receiveFrom(RADIAL_CONSTANT, this.pos);
+  }
+
+  invSquare(particle) {
+    const sqDistance = this.pos.sqDist(particle.pos);
+    if (sqDistance > 0.00005) {
+      particle.receiveFrom(GRAVITATIONAL_CONSTANT / sqDistance, this.pos);
+    } else {
+      particle.receiveFrom(GRAVITATIONAL_CONSTANT / this.pos.dist(particle.pos), this.pos);
+    }
   }
 }
 

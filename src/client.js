@@ -14,7 +14,7 @@ class Client {
     this.particles = particles;
     this.fields = fields;
 
-    this.selectedAction = 1;
+    this.selectedAction = 2;
     this.actions = {
       1: 'mouseField',
       2: 'newGravityField',
@@ -47,9 +47,11 @@ class Client {
   newGravityField() {
     this.fields.push(
       new Field({
-        fieldType: 'gravity',
+        fieldType: 'invSquare',
         mass: 1 + 10 * Math.random(),
         pos: Vector.clone(this.mouse),
+        vel: this.pointer.subtract(this.mouse).scale(0.05),
+        radius: 5,
       }),
     );
   }
@@ -62,8 +64,8 @@ class Client {
   createMouseField() {
     this.mouseField = new Field({
       pos: this.mouse,
-      fieldType: 'radialPush',
-      radius: 0.05,
+      fieldType: 'noEffect',
+      radius: 0.04,
     });
   }
 

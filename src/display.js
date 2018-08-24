@@ -38,7 +38,7 @@ class Display {
 
   circle({ x, y }) {
     this.ctx.beginPath();
-    this.ctx.arc(x * this.width, y * this.height, 3, 0, 2 * Math.PI, false);
+    this.ctx.arc(x * this.width, y * this.height, 2, 0, 2 * Math.PI, false);
     this.ctx.fill();
   }
 
