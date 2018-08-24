@@ -20,7 +20,7 @@ canvas {
 .options {
   cursor: initial;
   display:inline-block;
-  height: 80%;
+  max-height: 80%;
   position: absolute;
   right: -80px;
   top: 10%;
@@ -36,11 +36,11 @@ canvas {
   justify-content: space-around;
   flex-direction: column;
   align-content: center;
-  height: 100%;
+  min-height: 80vh;
   width: 80px;
   padding: 20px 3px;
   margin: 10px;
-  box-sizing: content-box;
+  box-sizing: border-box;
 
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
@@ -55,6 +55,6 @@ canvas {
 .options-text {
   color: rgba(255, 255, 255, 0.6);
   text-align: center;
-  padding: 15px 5px;
+  padding: 0 5px;
   cursor: pointer;
 }
