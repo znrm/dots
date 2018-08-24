@@ -2,9 +2,9 @@ import Vector from './vector';
 
 class Particle {
   constructor(pos, vel, acc, mass) {
-    this.pos = pos || new Vector(0);
-    this.vel = vel || new Vector(0);
-    this.acc = acc || new Vector(0);
+    this.pos = pos || new Vector(0, 0);
+    this.vel = vel || new Vector(0, 0);
+    this.acc = acc || new Vector(0, 0);
     this.mass = mass || 1;
   }
 

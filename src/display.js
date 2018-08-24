@@ -20,7 +20,13 @@ class Display {
     this.ctx.clearRect(0, 0, this.width, this.height);
   }
 
-  render({ x, y }) {
+  circle({ x, y }) {
+    this.ctx.beginPath();
+    this.ctx.arc(x * this.width, y * this.height, 5, 0, 2 * Math.PI, false);
+    this.ctx.fill();
+  }
+
+  dot({ x, y }) {
     this.ctx.fillRect(x * this.width, y * this.height, 1, 1);
   }
 }
