@@ -6,7 +6,7 @@ import walls from './environment';
 
 document.addEventListener('DOMContentLoaded', () => {
   const display = new Display(document.querySelector('canvas'));
-  const particles = Particle.randomStart(0);
+  const particles = Particle.randomStart(100);
   const fields = [];
   const client = new Client(particles, fields);
 
@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
       display.circle(fields[i].update());
     }
 
-    display.line(client.mouse, client.pointer);
     display.mouse(client.mouse);
 
     client.resetMouse();

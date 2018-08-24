@@ -7,7 +7,7 @@ class Client {
     this.mouse = new Vector(0, 0);
     this.mouseHistory = Array.from({ length: 2 }, () => new Vector(0, 0));
 
-    this.wall = false;
+    this.wall = true;
     this.pressing = false;
     this.previousMouse = [];
 
