@@ -17,14 +17,24 @@ class Vector {
   }
 
   scale(that) {
-    this.x *= that.x || that;
-    this.y *= that.y || that;
+    if (that instanceof Object) {
+      this.x *= that.x;
+      this.y *= that.y;
+    } else {
+      this.x *= that;
+      this.y *= that;
+    }
     return this;
   }
 
   moveTo(x, y) {
     this.x = x;
     this.y = y;
+    return this;
+  }
+
+  project(onto) {
+    this.scale(Vector.clone(onto).normalize());
     return this;
   }
 
@@ -49,6 +59,10 @@ class Vector {
     return Math.hypot(this.x - that.x, this.y - that.y);
   }
 
+  dot(that) {
+    return this.x * that.x + this.y * that.y;
+  }
+
   magnitude() {
     return Math.hypot(this.x, this.y);
   }
@@ -61,8 +75,12 @@ class Vector {
   }
 
   static randomDir(scale = 1) {
-    return new Vector(Math.random() - Math.random(),
-      Math.random() - Math.random()).normalize().scale(scale);
+    return new Vector(
+      Math.random() - Math.random(),
+      Math.random() - Math.random(),
+    )
+      .normalize()
+      .scale(scale);
   }
 
   static clone(vector) {

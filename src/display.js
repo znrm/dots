@@ -22,6 +22,13 @@ class Display {
     this.ctx.clearRect(0, 0, this.width, this.height);
   }
 
+  mouse({ x, y }) {
+    this.strokeStyle = 'rgba(255,255,255,0.2)';
+    this.ctx.beginPath();
+    this.ctx.arc(x * this.width, y * this.height, 5, 0, 2 * Math.PI, false);
+    this.ctx.stroke();
+  }
+
   line(from, to) {
     this.ctx.beginPath();
     this.ctx.moveTo(from.x * this.width, from.y * this.height);
@@ -31,7 +38,7 @@ class Display {
 
   circle({ x, y }) {
     this.ctx.beginPath();
-    this.ctx.arc(x * this.width, y * this.height, 5, 0, 2 * Math.PI, false);
+    this.ctx.arc(x * this.width, y * this.height, 3, 0, 2 * Math.PI, false);
     this.ctx.fill();
   }
 

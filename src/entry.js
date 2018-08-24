@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const run = () => {
     display.reset();
+
     const nParticles = particles.length;
     const nFields = fields.length;
 
@@ -25,7 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let i = 0; i < nFields; i += 1) {
       display.circle(fields[i].update());
     }
-    display.line(client.mouse, client.arrow);
+
+    display.line(client.mouse, client.pointer);
+    display.mouse(client.mouse);
     window.requestAnimationFrame(run);
   };
 

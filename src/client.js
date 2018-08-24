@@ -5,8 +5,8 @@ import Field from './field';
 class Client {
   constructor(particles, fields) {
     this.mouse = new Vector(0, 0);
-    this.mouseDir = new Vector(0, 0);
-    this.arrow = new Vector(0, 0);
+    this.mouseHistory = Array.from({ length: 2 }, () => new Vector(0, 0));
+
     this.pressing = false;
     this.previousMouse = [];
 
@@ -15,6 +15,12 @@ class Client {
 
     this.addEvents();
     this.createMouseField();
+  }
+
+  get pointer() {
+    return Vector.clone(this.mouse)
+      .scale(2)
+      .subtract(this.mouseHistory[0]);
   }
 
   newParticle() {
@@ -29,6 +35,11 @@ class Client {
         pos: this.mouse,
       }),
     );
+  }
+
+  recordMouse(prevMouse) {
+    this.mouseHistory.shift();
+    this.mouseHistory.push(Vector.clone(prevMouse));
   }
 
   createMouseField() {
@@ -49,17 +60,12 @@ class Client {
     };
 
     document.onmousemove = e => {
-      this.previousMouse.push(this.mouse);
+      this.recordMouse(this.mouse);
       this.mouse.moveTo(
         e.clientX / window.innerWidth,
         e.clientY / window.innerHeight,
       );
-      this.arrow = Vector.clone(this.mouse).add(
-        Vector.clone(this.mouse)
-          .subtract(this.previousMouse[this.previousMouse.length - 1])
-          .normalize()
-          .scale(0.05),
-      );
+      this.display.mouse(this.mouse);
     };
 
     document.onmouseup = () => {
