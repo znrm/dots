@@ -479,12 +479,18 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Particle {
-  constructor({ pos, vel, acc, mass, charge }) {
-    this.pos = pos || new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0);
-    this.vel = vel || new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0);
-    this.acc = acc || new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0);
-    this.mass = mass || 1;
-    this.charge = charge || 0;
+  constructor({
+    pos = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
+    vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
+    acc = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
+    mass = 1,
+    charge = 0,
+  }) {
+    this.pos = pos;
+    this.vel = vel;
+    this.acc = acc;
+    this.mass = mass;
+    this.charge = charge;
   }
 
   update() {
@@ -498,11 +504,19 @@ class Particle {
   }
 
   receiveFrom(amount, location) {
-    this.acc.add(_vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location).normalize().scale(amount));
+    this.acc.add(
+      _vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location)
+        .normalize()
+        .scale(amount),
+    );
   }
 
   moveAwayFrom(distance, location) {
-    this.pos.add(_vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location).normalize().scale(distance));
+    this.pos.add(
+      _vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location)
+        .normalize()
+        .scale(distance),
+    );
   }
 
   static random(initial) {
@@ -618,6 +632,10 @@ class Vector {
     )
       .normalize()
       .scale(scale);
+  }
+
+  static origin() {
+    return new Vector(0, 0);
   }
 
   static clone(vector) {

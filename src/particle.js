@@ -1,12 +1,18 @@
 import Vector from './vector';
 
 class Particle {
-  constructor({ pos, vel, acc, mass, charge }) {
-    this.pos = pos || new Vector(0, 0);
-    this.vel = vel || new Vector(0, 0);
-    this.acc = acc || new Vector(0, 0);
-    this.mass = mass || 1;
-    this.charge = charge || 0;
+  constructor({
+    pos = Vector.origin(),
+    vel = Vector.origin(),
+    acc = Vector.origin(),
+    mass = 1,
+    charge = 0,
+  }) {
+    this.pos = pos;
+    this.vel = vel;
+    this.acc = acc;
+    this.mass = mass;
+    this.charge = charge;
   }
 
   update() {
@@ -20,11 +26,19 @@ class Particle {
   }
 
   receiveFrom(amount, location) {
-    this.acc.add(Vector.direction(this.pos, location).normalize().scale(amount));
+    this.acc.add(
+      Vector.direction(this.pos, location)
+        .normalize()
+        .scale(amount),
+    );
   }
 
   moveAwayFrom(distance, location) {
-    this.pos.add(Vector.direction(this.pos, location).normalize().scale(distance));
+    this.pos.add(
+      Vector.direction(this.pos, location)
+        .normalize()
+        .scale(distance),
+    );
   }
 
   static random(initial) {

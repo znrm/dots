@@ -83,6 +83,10 @@ class Vector {
       .scale(scale);
   }
 
+  static origin() {
+    return new Vector(0, 0);
+  }
+
   static clone(vector) {
     return new Vector(vector.x, vector.y);
   }
