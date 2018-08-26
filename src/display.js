@@ -1,12 +1,23 @@
 class Display {
-  constructor(canvas) {
+  constructor(canvas, state, client) {
     this.canvas = canvas;
+    this.state = state;
+    this.client = client;
+
     this.ctx = canvas.getContext('2d', { alpha: false });
     this.resize.bind(this)();
+
     this.ctx.fillStyle = 'rgba(255,255,255,1)';
     this.ctx.strokeStyle = 'rgba(255,255,255,1)';
 
     window.onresize = () => this.resize();
+  }
+
+  render(nParticles, nFields) {
+    const { particles, fields } = this.state;
+    for (let i = 0; i < nParticles; i += 1) this.dot(particles[i]);
+    for (let i = 0; i < nFields; i += 1) this.circle(fields[i]);
+    this.mouse(this.client.mouse);
   }
 
   resize() {
@@ -36,14 +47,21 @@ class Display {
     this.ctx.stroke();
   }
 
-  circle({ x, y }) {
+  circle({ pos, mass }) {
     this.ctx.beginPath();
-    this.ctx.arc(x * this.width, y * this.height, 2, 0, 2 * Math.PI, false);
+    this.ctx.arc(
+      pos.x * this.width,
+      pos.y * this.height,
+      Math.sqrt(mass),
+      0,
+      2 * Math.PI,
+      false,
+    );
     this.ctx.fill();
   }
 
-  dot({ x, y }) {
-    this.ctx.fillRect(x * this.width, y * this.height, 1, 1);
+  dot({ pos }) {
+    this.ctx.fillRect(pos.x * this.width, pos.y * this.height, 1, 1);
   }
 }
 

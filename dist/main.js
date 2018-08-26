@@ -103,7 +103,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Client {
-  constructor(particles, fields) {
+  constructor(state) {
     this.mouse = new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0);
     this.mouseHistory = Array.from({ length: 2 }, () => new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0));
 
@@ -111,14 +111,13 @@ class Client {
     this.pressing = false;
     this.previousMouse = [];
 
-    this.particles = particles;
-    this.fields = fields;
+    this.state = state;
 
     this.selectedAction = 2;
     this.actions = {
       1: 'mouseField',
       2: 'newGravityField',
-      3: 'makeDots',
+      3: 'shootDots',
     };
 
     this.addEvents();
@@ -141,19 +140,33 @@ class Client {
   }
 
   newParticle() {
-    this.particles.push(_particle__WEBPACK_IMPORTED_MODULE_1__["default"].random(this.mouse));
+    const { particles } = this.state;
+    particles.push(_particle__WEBPACK_IMPORTED_MODULE_1__["default"].random(this.mouse));
   }
 
   newGravityField() {
-    this.fields.push(
+    const { fields } = this.state;
+    fields.push(
       new _field__WEBPACK_IMPORTED_MODULE_2__["default"]({
-        fieldType: 'invSquare',
+        fieldType: 'funCombinationField',
         mass: 1 + 10 * Math.random(),
         pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse),
-        vel: this.pointer.subtract(this.mouse).scale(0.05),
-        radius: 5,
+        vel: this.pointer.subtract(this.mouse).scale(0.08),
+        radius: 100,
       }),
     );
+  }
+
+  shootDots() {
+    const { particles } = this.state;
+    for (let i = 0; i < 100; i += 1) {
+      particles.push(
+        new _particle__WEBPACK_IMPORTED_MODULE_1__["default"]({
+          vel: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
+          pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse),
+        }),
+      );
+    }
   }
 
   recordMouse(prevMouse) {
@@ -165,12 +178,12 @@ class Client {
     this.mouseField = new _field__WEBPACK_IMPORTED_MODULE_2__["default"]({
       pos: this.mouse,
       fieldType: 'noEffect',
-      radius: 0.04,
+      radius: 0.01,
     });
   }
 
   addEvents() {
-    document.onmousedown = e => {
+    document.querySelector('canvas').onmousedown = e => {
       this.mouse.moveTo(
         e.clientX / window.innerWidth,
         e.clientY / window.innerHeight,
@@ -204,11 +217,15 @@ class Client {
           break;
         case 'make':
           this.mouseField.fieldType = 'noEffect';
-          this.selectedAction = 2;
+          this.selectedAction = 3;
           break;
         case 'grab':
           this.mouseField.fieldType = 'grab';
           this.selectedAction = 1;
+          break;
+        case 'shoot':
+          this.mouseField.fieldType = 'noEffect';
+          this.selectedAction = 2;
           break;
         case 'wall':
           this.wall = !this.wall;
@@ -235,14 +252,25 @@ class Client {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 class Display {
-  constructor(canvas) {
+  constructor(canvas, state, client) {
     this.canvas = canvas;
+    this.state = state;
+    this.client = client;
+
     this.ctx = canvas.getContext('2d', { alpha: false });
     this.resize.bind(this)();
+
     this.ctx.fillStyle = 'rgba(255,255,255,1)';
     this.ctx.strokeStyle = 'rgba(255,255,255,1)';
 
     window.onresize = () => this.resize();
+  }
+
+  render(nParticles, nFields) {
+    const { particles, fields } = this.state;
+    for (let i = 0; i < nParticles; i += 1) this.dot(particles[i]);
+    for (let i = 0; i < nFields; i += 1) this.circle(fields[i]);
+    this.mouse(this.client.mouse);
   }
 
   resize() {
@@ -272,14 +300,21 @@ class Display {
     this.ctx.stroke();
   }
 
-  circle({ x, y }) {
+  circle({ pos, mass }) {
     this.ctx.beginPath();
-    this.ctx.arc(x * this.width, y * this.height, 2, 0, 2 * Math.PI, false);
+    this.ctx.arc(
+      pos.x * this.width,
+      pos.y * this.height,
+      Math.sqrt(mass),
+      0,
+      2 * Math.PI,
+      false,
+    );
     this.ctx.fill();
   }
 
-  dot({ x, y }) {
-    this.ctx.fillRect(x * this.width, y * this.height, 1, 1);
+  dot({ pos }) {
+    this.ctx.fillRect(pos.x * this.width, pos.y * this.height, 1, 1);
   }
 }
 
@@ -302,6 +337,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _particle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./particle */ "./src/particle.js");
 /* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./vector */ "./src/vector.js");
 /* harmony import */ var _environment__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./environment */ "./src/environment.js");
+/* harmony import */ var _field__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./field */ "./src/field.js");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./state */ "./src/state.js");
+
+
 
 
 
@@ -309,61 +348,63 @@ __webpack_require__.r(__webpack_exports__);
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  const display = new _display__WEBPACK_IMPORTED_MODULE_0__["default"](document.querySelector('canvas'));
-  const particles = _particle__WEBPACK_IMPORTED_MODULE_2__["default"].randomStart(1000);
-  const fields = [];
-  const client = new _client__WEBPACK_IMPORTED_MODULE_1__["default"](particles, fields);
+  const canvas = document.querySelector('canvas');
+  const state = new _state__WEBPACK_IMPORTED_MODULE_6__["default"](_particle__WEBPACK_IMPORTED_MODULE_2__["default"].randomStart(0), [
+    new _field__WEBPACK_IMPORTED_MODULE_5__["default"]({ pos: new _vector__WEBPACK_IMPORTED_MODULE_3__["default"]() }),
+  ]);
+
+  const client = new _client__WEBPACK_IMPORTED_MODULE_1__["default"](state);
+
+  document
+    .getElementById('wall')
+    .addEventListener('click', function wallButton() {
+      if (client.wall) {
+        this.classList.remove('strike');
+      } else {
+        this.classList.add('strike');
+      }
+    });
+
+  const display = new _display__WEBPACK_IMPORTED_MODULE_0__["default"](canvas, state, client);
 
   const run = () => {
-    display.reset();
-
-
+    state.cleanup();
+    const { particles, fields } = state;
     const nParticles = particles.length;
     const nFields = fields.length;
 
     for (let i = 0; i < nParticles; i += 1) {
-      if (client.pressing) {
-        client.mouseField.interact(particles[i]);
-      }
+      if (client.pressing) client.mouseField.interact(particles[i]);
+      if (client.wall) Object(_environment__WEBPACK_IMPORTED_MODULE_4__["default"])(particles[i]);
 
-      if (client.wall) {
-        Object(_environment__WEBPACK_IMPORTED_MODULE_4__["default"])(particles[i]);
-      }
-
-      for (let j = 0; j < nFields; j += 1) {
-        fields[j].interact(particles[i]);
-      }
-
-      display.dot(particles[i].update());
+      for (let j = 0; j < nFields; j += 1) fields[j].interact(particles[i]);
     }
 
     for (let i = 0; i < nFields; i += 1) {
-      if (client.pressing) {
-        client.mouseField.interact(fields[i]);
-      }
-      if (client.wall) {
-        Object(_environment__WEBPACK_IMPORTED_MODULE_4__["default"])(fields[i]);
-      }
+      if (client.pressing) client.mouseField.interact(fields[i]);
+      if (client.wall) Object(_environment__WEBPACK_IMPORTED_MODULE_4__["default"])(fields[i]);
 
-      for (let j = 0; j < nFields; j += 1) {
-        fields[j].interact(fields[i]);
-      }
-    }
-    for (let i = 0; i < nFields; i += 1) {
-      display.circle(fields[i].update());
+      for (let j = 0; j < nFields; j += 1) fields[j].interact(fields[i]);
     }
 
-    display.mouse(client.mouse);
+    for (let i = 0; i < nParticles; i += 1) particles[i].update();
+    for (let i = 0; i < nFields; i += 1) fields[i].update();
 
     client.resetMouse();
+
+    display.reset();
+
+    display.render(nParticles, nFields);
+
     window.requestAnimationFrame(run);
   };
 
   // testing only
   window.display = display;
-  window.fields = fields;
+  window.fields = state.fields;
   window.client = client;
   window.Vector = _vector__WEBPACK_IMPORTED_MODULE_3__["default"];
+  window.state = state;
 
   run();
 });
@@ -411,7 +452,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const RADIAL_CONSTANT = 1e-3;
-const GRAVITATIONAL_CONSTANT = -1e-8;
+const FUN_CONSTANT = -15e-9;
 
 class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   constructor({ pos, vel, acc, mass, charge, fieldType, radius }) {
@@ -427,7 +468,7 @@ class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   isInRadius({ pos }) {
-    const distance = this.pos.dist(pos);
+    const distance = this.pos.sqDist(pos);
 
     return distance && distance < this.radius;
   }
@@ -437,26 +478,33 @@ class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   grab(particle) {
-    if (this.pos.dist(particle.pos) < 0.03) {
+    if (this.pos.sqDist(particle.pos) < 0.03) {
       const { x, y } = this.pos;
       particle.pos.moveTo(x, y);
     }
   }
 
   radialPush(particle) {
-    particle.moveAwayFrom(this.radius - this.pos.dist(particle.pos), this.pos);
+    particle.moveAwayFrom(
+      this.radius - this.pos.sqDist(particle.pos),
+      this.pos,
+    );
   }
 
   constRadialAcc(particle) {
     particle.receiveFrom(RADIAL_CONSTANT, this.pos);
   }
 
-  invSquare(particle) {
+  funCombinationField(particle) {
     const sqDistance = this.pos.sqDist(particle.pos);
-    if (sqDistance > 0.00005) {
-      particle.receiveFrom(GRAVITATIONAL_CONSTANT / sqDistance, this.pos);
-    } else {
-      particle.receiveFrom(GRAVITATIONAL_CONSTANT / this.pos.dist(particle.pos), this.pos);
+    if (sqDistance > 5e-3) {
+      particle.receiveFrom((this.mass * FUN_CONSTANT) / sqDistance, this.pos);
+    } else if (sqDistance > 5e-7 * this.mass) {
+      particle.receiveFrom((this.mass * FUN_CONSTANT) / 5e-3, this.pos);
+    } else if (this.protected && particle.protected) {
+      this.mass += particle.mass;
+      this.vel = particle.momentum.add(this.momentum).scale(1 / (this.mass + particle.mass));
+      particle.delete();
     }
   }
 }
@@ -483,7 +531,7 @@ class Particle {
     pos = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
     vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
     acc = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
-    mass = 1,
+    mass = 0.1,
     charge = 0,
   }) {
     this.pos = pos;
@@ -491,6 +539,7 @@ class Particle {
     this.acc = acc;
     this.mass = mass;
     this.charge = charge;
+    this.protected = true;
   }
 
   update() {
@@ -499,7 +548,11 @@ class Particle {
     return this.pos;
   }
 
-  momentum() {
+  delete() {
+    this.protected = false;
+  }
+
+  get momentum() {
     return _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.vel).scale(this.mass);
   }
 
@@ -521,7 +574,7 @@ class Particle {
 
   static random(initial) {
     const pos = initial || _vector__WEBPACK_IMPORTED_MODULE_0__["default"].random();
-    const vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005);
+    const vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.001);
 
     return new Particle({ pos, vel });
   }
@@ -536,6 +589,34 @@ class Particle {
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Particle);
+
+
+/***/ }),
+
+/***/ "./src/state.js":
+/*!**********************!*\
+  !*** ./src/state.js ***!
+  \**********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class State {
+  constructor(particles, fields) {
+    this.particles = particles;
+    this.fields = fields;
+  }
+
+  cleanup() {
+    this.particles = this.particles.filter(
+      particle => particle.protected,
+    );
+    this.fields = this.fields.filter(field => field.protected);
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (State);
 
 
 /***/ }),
