@@ -1,10 +1,10 @@
 class Display {
-  constructor(canvas, state, client) {
-    this.canvas = canvas;
+  constructor(state, client) {
+    this.canvas = document.querySelector('canvas');
     this.state = state;
     this.client = client;
 
-    this.ctx = canvas.getContext('2d', { alpha: false });
+    this.ctx = this.canvas.getContext('2d', { alpha: false });
     this.resize.bind(this)();
 
     this.ctx.fillStyle = 'rgba(255,255,255,1)';

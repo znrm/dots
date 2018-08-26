@@ -104,16 +104,15 @@ __webpack_require__.r(__webpack_exports__);
 
 class Client {
   constructor(state) {
+    this.state = state;
+
     this.mouse = new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0);
-    this.mouseHistory = Array.from({ length: 2 }, () => new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0));
+    this.mouseHistory = Array.from({ length: 3 }, () => new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0));
 
     this.wall = true;
     this.pressing = false;
-    this.previousMouse = [];
-
-    this.state = state;
-
     this.selectedAction = 2;
+
     this.actions = {
       1: 'mouseField',
       2: 'newGravityField',
@@ -129,10 +128,6 @@ class Client {
     return _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse)
       .scale(2)
       .subtract(this.mouseHistory[0]);
-  }
-
-  get mouseAction() {
-    return this[this.actions[this.selectedAction]];
   }
 
   resetMouse() {
@@ -163,9 +158,36 @@ class Client {
       particles.push(
         new _particle__WEBPACK_IMPORTED_MODULE_1__["default"]({
           vel: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
-          pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].random().scale(0.01).add(this.mouse),
+          pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].random()
+            .scale(0.01)
+            .add(this.mouse),
         }),
       );
+    }
+  }
+
+  walls(particle) {
+    if (this.walls) {
+      if (particle.pos.x > 1 || particle.pos.x < 0) {
+        particle.vel.scale(new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](-1, 1));
+      }
+
+      if (particle.pos.y > 1 || particle.pos.y < 0) {
+        particle.vel.scale(new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](1, -1));
+      }
+    }
+  }
+
+  handleActions(nParticles, nFields) {
+    const { particles, fields } = this.state;
+
+    for (let i = 0; i < nParticles; i += 1) {
+      if (this.pressing) this.mouseField.interact(particles[i]);
+      if (this.wall) this.walls(particles[i]);
+    }
+    for (let i = 0; i < nFields; i += 1) {
+      if (this.pressing) this.mouseField.interact(fields[i]);
+      if (this.wall) this.walls(fields[i]);
     }
   }
 
@@ -191,7 +213,7 @@ class Client {
       this.pressing = true;
 
       if (this.selectedAction !== 1) {
-        this.mouseAction();
+        this[this.actions[this.selectedAction]]();
       }
     };
 
@@ -206,6 +228,18 @@ class Client {
     document.onmouseup = () => {
       this.pressing = false;
     };
+
+    const { wall } = this;
+
+    document
+      .getElementById('wall')
+      .addEventListener('click', function wallButton() {
+        if (wall) {
+          this.classList.remove('strike');
+        } else {
+          this.classList.add('strike');
+        }
+      });
   }
 
   integrateUI() {
@@ -252,12 +286,12 @@ class Client {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 class Display {
-  constructor(canvas, state, client) {
-    this.canvas = canvas;
+  constructor(state, client) {
+    this.canvas = document.querySelector('canvas');
     this.state = state;
     this.client = client;
 
-    this.ctx = canvas.getContext('2d', { alpha: false });
+    this.ctx = this.canvas.getContext('2d', { alpha: false });
     this.resize.bind(this)();
 
     this.ctx.fillStyle = 'rgba(255,255,255,1)';
@@ -334,107 +368,40 @@ class Display {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _display__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./display */ "./src/display.js");
 /* harmony import */ var _client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./client */ "./src/client.js");
-/* harmony import */ var _particle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./particle */ "./src/particle.js");
-/* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./vector */ "./src/vector.js");
-/* harmony import */ var _environment__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./environment */ "./src/environment.js");
-/* harmony import */ var _field__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./field */ "./src/field.js");
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./state */ "./src/state.js");
-
-
-
-
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./state */ "./src/state.js");
 
 
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  const canvas = document.querySelector('canvas');
-  const state = new _state__WEBPACK_IMPORTED_MODULE_6__["default"](_particle__WEBPACK_IMPORTED_MODULE_2__["default"].randomStart(1000), [
-    new _field__WEBPACK_IMPORTED_MODULE_5__["default"]({ pos: new _vector__WEBPACK_IMPORTED_MODULE_3__["default"]() }),
-  ]);
-
+  const state = new _state__WEBPACK_IMPORTED_MODULE_2__["default"]();
   const client = new _client__WEBPACK_IMPORTED_MODULE_1__["default"](state);
-
-  document
-    .getElementById('wall')
-    .addEventListener('click', function wallButton() {
-      if (client.wall) {
-        this.classList.remove('strike');
-      } else {
-        this.classList.add('strike');
-      }
-    });
-
-  const display = new _display__WEBPACK_IMPORTED_MODULE_0__["default"](canvas, state, client);
+  const display = new _display__WEBPACK_IMPORTED_MODULE_0__["default"](state, client);
 
   const run = () => {
-    state.cleanup();
-    const { particles, fields } = state;
-    const nParticles = particles.length;
-    const nFields = fields.length;
+    window.requestAnimationFrame(run);
 
-    for (let i = 0; i < nParticles; i += 1) {
-      if (client.pressing) client.mouseField.interact(particles[i]);
-      if (client.wall) Object(_environment__WEBPACK_IMPORTED_MODULE_4__["default"])(particles[i]);
-
-      for (let j = 0; j < nFields; j += 1) fields[j].interact(particles[i]);
-    }
-
-    for (let i = 0; i < nFields; i += 1) {
-      if (client.pressing) client.mouseField.interact(fields[i]);
-      if (client.wall) Object(_environment__WEBPACK_IMPORTED_MODULE_4__["default"])(fields[i]);
-
-      for (let j = 0; j < nFields; j += 1) fields[j].interact(fields[i]);
-    }
-
-    for (let i = 0; i < nParticles; i += 1) particles[i].update();
-    for (let i = 0; i < nFields; i += 1) fields[i].update();
-
-    client.resetMouse();
+    const nParticles = state.particles.length;
+    const nFields = state.fields.length;
 
     display.reset();
-
     display.render(nParticles, nFields);
 
-    window.requestAnimationFrame(run);
+    client.handleActions(nParticles, nFields);
+    client.resetMouse();
+
+    state.update(nParticles, nFields);
+    state.cleanup();
   };
 
   // testing only
-  window.display = display;
-  window.fields = state.fields;
-  window.client = client;
-  window.Vector = _vector__WEBPACK_IMPORTED_MODULE_3__["default"];
-  window.state = state;
+  // window.display = display;
+  // window.client = client;
+  // window.Vector = Vector;
+  // window.state = state;
 
   run();
 });
-
-
-/***/ }),
-
-/***/ "./src/environment.js":
-/*!****************************!*\
-  !*** ./src/environment.js ***!
-  \****************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./vector */ "./src/vector.js");
-
-
-const walls = particle => {
-  if (particle.pos.x > 1 || particle.pos.x < 0) {
-    particle.vel.scale(new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](-1, 1));
-  }
-
-  if (particle.pos.y > 1 || particle.pos.y < 0) {
-    particle.vel.scale(new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](1, -1));
-  }
-};
-
-/* harmony default export */ __webpack_exports__["default"] = (walls);
 
 
 /***/ }),
@@ -603,7 +570,7 @@ class Particle {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 class State {
-  constructor(particles, fields) {
+  constructor(particles = [], fields = []) {
     this.particles = particles;
     this.fields = fields;
   }
@@ -613,6 +580,19 @@ class State {
       particle => particle.protected,
     );
     this.fields = this.fields.filter(field => field.protected);
+  }
+
+  update(nParticles, nFields) {
+    for (let i = 0; i < nParticles; i += 1) {
+      for (let j = 0; j < nFields; j += 1) this.fields[j].interact(this.particles[i]);
+    }
+
+    for (let i = 0; i < nFields; i += 1) {
+      for (let j = 0; j < nFields; j += 1) this.fields[j].interact(this.fields[i]);
+    }
+
+    for (let i = 0; i < nParticles; i += 1) this.particles[i].update();
+    for (let i = 0; i < nFields; i += 1) this.fields[i].update();
   }
 }
 

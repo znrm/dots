@@ -4,16 +4,15 @@ import Field from './field';
 
 class Client {
   constructor(state) {
+    this.state = state;
+
     this.mouse = new Vector(0, 0);
-    this.mouseHistory = Array.from({ length: 2 }, () => new Vector(0, 0));
+    this.mouseHistory = Array.from({ length: 3 }, () => new Vector(0, 0));
 
     this.wall = true;
     this.pressing = false;
-    this.previousMouse = [];
-
-    this.state = state;
-
     this.selectedAction = 2;
+
     this.actions = {
       1: 'mouseField',
       2: 'newGravityField',
@@ -29,10 +28,6 @@ class Client {
     return Vector.clone(this.mouse)
       .scale(2)
       .subtract(this.mouseHistory[0]);
-  }
-
-  get mouseAction() {
-    return this[this.actions[this.selectedAction]];
   }
 
   resetMouse() {
@@ -63,9 +58,36 @@ class Client {
       particles.push(
         new Particle({
           vel: Vector.randomDir(0.00005),
-          pos: Vector.random().scale(0.01).add(this.mouse),
+          pos: Vector.random()
+            .scale(0.01)
+            .add(this.mouse),
         }),
       );
+    }
+  }
+
+  walls(particle) {
+    if (this.walls) {
+      if (particle.pos.x > 1 || particle.pos.x < 0) {
+        particle.vel.scale(new Vector(-1, 1));
+      }
+
+      if (particle.pos.y > 1 || particle.pos.y < 0) {
+        particle.vel.scale(new Vector(1, -1));
+      }
+    }
+  }
+
+  handleActions(nParticles, nFields) {
+    const { particles, fields } = this.state;
+
+    for (let i = 0; i < nParticles; i += 1) {
+      if (this.pressing) this.mouseField.interact(particles[i]);
+      if (this.wall) this.walls(particles[i]);
+    }
+    for (let i = 0; i < nFields; i += 1) {
+      if (this.pressing) this.mouseField.interact(fields[i]);
+      if (this.wall) this.walls(fields[i]);
     }
   }
 
@@ -91,7 +113,7 @@ class Client {
       this.pressing = true;
 
       if (this.selectedAction !== 1) {
-        this.mouseAction();
+        this[this.actions[this.selectedAction]]();
       }
     };
 
@@ -106,6 +128,18 @@ class Client {
     document.onmouseup = () => {
       this.pressing = false;
     };
+
+    const { wall } = this;
+
+    document
+      .getElementById('wall')
+      .addEventListener('click', function wallButton() {
+        if (wall) {
+          this.classList.remove('strike');
+        } else {
+          this.classList.add('strike');
+        }
+      });
   }
 
   integrateUI() {
