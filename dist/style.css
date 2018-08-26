@@ -7,7 +7,8 @@ body {
   font-family: 'Courier New', Courier, monospace;
 }
 
-li, ul {
+li,
+ul {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -19,7 +20,7 @@ canvas {
 
 .options {
   cursor: initial;
-  display:inline-block;
+  display: inline-block;
   max-height: 80%;
   position: absolute;
   right: -80px;
@@ -32,6 +33,13 @@ canvas {
 }
 
 .options ul {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
   display: flex;
   justify-content: space-around;
   flex-direction: column;
@@ -57,4 +65,8 @@ canvas {
   text-align: center;
   padding: 0 5px;
   cursor: pointer;
+}
+
+.strike {
+  text-decoration-line: line-through;
 }
