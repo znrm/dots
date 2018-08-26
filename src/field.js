@@ -1,7 +1,7 @@
 import Particle from './particle';
 
 const RADIAL_CONSTANT = 1e-3;
-const GRAVITATIONAL_CONSTANT = -1e-8;
+const FUN_CONSTANT = -15e-9;
 
 class Field extends Particle {
   constructor({ pos, vel, acc, mass, charge, fieldType, radius }) {
@@ -17,7 +17,7 @@ class Field extends Particle {
   }
 
   isInRadius({ pos }) {
-    const distance = this.pos.dist(pos);
+    const distance = this.pos.sqDist(pos);
 
     return distance && distance < this.radius;
   }
@@ -27,26 +27,33 @@ class Field extends Particle {
   }
 
   grab(particle) {
-    if (this.pos.dist(particle.pos) < 0.03) {
+    if (this.pos.sqDist(particle.pos) < 0.03) {
       const { x, y } = this.pos;
       particle.pos.moveTo(x, y);
     }
   }
 
   radialPush(particle) {
-    particle.moveAwayFrom(this.radius - this.pos.dist(particle.pos), this.pos);
+    particle.moveAwayFrom(
+      this.radius - this.pos.sqDist(particle.pos),
+      this.pos,
+    );
   }
 
   constRadialAcc(particle) {
     particle.receiveFrom(RADIAL_CONSTANT, this.pos);
   }
 
-  invSquare(particle) {
+  funCombinationField(particle) {
     const sqDistance = this.pos.sqDist(particle.pos);
-    if (sqDistance > 0.00005) {
-      particle.receiveFrom(GRAVITATIONAL_CONSTANT / sqDistance, this.pos);
-    } else {
-      particle.receiveFrom(GRAVITATIONAL_CONSTANT / this.pos.dist(particle.pos), this.pos);
+    if (sqDistance > 5e-3) {
+      particle.receiveFrom((this.mass * FUN_CONSTANT) / sqDistance, this.pos);
+    } else if (sqDistance > 5e-7 * this.mass) {
+      particle.receiveFrom((this.mass * FUN_CONSTANT) / 5e-3, this.pos);
+    } else if (this.protected && particle.protected) {
+      this.mass += particle.mass;
+      this.vel = particle.momentum.add(this.momentum).scale(1 / (this.mass + particle.mass));
+      particle.delete();
     }
   }
 }
