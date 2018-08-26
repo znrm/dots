@@ -48,7 +48,7 @@ class Particle {
 
   static random(initial) {
     const pos = initial || Vector.random();
-    const vel = Vector.randomDir(0.001);
+    const vel = Vector.randomDir(0.00005);
 
     return new Particle({ pos, vel });
   }

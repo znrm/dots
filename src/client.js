@@ -17,7 +17,7 @@ class Client {
     this.actions = {
       1: 'mouseField',
       2: 'newGravityField',
-      3: 'shootDots',
+      3: 'makeDots',
     };
 
     this.addEvents();
@@ -49,7 +49,7 @@ class Client {
     fields.push(
       new Field({
         fieldType: 'funCombinationField',
-        mass: 1 + 10 * Math.random(),
+        mass: 1 + 5 * Math.random(),
         pos: Vector.clone(this.mouse),
         vel: this.pointer.subtract(this.mouse).scale(0.08),
         radius: 100,
@@ -57,13 +57,13 @@ class Client {
     );
   }
 
-  shootDots() {
+  makeDots() {
     const { particles } = this.state;
     for (let i = 0; i < 100; i += 1) {
       particles.push(
         new Particle({
           vel: Vector.randomDir(0.00005),
-          pos: Vector.clone(this.mouse),
+          pos: Vector.random().scale(0.01).add(this.mouse),
         }),
       );
     }

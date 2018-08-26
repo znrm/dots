@@ -2,6 +2,13 @@
 
 An entertaining, surprisingly sophisticated particle playground.
 
+[Try it live!](https://znrm.github.io/dots/)
+
+----
+This readme is a work in progress.
+
+----
+
 ## Features & Code Overview
 
 ### Vector Prototype
@@ -39,12 +46,7 @@ for (let i = 0; i < nFields; i += 1) {
   }
 }
 ```
-
 ### User Interface
-
-### Separation of Concerns
-
-### Particles and Fields
 
 ## Performance
 

@@ -1,5 +1,6 @@
 html,
 body {
+  background-color: black;
   overflow: hidden;
   margin: 0;
   height: 100vh;
@@ -63,8 +64,13 @@ canvas {
 .options-text {
   color: rgba(255, 255, 255, 0.6);
   text-align: center;
-  padding: 0 5px;
+  padding: 5px;
   cursor: pointer;
+}
+
+.options-text:hover{
+  color: rgba(255, 255, 255, 1);
+  font-weight: bold;
 }
 
 .strike {

@@ -8,7 +8,7 @@ import State from './state';
 
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.querySelector('canvas');
-  const state = new State(Particle.randomStart(0), [
+  const state = new State(Particle.randomStart(1000), [
     new Field({ pos: new Vector() }),
   ]);
 

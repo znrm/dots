@@ -117,7 +117,7 @@ class Client {
     this.actions = {
       1: 'mouseField',
       2: 'newGravityField',
-      3: 'shootDots',
+      3: 'makeDots',
     };
 
     this.addEvents();
@@ -149,7 +149,7 @@ class Client {
     fields.push(
       new _field__WEBPACK_IMPORTED_MODULE_2__["default"]({
         fieldType: 'funCombinationField',
-        mass: 1 + 10 * Math.random(),
+        mass: 1 + 5 * Math.random(),
         pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse),
         vel: this.pointer.subtract(this.mouse).scale(0.08),
         radius: 100,
@@ -157,13 +157,13 @@ class Client {
     );
   }
 
-  shootDots() {
+  makeDots() {
     const { particles } = this.state;
     for (let i = 0; i < 100; i += 1) {
       particles.push(
         new _particle__WEBPACK_IMPORTED_MODULE_1__["default"]({
           vel: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
-          pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse),
+          pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].random().scale(0.01).add(this.mouse),
         }),
       );
     }
@@ -349,7 +349,7 @@ __webpack_require__.r(__webpack_exports__);
 
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.querySelector('canvas');
-  const state = new _state__WEBPACK_IMPORTED_MODULE_6__["default"](_particle__WEBPACK_IMPORTED_MODULE_2__["default"].randomStart(0), [
+  const state = new _state__WEBPACK_IMPORTED_MODULE_6__["default"](_particle__WEBPACK_IMPORTED_MODULE_2__["default"].randomStart(1000), [
     new _field__WEBPACK_IMPORTED_MODULE_5__["default"]({ pos: new _vector__WEBPACK_IMPORTED_MODULE_3__["default"]() }),
   ]);
 
@@ -542,6 +542,10 @@ class Particle {
     this.protected = true;
   }
 
+  get momentum() {
+    return _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.vel).scale(this.mass);
+  }
+
   update() {
     this.pos.add(this.vel.add(this.acc));
     this.acc.moveTo(0, 0);
@@ -550,10 +554,6 @@ class Particle {
 
   delete() {
     this.protected = false;
-  }
-
-  get momentum() {
-    return _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.vel).scale(this.mass);
   }
 
   receiveFrom(amount, location) {
@@ -574,7 +574,7 @@ class Particle {
 
   static random(initial) {
     const pos = initial || _vector__WEBPACK_IMPORTED_MODULE_0__["default"].random();
-    const vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.001);
+    const vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005);
 
     return new Particle({ pos, vel });
   }
