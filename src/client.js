@@ -3,7 +3,7 @@ import Particle from './particle';
 import Field from './field';
 
 class Client {
-  constructor(particles, fields) {
+  constructor(state) {
     this.mouse = new Vector(0, 0);
     this.mouseHistory = Array.from({ length: 2 }, () => new Vector(0, 0));
 
@@ -11,14 +11,13 @@ class Client {
     this.pressing = false;
     this.previousMouse = [];
 
-    this.particles = particles;
-    this.fields = fields;
+    this.state = state;
 
     this.selectedAction = 2;
     this.actions = {
       1: 'mouseField',
       2: 'newGravityField',
-      3: 'makeDots',
+      3: 'shootDots',
     };
 
     this.addEvents();
@@ -41,19 +40,33 @@ class Client {
   }
 
   newParticle() {
-    this.particles.push(Particle.random(this.mouse));
+    const { particles } = this.state;
+    particles.push(Particle.random(this.mouse));
   }
 
   newGravityField() {
-    this.fields.push(
+    const { fields } = this.state;
+    fields.push(
       new Field({
-        fieldType: 'invSquare',
+        fieldType: 'funCombinationField',
         mass: 1 + 10 * Math.random(),
         pos: Vector.clone(this.mouse),
-        vel: this.pointer.subtract(this.mouse).scale(0.05),
-        radius: 5,
+        vel: this.pointer.subtract(this.mouse).scale(0.08),
+        radius: 100,
       }),
     );
+  }
+
+  shootDots() {
+    const { particles } = this.state;
+    for (let i = 0; i < 100; i += 1) {
+      particles.push(
+        new Particle({
+          vel: Vector.randomDir(0.00005),
+          pos: Vector.clone(this.mouse),
+        }),
+      );
+    }
   }
 
   recordMouse(prevMouse) {
@@ -65,12 +78,12 @@ class Client {
     this.mouseField = new Field({
       pos: this.mouse,
       fieldType: 'noEffect',
-      radius: 0.04,
+      radius: 0.01,
     });
   }
 
   addEvents() {
-    document.onmousedown = e => {
+    document.querySelector('canvas').onmousedown = e => {
       this.mouse.moveTo(
         e.clientX / window.innerWidth,
         e.clientY / window.innerHeight,
@@ -104,11 +117,15 @@ class Client {
           break;
         case 'make':
           this.mouseField.fieldType = 'noEffect';
-          this.selectedAction = 2;
+          this.selectedAction = 3;
           break;
         case 'grab':
           this.mouseField.fieldType = 'grab';
           this.selectedAction = 1;
+          break;
+        case 'shoot':
+          this.mouseField.fieldType = 'noEffect';
+          this.selectedAction = 2;
           break;
         case 'wall':
           this.wall = !this.wall;
