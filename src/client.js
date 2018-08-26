@@ -8,6 +8,8 @@ class Client {
 
     this.mouse = new Vector(0, 0);
     this.mouseHistory = Array.from({ length: 3 }, () => new Vector(0, 0));
+    this.displayWidth = window.innerWidth;
+    this.displayHeight = window.innerHeight;
 
     this.wall = true;
     this.pressing = false;
@@ -44,9 +46,9 @@ class Client {
     fields.push(
       new Field({
         fieldType: 'funCombinationField',
-        mass: 1 + 5 * Math.random(),
+        mass: 1 + 10 * Math.random(),
         pos: Vector.clone(this.mouse),
-        vel: this.pointer.subtract(this.mouse).scale(0.08),
+        vel: this.pointer.subtract(this.mouse).scale(0.04),
         radius: 100,
       }),
     );
@@ -58,9 +60,7 @@ class Client {
       particles.push(
         new Particle({
           vel: Vector.randomDir(0.00005),
-          pos: Vector.random()
-            .scale(0.01)
-            .add(this.mouse),
+          pos: Vector.randomDir(0.01).add(this.mouse),
         }),
       );
     }
@@ -69,11 +69,11 @@ class Client {
   walls(particle) {
     if (this.walls) {
       if (particle.pos.x > 1 || particle.pos.x < 0) {
-        particle.vel.scale(new Vector(-1, 1));
+        particle.vel.subtract(new Vector(particle.vel.x, 0).scale(2));
       }
 
       if (particle.pos.y > 1 || particle.pos.y < 0) {
-        particle.vel.scale(new Vector(1, -1));
+        particle.vel.subtract(new Vector(0, particle.vel.y).scale(2));
       }
     }
   }
@@ -83,11 +83,11 @@ class Client {
 
     for (let i = 0; i < nParticles; i += 1) {
       if (this.pressing) this.mouseField.interact(particles[i]);
-      if (this.wall) this.walls(particles[i]);
+      this.walls(particles[i]);
     }
     for (let i = 0; i < nFields; i += 1) {
       if (this.pressing) this.mouseField.interact(fields[i]);
-      if (this.wall) this.walls(fields[i]);
+      this.walls(fields[i]);
     }
   }
 
@@ -107,8 +107,8 @@ class Client {
   addEvents() {
     document.querySelector('canvas').onmousedown = e => {
       this.mouse.moveTo(
-        e.clientX / window.innerWidth,
-        e.clientY / window.innerHeight,
+        e.clientX / this.displayWidth,
+        e.clientY / this.displayHeight,
       );
       this.pressing = true;
 
@@ -120,8 +120,8 @@ class Client {
     document.onmousemove = e => {
       this.recordMouse(this.mouse);
       this.mouse.moveTo(
-        e.clientX / window.innerWidth,
-        e.clientY / window.innerHeight,
+        e.clientX / this.displayWidth,
+        e.clientY / this.displayHeight,
       );
     };
 
@@ -135,9 +135,9 @@ class Client {
       .getElementById('wall')
       .addEventListener('click', function wallButton() {
         if (wall) {
-          this.classList.remove('strike');
-        } else {
           this.classList.add('strike');
+        } else {
+          this.classList.remove('strike');
         }
       });
   }

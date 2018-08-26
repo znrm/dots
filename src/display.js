@@ -23,6 +23,8 @@ class Display {
   resize() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
+    this.client.displayWidth = this.width;
+    this.client.displayHeight = this.height;
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.ctx.fillStyle = 'rgba(255,255,255,1)';

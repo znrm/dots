@@ -1,6 +1,7 @@
 import Display from './display';
 import Client from './client';
 import State from './state';
+import Vector from './vector';
 
 document.addEventListener('DOMContentLoaded', () => {
   const state = new State();
@@ -22,12 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     state.update(nParticles, nFields);
     state.cleanup();
   };
-
-  // testing only
-  // window.display = display;
-  // window.client = client;
-  // window.Vector = Vector;
-  // window.state = state;
-
+  window.Vector = Vector;
   run();
 });

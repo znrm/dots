@@ -108,6 +108,8 @@ class Client {
 
     this.mouse = new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0);
     this.mouseHistory = Array.from({ length: 3 }, () => new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0));
+    this.displayWidth = window.innerWidth;
+    this.displayHeight = window.innerHeight;
 
     this.wall = true;
     this.pressing = false;
@@ -144,9 +146,9 @@ class Client {
     fields.push(
       new _field__WEBPACK_IMPORTED_MODULE_2__["default"]({
         fieldType: 'funCombinationField',
-        mass: 1 + 5 * Math.random(),
+        mass: 1 + 10 * Math.random(),
         pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse),
-        vel: this.pointer.subtract(this.mouse).scale(0.08),
+        vel: this.pointer.subtract(this.mouse).scale(0.04),
         radius: 100,
       }),
     );
@@ -158,9 +160,7 @@ class Client {
       particles.push(
         new _particle__WEBPACK_IMPORTED_MODULE_1__["default"]({
           vel: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
-          pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].random()
-            .scale(0.01)
-            .add(this.mouse),
+          pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.01).add(this.mouse),
         }),
       );
     }
@@ -169,11 +169,11 @@ class Client {
   walls(particle) {
     if (this.walls) {
       if (particle.pos.x > 1 || particle.pos.x < 0) {
-        particle.vel.scale(new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](-1, 1));
+        particle.vel.subtract(new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](particle.vel.x, 0).scale(2));
       }
 
       if (particle.pos.y > 1 || particle.pos.y < 0) {
-        particle.vel.scale(new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](1, -1));
+        particle.vel.subtract(new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, particle.vel.y).scale(2));
       }
     }
   }
@@ -183,11 +183,11 @@ class Client {
 
     for (let i = 0; i < nParticles; i += 1) {
       if (this.pressing) this.mouseField.interact(particles[i]);
-      if (this.wall) this.walls(particles[i]);
+      this.walls(particles[i]);
     }
     for (let i = 0; i < nFields; i += 1) {
       if (this.pressing) this.mouseField.interact(fields[i]);
-      if (this.wall) this.walls(fields[i]);
+      this.walls(fields[i]);
     }
   }
 
@@ -207,8 +207,8 @@ class Client {
   addEvents() {
     document.querySelector('canvas').onmousedown = e => {
       this.mouse.moveTo(
-        e.clientX / window.innerWidth,
-        e.clientY / window.innerHeight,
+        e.clientX / this.displayWidth,
+        e.clientY / this.displayHeight,
       );
       this.pressing = true;
 
@@ -220,8 +220,8 @@ class Client {
     document.onmousemove = e => {
       this.recordMouse(this.mouse);
       this.mouse.moveTo(
-        e.clientX / window.innerWidth,
-        e.clientY / window.innerHeight,
+        e.clientX / this.displayWidth,
+        e.clientY / this.displayHeight,
       );
     };
 
@@ -235,9 +235,9 @@ class Client {
       .getElementById('wall')
       .addEventListener('click', function wallButton() {
         if (wall) {
-          this.classList.remove('strike');
-        } else {
           this.classList.add('strike');
+        } else {
+          this.classList.remove('strike');
         }
       });
   }
@@ -310,6 +310,8 @@ class Display {
   resize() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
+    this.client.displayWidth = this.width;
+    this.client.displayHeight = this.height;
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.ctx.fillStyle = 'rgba(255,255,255,1)';
@@ -369,6 +371,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _display__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./display */ "./src/display.js");
 /* harmony import */ var _client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./client */ "./src/client.js");
 /* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./state */ "./src/state.js");
+/* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./vector */ "./src/vector.js");
+
 
 
 
@@ -393,13 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.update(nParticles, nFields);
     state.cleanup();
   };
-
-  // testing only
-  // window.display = display;
-  // window.client = client;
-  // window.Vector = Vector;
-  // window.state = state;
-
+  window.Vector = _vector__WEBPACK_IMPORTED_MODULE_3__["default"];
   run();
 });
 
@@ -416,9 +414,10 @@ document.addEventListener('DOMContentLoaded', () => {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _particle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./particle */ "./src/particle.js");
+/* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./vector */ "./src/vector.js");
 
 
-const RADIAL_CONSTANT = 1e-3;
+
 const FUN_CONSTANT = -15e-9;
 
 class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
@@ -429,15 +428,23 @@ class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   interact(particle) {
-    if (this.isInRadius(particle)) {
+    if (this.isInRadius(particle.pos)) {
       this[this.fieldType](particle);
     }
   }
 
-  isInRadius({ pos }) {
+  isInRadius(pos) {
     const distance = this.pos.sqDist(pos);
 
     return distance && distance < this.radius;
+  }
+
+  radialAccelerate(particle, amount) {
+    particle.accelerate(
+      _vector__WEBPACK_IMPORTED_MODULE_1__["default"].clone(particle.pos)
+        .subtract(this.pos)
+        .scale(amount),
+    );
   }
 
   noEffect() {
@@ -447,7 +454,8 @@ class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   grab(particle) {
     if (this.pos.sqDist(particle.pos) < 0.03) {
       const { x, y } = this.pos;
-      particle.pos.moveTo(x, y);
+      const difference = new _vector__WEBPACK_IMPORTED_MODULE_1__["default"](x, y).subtract(particle.pos);
+      particle.pos.moveTo(x, y).add(difference);
     }
   }
 
@@ -458,19 +466,23 @@ class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
     );
   }
 
-  constRadialAcc(particle) {
-    particle.receiveFrom(RADIAL_CONSTANT, this.pos);
-  }
-
   funCombinationField(particle) {
     const sqDistance = this.pos.sqDist(particle.pos);
     if (sqDistance > 5e-3) {
-      particle.receiveFrom((this.mass * FUN_CONSTANT) / sqDistance, this.pos);
+      this.radialAccelerate(
+        particle,
+        this.mass * FUN_CONSTANT / (this.pos.dist(particle.pos) * sqDistance),
+      );
     } else if (sqDistance > 5e-7 * this.mass) {
-      particle.receiveFrom((this.mass * FUN_CONSTANT) / 5e-3, this.pos);
+      this.radialAccelerate(
+        particle,
+        this.mass * FUN_CONSTANT / sqDistance,
+      );
     } else if (this.protected && particle.protected) {
       this.mass += particle.mass;
-      this.vel = particle.momentum.add(this.momentum).scale(1 / (this.mass + particle.mass));
+      this.vel = particle.momentum
+        .add(this.momentum)
+        .scale(1 / (this.mass + particle.mass));
       particle.delete();
     }
   }
@@ -523,10 +535,13 @@ class Particle {
     this.protected = false;
   }
 
+  accelerate(amount) {
+    this.acc.add(amount);
+  }
+
   receiveFrom(amount, location) {
     this.acc.add(
       _vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location)
-        .normalize()
         .scale(amount),
     );
   }
@@ -534,7 +549,6 @@ class Particle {
   moveAwayFrom(distance, location) {
     this.pos.add(
       _vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location)
-        .normalize()
         .scale(distance),
     );
   }
@@ -629,13 +643,8 @@ class Vector {
   }
 
   scale(that) {
-    if (that instanceof Object) {
-      this.x *= that.x;
-      this.y *= that.y;
-    } else {
-      this.x *= that;
-      this.y *= that;
-    }
+    this.x *= that;
+    this.y *= that;
     return this;
   }
 
@@ -645,19 +654,9 @@ class Vector {
     return this;
   }
 
-  project(onto) {
-    this.scale(Vector.clone(onto).normalize());
-    return this;
-  }
-
   normalize() {
-    const magnitude = this.magnitude();
-    if (magnitude === 0) {
-      this.x = 0;
-      this.y = 0;
-    } else {
-      this.scale({ x: 1 / magnitude, y: 1 / magnitude });
-    }
+    if (!this.x && !this.y) return this;
+    this.scale(1 / this.magnitude());
     return this;
   }
 
@@ -667,8 +666,14 @@ class Vector {
     return dX * dX + dY * dY;
   }
 
+  invCubedDist(that) {
+    return (1 / (this.dist(that) ** 3));
+  }
+
   dist(that) {
-    return Math.hypot(this.x - that.x, this.y - that.y);
+    const dX = this.x - that.x;
+    const dY = this.y - that.y;
+    return Math.hypot(dX, dY);
   }
 
   dot(that) {
@@ -699,8 +704,8 @@ class Vector {
     return new Vector(0, 0);
   }
 
-  static clone(vector) {
-    return new Vector(vector.x, vector.y);
+  static clone(that) {
+    return new Vector(that.x, that.y);
   }
 
   static random() {

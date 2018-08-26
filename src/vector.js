@@ -17,13 +17,8 @@ class Vector {
   }
 
   scale(that) {
-    if (that instanceof Object) {
-      this.x *= that.x;
-      this.y *= that.y;
-    } else {
-      this.x *= that;
-      this.y *= that;
-    }
+    this.x *= that;
+    this.y *= that;
     return this;
   }
 
@@ -33,19 +28,9 @@ class Vector {
     return this;
   }
 
-  project(onto) {
-    this.scale(Vector.clone(onto).normalize());
-    return this;
-  }
-
   normalize() {
-    const magnitude = this.magnitude();
-    if (magnitude === 0) {
-      this.x = 0;
-      this.y = 0;
-    } else {
-      this.scale({ x: 1 / magnitude, y: 1 / magnitude });
-    }
+    if (!this.x && !this.y) return this;
+    this.scale(1 / this.magnitude());
     return this;
   }
 
@@ -55,8 +40,14 @@ class Vector {
     return dX * dX + dY * dY;
   }
 
+  invCubedDist(that) {
+    return (1 / (this.dist(that) ** 3));
+  }
+
   dist(that) {
-    return Math.hypot(this.x - that.x, this.y - that.y);
+    const dX = this.x - that.x;
+    const dY = this.y - that.y;
+    return Math.hypot(dX, dY);
   }
 
   dot(that) {
@@ -87,8 +78,8 @@ class Vector {
     return new Vector(0, 0);
   }
 
-  static clone(vector) {
-    return new Vector(vector.x, vector.y);
+  static clone(that) {
+    return new Vector(that.x, that.y);
   }
 
   static random() {

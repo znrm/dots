@@ -30,10 +30,13 @@ class Particle {
     this.protected = false;
   }
 
+  accelerate(amount) {
+    this.acc.add(amount);
+  }
+
   receiveFrom(amount, location) {
     this.acc.add(
       Vector.direction(this.pos, location)
-        .normalize()
         .scale(amount),
     );
   }
@@ -41,7 +44,6 @@ class Particle {
   moveAwayFrom(distance, location) {
     this.pos.add(
       Vector.direction(this.pos, location)
-        .normalize()
         .scale(distance),
     );
   }
