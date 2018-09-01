@@ -1,7 +1,7 @@
 import Particle from './particle';
 import Vector from './vector';
 
-const FUN_CONSTANT = -15e-9;
+const FUN_CONSTANT = -3e-9;
 
 class Field extends Particle {
   constructor({ pos, vel, acc, mass, charge, fieldType, radius }) {

@@ -146,9 +146,9 @@ class Client {
     fields.push(
       new _field__WEBPACK_IMPORTED_MODULE_2__["default"]({
         fieldType: 'funCombinationField',
-        mass: 1 + 10 * Math.random(),
+        mass: 1 + 20 * Math.random(),
         pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse),
-        vel: this.pointer.subtract(this.mouse).scale(0.04),
+        vel: this.pointer.subtract(this.mouse).scale(0.03),
         radius: 100,
       }),
     );
@@ -183,11 +183,11 @@ class Client {
 
     for (let i = 0; i < nParticles; i += 1) {
       if (this.pressing) this.mouseField.interact(particles[i]);
-      this.walls(particles[i]);
+      if (this.wall) this.walls(particles[i]);
     }
     for (let i = 0; i < nFields; i += 1) {
       if (this.pressing) this.mouseField.interact(fields[i]);
-      this.walls(fields[i]);
+      if (this.wall) this.walls(fields[i]);
     }
   }
 
@@ -229,15 +229,18 @@ class Client {
       this.pressing = false;
     };
 
-    const { wall } = this;
+    const toggleWalls = () => {
+      this.wall = !this.wall;
+      return this.wall;
+    };
 
     document
       .getElementById('wall')
       .addEventListener('click', function wallButton() {
-        if (wall) {
-          this.classList.add('strike');
-        } else {
+        if (toggleWalls()) {
           this.classList.remove('strike');
+        } else {
+          this.classList.add('strike');
         }
       });
   }
@@ -253,16 +256,13 @@ class Client {
           this.mouseField.fieldType = 'noEffect';
           this.selectedAction = 3;
           break;
-        case 'grab':
-          this.mouseField.fieldType = 'grab';
+        case 'pull':
+          this.mouseField.fieldType = 'pull';
           this.selectedAction = 1;
           break;
         case 'shoot':
           this.mouseField.fieldType = 'noEffect';
           this.selectedAction = 2;
-          break;
-        case 'wall':
-          this.wall = !this.wall;
           break;
         default:
           break;
@@ -418,7 +418,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const FUN_CONSTANT = -15e-9;
+const FUN_CONSTANT = -3e-9;
 
 class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   constructor({ pos, vel, acc, mass, charge, fieldType, radius }) {
@@ -509,15 +509,16 @@ class Particle {
   constructor({
     pos = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
     vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
-    acc = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
-    mass = 0.1,
+    mass = 0.05,
     charge = 0,
+    action = null,
   }) {
     this.pos = pos;
     this.vel = vel;
-    this.acc = acc;
     this.mass = mass;
     this.charge = charge;
+    this.action = action;
+
     this.protected = true;
   }
 
@@ -526,9 +527,7 @@ class Particle {
   }
 
   update() {
-    this.pos.add(this.vel.add(this.acc));
-    this.acc.moveTo(0, 0);
-    return this.pos;
+    this.pos.add(this.vel);
   }
 
   delete() {
@@ -536,11 +535,11 @@ class Particle {
   }
 
   accelerate(amount) {
-    this.acc.add(amount);
+    this.vel.add(amount);
   }
 
   receiveFrom(amount, location) {
-    this.acc.add(
+    this.vel.add(
       _vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location)
         .scale(amount),
     );

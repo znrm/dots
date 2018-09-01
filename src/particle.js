@@ -4,15 +4,16 @@ class Particle {
   constructor({
     pos = Vector.origin(),
     vel = Vector.origin(),
-    acc = Vector.origin(),
-    mass = 0.1,
+    mass = 0.05,
     charge = 0,
+    action = null,
   }) {
     this.pos = pos;
     this.vel = vel;
-    this.acc = acc;
     this.mass = mass;
     this.charge = charge;
+    this.action = action;
+
     this.protected = true;
   }
 
@@ -21,9 +22,7 @@ class Particle {
   }
 
   update() {
-    this.pos.add(this.vel.add(this.acc));
-    this.acc.moveTo(0, 0);
-    return this.pos;
+    this.pos.add(this.vel);
   }
 
   delete() {
@@ -31,11 +30,11 @@ class Particle {
   }
 
   accelerate(amount) {
-    this.acc.add(amount);
+    this.vel.add(amount);
   }
 
   receiveFrom(amount, location) {
-    this.acc.add(
+    this.vel.add(
       Vector.direction(this.pos, location)
         .scale(amount),
     );

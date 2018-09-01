@@ -46,9 +46,9 @@ class Client {
     fields.push(
       new Field({
         fieldType: 'funCombinationField',
-        mass: 1 + 10 * Math.random(),
+        mass: 1 + 20 * Math.random(),
         pos: Vector.clone(this.mouse),
-        vel: this.pointer.subtract(this.mouse).scale(0.04),
+        vel: this.pointer.subtract(this.mouse).scale(0.03),
         radius: 100,
       }),
     );
@@ -83,11 +83,11 @@ class Client {
 
     for (let i = 0; i < nParticles; i += 1) {
       if (this.pressing) this.mouseField.interact(particles[i]);
-      this.walls(particles[i]);
+      if (this.wall) this.walls(particles[i]);
     }
     for (let i = 0; i < nFields; i += 1) {
       if (this.pressing) this.mouseField.interact(fields[i]);
-      this.walls(fields[i]);
+      if (this.wall) this.walls(fields[i]);
     }
   }
 
@@ -129,15 +129,18 @@ class Client {
       this.pressing = false;
     };
 
-    const { wall } = this;
+    const toggleWalls = () => {
+      this.wall = !this.wall;
+      return this.wall;
+    };
 
     document
       .getElementById('wall')
       .addEventListener('click', function wallButton() {
-        if (wall) {
-          this.classList.add('strike');
-        } else {
+        if (toggleWalls()) {
           this.classList.remove('strike');
+        } else {
+          this.classList.add('strike');
         }
       });
   }
@@ -153,16 +156,13 @@ class Client {
           this.mouseField.fieldType = 'noEffect';
           this.selectedAction = 3;
           break;
-        case 'grab':
-          this.mouseField.fieldType = 'grab';
+        case 'pull':
+          this.mouseField.fieldType = 'pull';
           this.selectedAction = 1;
           break;
         case 'shoot':
           this.mouseField.fieldType = 'noEffect';
           this.selectedAction = 2;
-          break;
-        case 'wall':
-          this.wall = !this.wall;
           break;
         default:
           break;
