@@ -3,6 +3,7 @@ import Vector from './vector';
 
 const FUN_CONSTANT = -3e-9;
 
+
 class Field extends Particle {
   constructor({ pos, vel, acc, mass, charge, fieldType, radius }) {
     super({ pos, vel, acc, mass, charge });
@@ -32,14 +33,6 @@ class Field extends Particle {
 
   noEffect() {
     return this.fieldType;
-  }
-
-  grab(particle) {
-    if (this.pos.sqDist(particle.pos) < 0.03) {
-      const { x, y } = this.pos;
-      const difference = new Vector(x, y).subtract(particle.pos);
-      particle.pos.moveTo(x, y).add(difference);
-    }
   }
 
   radialPush(particle) {

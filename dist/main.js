@@ -257,7 +257,7 @@ class Client {
           this.selectedAction = 3;
           break;
         case 'pull':
-          this.mouseField.fieldType = 'pull';
+          this.mouseField.fieldType = 'radialPull';
           this.selectedAction = 1;
           break;
         case 'shoot':
@@ -420,6 +420,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const FUN_CONSTANT = -3e-9;
 
+
 class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   constructor({ pos, vel, acc, mass, charge, fieldType, radius }) {
     super({ pos, vel, acc, mass, charge });
@@ -449,14 +450,6 @@ class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
   noEffect() {
     return this.fieldType;
-  }
-
-  grab(particle) {
-    if (this.pos.sqDist(particle.pos) < 0.03) {
-      const { x, y } = this.pos;
-      const difference = new _vector__WEBPACK_IMPORTED_MODULE_1__["default"](x, y).subtract(particle.pos);
-      particle.pos.moveTo(x, y).add(difference);
-    }
   }
 
   radialPush(particle) {

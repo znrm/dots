@@ -157,7 +157,7 @@ class Client {
           this.selectedAction = 3;
           break;
         case 'pull':
-          this.mouseField.fieldType = 'pull';
+          this.mouseField.fieldType = 'radialPull';
           this.selectedAction = 1;
           break;
         case 'shoot':
