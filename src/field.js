@@ -3,7 +3,6 @@ import Vector from './vector';
 
 const FUN_CONSTANT = -3e-9;
 
-
 class Field extends Particle {
   constructor({ pos, vel, acc, mass, charge, fieldType, radius }) {
     super({ pos, vel, acc, mass, charge });
@@ -27,7 +26,7 @@ class Field extends Particle {
     particle.accelerate(
       Vector.clone(particle.pos)
         .subtract(this.pos)
-        .scale(amount),
+        .scale(amount)
     );
   }
 
@@ -38,8 +37,23 @@ class Field extends Particle {
   radialPush(particle) {
     particle.moveAwayFrom(
       this.radius - this.pos.sqDist(particle.pos),
-      this.pos,
+      this.pos
     );
+  }
+
+  inverseSq(particle, sqDistance, constant) {
+    return (this.mass * constant) / (this.pos.dist(particle.pos) * sqDistance);
+  }
+
+  absorb(particle) {
+    this.mass += particle.mass;
+    particle.delete();
+  }
+
+  inelasticCollide(particle) {
+    this.vel = particle.momentum
+      .add(this.momentum)
+      .scale(1 / (this.mass + particle.mass));
   }
 
   funCombinationField(particle) {
@@ -47,19 +61,13 @@ class Field extends Particle {
     if (sqDistance > 5e-3) {
       this.radialAccelerate(
         particle,
-        this.mass * FUN_CONSTANT / (this.pos.dist(particle.pos) * sqDistance),
+        this.inverseSq(particle, sqDistance, FUN_CONSTANT)
       );
     } else if (sqDistance > 5e-7 * this.mass) {
-      this.radialAccelerate(
-        particle,
-        this.mass * FUN_CONSTANT / sqDistance,
-      );
+      this.radialAccelerate(particle, (this.mass * FUN_CONSTANT) / sqDistance);
     } else if (this.protected && particle.protected) {
-      this.mass += particle.mass;
-      this.vel = particle.momentum
-        .add(this.momentum)
-        .scale(1 / (this.mass + particle.mass));
-      particle.delete();
+      this.inelasticCollide(particle);
+      this.absorb(particle);
     }
   }
 }

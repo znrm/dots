@@ -47,6 +47,10 @@ class Particle {
     );
   }
 
+  interact(particle) {
+    this.action(particle);
+  }
+
   static random(initial) {
     const pos = initial || Vector.random();
     const vel = Vector.randomDir(0.00005);
