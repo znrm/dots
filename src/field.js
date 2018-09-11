@@ -35,9 +35,10 @@ class Field extends Particle {
   }
 
   radialPush(particle) {
-    particle.moveAwayFrom(
-      this.radius - this.pos.sqDist(particle.pos),
-      this.pos
+    particle.move(
+      Vector.direction(particle.pos, this.pos).scale(
+        this.radius - this.pos.sqDist(particle.pos)
+      )
     );
   }
 

@@ -40,10 +40,6 @@ class Vector {
     return dX * dX + dY * dY;
   }
 
-  invCubedDist(that) {
-    return (1 / (this.dist(that) ** 3));
-  }
-
   dist(that) {
     const dX = this.x - that.x;
     const dY = this.y - that.y;

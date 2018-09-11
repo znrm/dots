@@ -164,6 +164,9 @@ class Client {
           this.mouseField.fieldType = 'noEffect';
           this.selectedAction = 2;
           break;
+        case 'reset':
+          this.state.reset();
+          break;
         default:
           break;
       }

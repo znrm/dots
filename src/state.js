@@ -23,6 +23,11 @@ class State {
     for (let i = 0; i < nParticles; i += 1) this.particles[i].update();
     for (let i = 0; i < nFields; i += 1) this.fields[i].update();
   }
+
+  reset() {
+    this.particles = [];
+    this.fields = [];
+  }
 }
 
 export default State;

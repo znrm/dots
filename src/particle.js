@@ -25,12 +25,16 @@ class Particle {
     this.pos.add(this.vel);
   }
 
-  delete() {
-    this.protected = false;
-  }
-
   accelerate(amount) {
     this.vel.add(amount);
+  }
+
+  move(amount) {
+    this.pos.add(amount);
+  }
+
+  delete() {
+    this.protected = false;
   }
 
   receiveFrom(amount, location) {

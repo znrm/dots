@@ -264,6 +264,9 @@ class Client {
           this.mouseField.fieldType = 'noEffect';
           this.selectedAction = 2;
           break;
+        case 'reset':
+          this.state.reset();
+          break;
         default:
           break;
       }
@@ -452,9 +455,10 @@ class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   radialPush(particle) {
-    particle.moveAwayFrom(
-      this.radius - this.pos.sqDist(particle.pos),
-      this.pos
+    particle.move(
+      _vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(particle.pos, this.pos).scale(
+        this.radius - this.pos.sqDist(particle.pos)
+      )
     );
   }
 
@@ -531,12 +535,16 @@ class Particle {
     this.pos.add(this.vel);
   }
 
-  delete() {
-    this.protected = false;
-  }
-
   accelerate(amount) {
     this.vel.add(amount);
+  }
+
+  move(amount) {
+    this.pos.add(amount);
+  }
+
+  delete() {
+    this.protected = false;
   }
 
   receiveFrom(amount, location) {
@@ -612,6 +620,11 @@ class State {
     for (let i = 0; i < nParticles; i += 1) this.particles[i].update();
     for (let i = 0; i < nFields; i += 1) this.fields[i].update();
   }
+
+  reset() {
+    this.particles = [];
+    this.fields = [];
+  }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (State);
@@ -668,10 +681,6 @@ class Vector {
     const dX = this.x - that.x;
     const dY = this.y - that.y;
     return dX * dX + dY * dY;
-  }
-
-  invCubedDist(that) {
-    return (1 / (this.dist(that) ** 3));
   }
 
   dist(that) {
