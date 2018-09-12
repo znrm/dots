@@ -22,7 +22,6 @@ class Client {
     };
 
     this.addEvents();
-    this.integrateUI();
     this.createMouseField();
   }
 
@@ -50,7 +49,7 @@ class Client {
         pos: Vector.clone(this.mouse),
         vel: this.pointer.subtract(this.mouse).scale(0.03),
         radius: 100,
-      }),
+      })
     );
   }
 
@@ -61,7 +60,7 @@ class Client {
         new Particle({
           vel: Vector.randomDir(0.00005),
           pos: Vector.randomDir(0.01).add(this.mouse),
-        }),
+        })
       );
     }
   }
@@ -105,29 +104,20 @@ class Client {
   }
 
   addEvents() {
-    document.querySelector('canvas').onmousedown = e => {
-      this.mouse.moveTo(
-        e.clientX / this.displayWidth,
-        e.clientY / this.displayHeight,
-      );
-      this.pressing = true;
+    const ui = document.getElementById('ui');
+    const canvas = document.querySelector('canvas');
 
-      if (this.selectedAction !== 1) {
-        this[this.actions[this.selectedAction]]();
-      }
-    };
+    ui.onclick = this.integrateUI();
+    ui.ontouchstart = this.integrateUI();
 
-    document.onmousemove = e => {
-      this.recordMouse(this.mouse);
-      this.mouse.moveTo(
-        e.clientX / this.displayWidth,
-        e.clientY / this.displayHeight,
-      );
-    };
+    canvas.onmousedown = this.mouseDown();
+    canvas.ontouchstart = this.mouseDown();
 
-    document.onmouseup = () => {
-      this.pressing = false;
-    };
+    document.onmousemove = this.mouseMove();
+    document.ontouchmove = this.mouseMove();
+
+    document.onmouseup = this.mouseUp();
+    document.ontouchend = this.mouseUp();
 
     const toggleWalls = () => {
       this.wall = !this.wall;
@@ -145,8 +135,38 @@ class Client {
       });
   }
 
+  mouseDown() {
+    return e => {
+      this.mouse.moveTo(
+        e.clientX / this.displayWidth,
+        e.clientY / this.displayHeight
+      );
+      this.pressing = true;
+
+      if (this.selectedAction !== 1) {
+        this[this.actions[this.selectedAction]]();
+      }
+    };
+  }
+
+  mouseMove() {
+    return e => {
+      this.recordMouse(this.mouse);
+      this.mouse.moveTo(
+        e.clientX / this.displayWidth,
+        e.clientY / this.displayHeight
+      );
+    };
+  }
+
+  mouseUp() {
+    return () => {
+      this.pressing = false;
+    };
+  }
+
   integrateUI() {
-    document.getElementById('ui').onclick = e => {
+    return e => {
       switch (e.target.id) {
         case 'push':
           this.mouseField.fieldType = 'radialPush';

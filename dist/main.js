@@ -122,7 +122,6 @@ class Client {
     };
 
     this.addEvents();
-    this.integrateUI();
     this.createMouseField();
   }
 
@@ -150,7 +149,7 @@ class Client {
         pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse),
         vel: this.pointer.subtract(this.mouse).scale(0.03),
         radius: 100,
-      }),
+      })
     );
   }
 
@@ -161,7 +160,7 @@ class Client {
         new _particle__WEBPACK_IMPORTED_MODULE_1__["default"]({
           vel: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
           pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.01).add(this.mouse),
-        }),
+        })
       );
     }
   }
@@ -205,29 +204,20 @@ class Client {
   }
 
   addEvents() {
-    document.querySelector('canvas').onmousedown = e => {
-      this.mouse.moveTo(
-        e.clientX / this.displayWidth,
-        e.clientY / this.displayHeight,
-      );
-      this.pressing = true;
+    const ui = document.getElementById('ui');
+    const canvas = document.querySelector('canvas');
 
-      if (this.selectedAction !== 1) {
-        this[this.actions[this.selectedAction]]();
-      }
-    };
+    ui.onclick = this.integrateUI();
+    ui.ontouchstart = this.integrateUI();
 
-    document.onmousemove = e => {
-      this.recordMouse(this.mouse);
-      this.mouse.moveTo(
-        e.clientX / this.displayWidth,
-        e.clientY / this.displayHeight,
-      );
-    };
+    canvas.onmousedown = this.mouseDown();
+    canvas.ontouchstart = this.mouseDown();
 
-    document.onmouseup = () => {
-      this.pressing = false;
-    };
+    document.onmousemove = this.mouseMove();
+    document.ontouchmove = this.mouseMove();
+
+    document.onmouseup = this.mouseUp();
+    document.ontouchend = this.mouseUp();
 
     const toggleWalls = () => {
       this.wall = !this.wall;
@@ -245,8 +235,38 @@ class Client {
       });
   }
 
+  mouseDown() {
+    return e => {
+      this.mouse.moveTo(
+        e.clientX / this.displayWidth,
+        e.clientY / this.displayHeight
+      );
+      this.pressing = true;
+
+      if (this.selectedAction !== 1) {
+        this[this.actions[this.selectedAction]]();
+      }
+    };
+  }
+
+  mouseMove() {
+    return e => {
+      this.recordMouse(this.mouse);
+      this.mouse.moveTo(
+        e.clientX / this.displayWidth,
+        e.clientY / this.displayHeight
+      );
+    };
+  }
+
+  mouseUp() {
+    return () => {
+      this.pressing = false;
+    };
+  }
+
   integrateUI() {
-    document.getElementById('ui').onclick = e => {
+    return e => {
       switch (e.target.id) {
         case 'push':
           this.mouseField.fieldType = 'radialPush';
@@ -515,14 +535,12 @@ class Particle {
     pos = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
     vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
     mass = 0.05,
-    charge = 0,
-    action = null,
+    charge = 0
   }) {
     this.pos = pos;
     this.vel = vel;
     this.mass = mass;
     this.charge = charge;
-    this.action = action;
 
     this.protected = true;
   }
@@ -570,14 +588,6 @@ class Particle {
     const vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005);
 
     return new Particle({ pos, vel });
-  }
-
-  static randomStart(nParticles) {
-    const particles = [];
-    for (let i = 0; i < nParticles; i += 1) {
-      particles.push(Particle.random());
-    }
-    return particles;
   }
 }
 

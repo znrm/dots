@@ -5,14 +5,12 @@ class Particle {
     pos = Vector.origin(),
     vel = Vector.origin(),
     mass = 0.05,
-    charge = 0,
-    action = null,
+    charge = 0
   }) {
     this.pos = pos;
     this.vel = vel;
     this.mass = mass;
     this.charge = charge;
-    this.action = action;
 
     this.protected = true;
   }
@@ -60,14 +58,6 @@ class Particle {
     const vel = Vector.randomDir(0.00005);
 
     return new Particle({ pos, vel });
-  }
-
-  static randomStart(nParticles) {
-    const particles = [];
-    for (let i = 0; i < nParticles; i += 1) {
-      particles.push(Particle.random());
-    }
-    return particles;
   }
 }
 
