@@ -86,18 +86,63 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/client.js":
-/*!***********************!*\
-  !*** ./src/client.js ***!
-  \***********************/
+/***/ "./src/entry.js":
+/*!**********************!*\
+  !*** ./src/entry.js ***!
+  \**********************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _interface_display__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./interface/display */ "./src/interface/display.js");
+/* harmony import */ var _interface_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./interface/client */ "./src/interface/client.js");
+/* harmony import */ var _simulator_state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./simulator/state */ "./src/simulator/state.js");
+/* harmony import */ var _simulator_vector__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./simulator/vector */ "./src/simulator/vector.js");
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const state = new _simulator_state__WEBPACK_IMPORTED_MODULE_2__["default"]();
+  const client = new _interface_client__WEBPACK_IMPORTED_MODULE_1__["default"](state);
+  const display = new _interface_display__WEBPACK_IMPORTED_MODULE_0__["default"](state, client);
+
+  const run = () => {
+    window.requestAnimationFrame(run);
+
+    const nParticles = state.particles.length;
+    const nFields = state.fields.length;
+
+    display.reset();
+    display.render(nParticles, nFields);
+
+    client.handleActions(nParticles, nFields);
+    client.resetMouse();
+
+    state.update(nParticles, nFields);
+    state.cleanup();
+  };
+  window.Vector = _simulator_vector__WEBPACK_IMPORTED_MODULE_3__["default"];
+  run();
+});
+
+
+/***/ }),
+
+/***/ "./src/interface/client.js":
+/*!*********************************!*\
+  !*** ./src/interface/client.js ***!
+  \*********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./vector */ "./src/vector.js");
-/* harmony import */ var _particle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./particle */ "./src/particle.js");
-/* harmony import */ var _field__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./field */ "./src/field.js");
+/* harmony import */ var _simulator_vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../simulator/vector */ "./src/simulator/vector.js");
+/* harmony import */ var _simulator_particle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../simulator/particle */ "./src/simulator/particle.js");
+/* harmony import */ var _simulator_field__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../simulator/field */ "./src/simulator/field.js");
 
 
 
@@ -106,8 +151,8 @@ class Client {
   constructor(state) {
     this.state = state;
 
-    this.mouse = new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0);
-    this.mouseHistory = Array.from({ length: 3 }, () => new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0));
+    this.mouse = new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0);
+    this.mouseHistory = Array.from({ length: 3 }, () => new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0));
     this.displayWidth = window.innerWidth;
     this.displayHeight = window.innerHeight;
 
@@ -126,7 +171,7 @@ class Client {
   }
 
   get pointer() {
-    return _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse)
+    return _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse)
       .scale(2)
       .subtract(this.mouseHistory[0]);
   }
@@ -137,16 +182,16 @@ class Client {
 
   newParticle() {
     const { particles } = this.state;
-    particles.push(_particle__WEBPACK_IMPORTED_MODULE_1__["default"].random(this.mouse));
+    particles.push(_simulator_particle__WEBPACK_IMPORTED_MODULE_1__["default"].random(this.mouse));
   }
 
   newGravityField() {
     const { fields } = this.state;
     fields.push(
-      new _field__WEBPACK_IMPORTED_MODULE_2__["default"]({
+      new _simulator_field__WEBPACK_IMPORTED_MODULE_2__["default"]({
         fieldType: 'funCombinationField',
         mass: 1 + 20 * Math.random(),
-        pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse),
+        pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse),
         vel: this.pointer.subtract(this.mouse).scale(0.03),
         radius: 100,
       })
@@ -157,9 +202,9 @@ class Client {
     const { particles } = this.state;
     for (let i = 0; i < 100; i += 1) {
       particles.push(
-        new _particle__WEBPACK_IMPORTED_MODULE_1__["default"]({
-          vel: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
-          pos: _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.01).add(this.mouse),
+        new _simulator_particle__WEBPACK_IMPORTED_MODULE_1__["default"]({
+          vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
+          pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.01).add(this.mouse),
         })
       );
     }
@@ -168,11 +213,11 @@ class Client {
   walls(particle) {
     if (this.walls) {
       if (particle.pos.x > 1 || particle.pos.x < 0) {
-        particle.vel.subtract(new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](particle.vel.x, 0).scale(2));
+        particle.vel.subtract(new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](particle.vel.x, 0).scale(2));
       }
 
       if (particle.pos.y > 1 || particle.pos.y < 0) {
-        particle.vel.subtract(new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, particle.vel.y).scale(2));
+        particle.vel.subtract(new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, particle.vel.y).scale(2));
       }
     }
   }
@@ -192,11 +237,11 @@ class Client {
 
   recordMouse(prevMouse) {
     this.mouseHistory.shift();
-    this.mouseHistory.push(_vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(prevMouse));
+    this.mouseHistory.push(_simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(prevMouse));
   }
 
   createMouseField() {
-    this.mouseField = new _field__WEBPACK_IMPORTED_MODULE_2__["default"]({
+    this.mouseField = new _simulator_field__WEBPACK_IMPORTED_MODULE_2__["default"]({
       pos: this.mouse,
       fieldType: 'noEffect',
       radius: 0.01,
@@ -299,10 +344,10 @@ class Client {
 
 /***/ }),
 
-/***/ "./src/display.js":
-/*!************************!*\
-  !*** ./src/display.js ***!
-  \************************/
+/***/ "./src/interface/display.js":
+/*!**********************************!*\
+  !*** ./src/interface/display.js ***!
+  \**********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -382,62 +427,17 @@ class Display {
 
 /***/ }),
 
-/***/ "./src/entry.js":
-/*!**********************!*\
-  !*** ./src/entry.js ***!
-  \**********************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _display__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./display */ "./src/display.js");
-/* harmony import */ var _client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./client */ "./src/client.js");
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./state */ "./src/state.js");
-/* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./vector */ "./src/vector.js");
-
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  const state = new _state__WEBPACK_IMPORTED_MODULE_2__["default"]();
-  const client = new _client__WEBPACK_IMPORTED_MODULE_1__["default"](state);
-  const display = new _display__WEBPACK_IMPORTED_MODULE_0__["default"](state, client);
-
-  const run = () => {
-    window.requestAnimationFrame(run);
-
-    const nParticles = state.particles.length;
-    const nFields = state.fields.length;
-
-    display.reset();
-    display.render(nParticles, nFields);
-
-    client.handleActions(nParticles, nFields);
-    client.resetMouse();
-
-    state.update(nParticles, nFields);
-    state.cleanup();
-  };
-  window.Vector = _vector__WEBPACK_IMPORTED_MODULE_3__["default"];
-  run();
-});
-
-
-/***/ }),
-
-/***/ "./src/field.js":
-/*!**********************!*\
-  !*** ./src/field.js ***!
-  \**********************/
+/***/ "./src/simulator/field.js":
+/*!********************************!*\
+  !*** ./src/simulator/field.js ***!
+  \********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _particle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./particle */ "./src/particle.js");
-/* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./vector */ "./src/vector.js");
+/* harmony import */ var _particle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./particle */ "./src/simulator/particle.js");
+/* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./vector */ "./src/simulator/vector.js");
 
 
 
@@ -518,16 +518,16 @@ class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
-/***/ "./src/particle.js":
-/*!*************************!*\
-  !*** ./src/particle.js ***!
-  \*************************/
+/***/ "./src/simulator/particle.js":
+/*!***********************************!*\
+  !*** ./src/simulator/particle.js ***!
+  \***********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./vector */ "./src/vector.js");
+/* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./vector */ "./src/simulator/vector.js");
 
 
 class Particle {
@@ -596,10 +596,10 @@ class Particle {
 
 /***/ }),
 
-/***/ "./src/state.js":
-/*!**********************!*\
-  !*** ./src/state.js ***!
-  \**********************/
+/***/ "./src/simulator/state.js":
+/*!********************************!*\
+  !*** ./src/simulator/state.js ***!
+  \********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -642,10 +642,10 @@ class State {
 
 /***/ }),
 
-/***/ "./src/vector.js":
-/*!***********************!*\
-  !*** ./src/vector.js ***!
-  \***********************/
+/***/ "./src/simulator/vector.js":
+/*!*********************************!*\
+  !*** ./src/simulator/vector.js ***!
+  \*********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 

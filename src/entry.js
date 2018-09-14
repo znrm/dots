@@ -1,7 +1,7 @@
-import Display from './display';
-import Client from './client';
-import State from './state';
-import Vector from './vector';
+import Display from './interface/display';
+import Client from './interface/client';
+import State from './simulator/state';
+import Vector from './simulator/vector';
 
 document.addEventListener('DOMContentLoaded', () => {
   const state = new State();

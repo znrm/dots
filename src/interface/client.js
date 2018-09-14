@@ -1,6 +1,6 @@
-import Vector from './vector';
-import Particle from './particle';
-import Field from './field';
+import Vector from '../simulator/vector';
+import Particle from '../simulator/particle';
+import Field from '../simulator/field';
 
 class Client {
   constructor(state) {
