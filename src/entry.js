@@ -11,16 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const run = () => {
     window.requestAnimationFrame(run);
 
-    const nParticles = state.particles.length;
-    const nFields = state.fields.length;
-
     display.reset();
-    display.render(nParticles, nFields);
+    display.render();
 
-    client.handleActions(nParticles, nFields);
+    client.handleActions();
     client.resetMouse();
 
-    state.update(nParticles, nFields);
+    state.update();
     state.cleanup();
   };
   window.Vector = Vector;

@@ -65,7 +65,7 @@ canvas {
 .options-text {
   color: rgba(255, 255, 255, 0.6);
   text-align: center;
-  padding: 5px;
+  padding: 20px 0;
   cursor: pointer;
 }
 

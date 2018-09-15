@@ -13,8 +13,11 @@ class Display {
     window.onresize = () => this.resize();
   }
 
-  render(nParticles, nFields) {
+  render() {
     const { particles, fields } = this.state;
+    const nParticles = particles.length;
+    const nFields = fields.length;
+
     for (let i = 0; i < nParticles; i += 1) this.dot(particles[i]);
     for (let i = 0; i < nFields; i += 1) this.circle(fields[i]);
     this.mouse(this.client.mouse);

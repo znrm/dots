@@ -7,7 +7,7 @@ class Client {
     this.state = state;
 
     this.mouse = new Vector(0, 0);
-    this.mouseHistory = Array.from({ length: 3 }, () => new Vector(0, 0));
+    this.mouseHistory = Array.from({ length: 5 }, () => new Vector(0, 0));
     this.displayWidth = window.innerWidth;
     this.displayHeight = window.innerHeight;
 
@@ -26,9 +26,7 @@ class Client {
   }
 
   get pointer() {
-    return Vector.clone(this.mouse)
-      .scale(2)
-      .subtract(this.mouseHistory[0]);
+    return Vector.direction(this.mouse, this.mouseHistory[0]);
   }
 
   resetMouse() {
@@ -47,7 +45,7 @@ class Client {
         fieldType: 'funCombinationField',
         mass: 1 + 20 * Math.random(),
         pos: Vector.clone(this.mouse),
-        vel: this.pointer.subtract(this.mouse).scale(0.03),
+        vel: this.pointer.scale(0.002),
         radius: 100,
       })
     );
@@ -55,14 +53,13 @@ class Client {
 
   makeDots() {
     const { particles } = this.state;
-    for (let i = 0; i < 100; i += 1) {
-      particles.push(
-        new Particle({
-          vel: Vector.randomDir(0.00005),
-          pos: Vector.randomDir(0.01).add(this.mouse),
-        })
-      );
-    }
+
+    particles.push(
+      new Particle({
+        vel: Vector.randomDir(0.00005),
+        pos: Vector.randomDir(0.01).add(this.mouse),
+      })
+    );
   }
 
   walls(particle) {
@@ -77,8 +74,13 @@ class Client {
     }
   }
 
-  handleActions(nParticles, nFields) {
+  handleActions() {
     const { particles, fields } = this.state;
+    const nParticles = particles.length;
+    const nFields = fields.length;
+    if (this.pressing && this.selectedAction === 3) {
+      for (let i = 0; i < 5; i += 1) this.makeDots();
+    }
 
     for (let i = 0; i < nParticles; i += 1) {
       if (this.pressing) this.mouseField.interact(particles[i]);
@@ -186,6 +188,8 @@ class Client {
           break;
         case 'reset':
           this.state.reset();
+          break;
+        case 'paint':
           break;
         default:
           break;

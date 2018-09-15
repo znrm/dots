@@ -112,16 +112,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const run = () => {
     window.requestAnimationFrame(run);
 
-    const nParticles = state.particles.length;
-    const nFields = state.fields.length;
-
     display.reset();
-    display.render(nParticles, nFields);
+    display.render();
 
-    client.handleActions(nParticles, nFields);
+    client.handleActions();
     client.resetMouse();
 
-    state.update(nParticles, nFields);
+    state.update();
     state.cleanup();
   };
   window.Vector = _simulator_vector__WEBPACK_IMPORTED_MODULE_3__["default"];
@@ -152,7 +149,7 @@ class Client {
     this.state = state;
 
     this.mouse = new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0);
-    this.mouseHistory = Array.from({ length: 3 }, () => new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0));
+    this.mouseHistory = Array.from({ length: 5 }, () => new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0));
     this.displayWidth = window.innerWidth;
     this.displayHeight = window.innerHeight;
 
@@ -171,9 +168,7 @@ class Client {
   }
 
   get pointer() {
-    return _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse)
-      .scale(2)
-      .subtract(this.mouseHistory[0]);
+    return _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.mouse, this.mouseHistory[0]);
   }
 
   resetMouse() {
@@ -192,7 +187,7 @@ class Client {
         fieldType: 'funCombinationField',
         mass: 1 + 20 * Math.random(),
         pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse),
-        vel: this.pointer.subtract(this.mouse).scale(0.03),
+        vel: this.pointer.scale(0.002),
         radius: 100,
       })
     );
@@ -200,14 +195,13 @@ class Client {
 
   makeDots() {
     const { particles } = this.state;
-    for (let i = 0; i < 100; i += 1) {
-      particles.push(
-        new _simulator_particle__WEBPACK_IMPORTED_MODULE_1__["default"]({
-          vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
-          pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.01).add(this.mouse),
-        })
-      );
-    }
+
+    particles.push(
+      new _simulator_particle__WEBPACK_IMPORTED_MODULE_1__["default"]({
+        vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
+        pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.01).add(this.mouse),
+      })
+    );
   }
 
   walls(particle) {
@@ -222,8 +216,13 @@ class Client {
     }
   }
 
-  handleActions(nParticles, nFields) {
+  handleActions() {
     const { particles, fields } = this.state;
+    const nParticles = particles.length;
+    const nFields = fields.length;
+    if (this.pressing && this.selectedAction === 3) {
+      for (let i = 0; i < 5; i += 1) this.makeDots();
+    }
 
     for (let i = 0; i < nParticles; i += 1) {
       if (this.pressing) this.mouseField.interact(particles[i]);
@@ -332,6 +331,8 @@ class Client {
         case 'reset':
           this.state.reset();
           break;
+        case 'paint':
+          break;
         default:
           break;
       }
@@ -368,8 +369,11 @@ class Display {
     window.onresize = () => this.resize();
   }
 
-  render(nParticles, nFields) {
+  render() {
     const { particles, fields } = this.state;
+    const nParticles = particles.length;
+    const nFields = fields.length;
+
     for (let i = 0; i < nParticles; i += 1) this.dot(particles[i]);
     for (let i = 0; i < nFields; i += 1) this.circle(fields[i]);
     this.mouse(this.client.mouse);
@@ -612,19 +616,24 @@ class State {
   }
 
   cleanup() {
-    this.particles = this.particles.filter(
-      particle => particle.protected,
-    );
+    this.particles = this.particles.filter(particle => particle.protected);
     this.fields = this.fields.filter(field => field.protected);
   }
 
-  update(nParticles, nFields) {
+  update() {
+    const nParticles = this.particles.length;
+    const nFields = this.fields.length;
+
     for (let i = 0; i < nParticles; i += 1) {
-      for (let j = 0; j < nFields; j += 1) this.fields[j].interact(this.particles[i]);
+      for (let j = 0; j < nFields; j += 1) {
+        this.fields[j].interact(this.particles[i]);
+      }
     }
 
     for (let i = 0; i < nFields; i += 1) {
-      for (let j = 0; j < nFields; j += 1) this.fields[j].interact(this.fields[i]);
+      for (let j = 0; j < nFields; j += 1) {
+        this.fields[j].interact(this.fields[i]);
+      }
     }
 
     for (let i = 0; i < nParticles; i += 1) this.particles[i].update();
