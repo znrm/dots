@@ -144,6 +144,18 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+function buildUi() {
+  const buttonsRight = ['push', 'make many', 'make one', 'walls', 'reset'];
+
+  for (let i = 0; i < buttonsRight.length; i += 1) {
+    const uiElement = document.createElement('li');
+    uiElement.className = 'options-text';
+    uiElement.id = buttonsRight[i];
+    uiElement.innerText = buttonsRight[i];
+    document.getElementById('ui').appendChild(uiElement);
+  }
+}
+
 class Client {
   constructor(state) {
     this.state = state;
@@ -162,7 +174,7 @@ class Client {
       2: 'newGravityField',
       3: 'makeDots',
     };
-
+    buildUi();
     this.addEvents();
     this.createMouseField();
   }
@@ -269,7 +281,7 @@ class Client {
     };
 
     document
-      .getElementById('wall')
+      .getElementById('walls')
       .addEventListener('click', function wallButton() {
         if (toggleWalls()) {
           this.classList.remove('strike');
@@ -316,22 +328,16 @@ class Client {
           this.mouseField.fieldType = 'radialPush';
           this.selectedAction = 1;
           break;
-        case 'make':
+        case 'make many':
           this.mouseField.fieldType = 'noEffect';
           this.selectedAction = 3;
           break;
-        case 'pull':
-          this.mouseField.fieldType = 'radialPull';
-          this.selectedAction = 1;
-          break;
-        case 'shoot':
+        case 'make one':
           this.mouseField.fieldType = 'noEffect';
           this.selectedAction = 2;
           break;
         case 'reset':
           this.state.reset();
-          break;
-        case 'paint':
           break;
         default:
           break;
