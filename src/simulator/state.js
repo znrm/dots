@@ -21,7 +21,9 @@ class State {
   calculateInteractions(nParticles) {
     for (let i = 0; i < nParticles; i += 1) {
       for (let j = 0; j < nParticles; j += 1) {
-        this.particles[j].interact(this.particles[i]);
+        if (i !== j) {
+          this.particles[i].interact(this.particles[j]);
+        }
       }
     }
   }

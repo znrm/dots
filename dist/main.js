@@ -146,25 +146,19 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+const PAINT_RATE = 10;
+const PAINT_SPREAD = 0.02;
+
 class Client {
   constructor(state) {
     this.state = state;
 
     this.mouse = new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0);
     this.mouseHistory = Array.from({ length: 5 }, () => new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0));
-    this.displayWidth = window.innerWidth;
-    this.displayHeight = window.innerHeight;
 
     this.wall = true;
     this.pressing = false;
-    this.selectedAction = 0;
-
-    this.actions = {
-      0: 'noEffect',
-      1: 'mouseField',
-      2: 'newGravityField',
-      3: 'newParticle',
-    };
+    this.selectedAction = 'none';
 
     this.addEvents();
     this.createMouseField();
@@ -178,25 +172,35 @@ class Client {
     this.pressed = false;
   }
 
-  newGravityField() {
+  newLargeAttractor() {
     const { particles } = this.state;
+
     particles.push(
-      new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["default"]({
-        fieldType: 'funCombinationField',
+      new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["Attractor"]({
         mass: 1 + 20 * Math.random(),
         pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse),
         vel: this.pointer.scale(0.002),
-        radius: 100,
       })
     );
   }
 
-  newParticle() {
+  newAttractor() {
     const { particles } = this.state;
 
     particles.push(
-      new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["default"]({
-        fieldType: 'funCombinationField',
+      new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["Attractor"]({
+        mass: 0.05,
+        vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
+        pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(PAINT_SPREAD * Math.random()).add(this.mouse),
+      })
+    );
+  }
+
+  newHardSphere() {
+    const { particles } = this.state;
+
+    particles.push(
+      new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["Attractor"]({
         mass: 0.05,
         vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
         pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.01 * Math.random()).add(this.mouse),
@@ -227,24 +231,40 @@ class Client {
     }
   }
 
+  clickAction() {
+    if (this.selectedAction === 'make one') {
+      this.newLargeAttractor();
+    }
+  }
+
   continuousAction() {
     const { particles } = this.state;
     const nParticles = particles.length;
-    if (this.selectedAction === 3) {
-      for (let i = 0; i < 4; i += 1) this.newParticle();
-    }
 
-    for (let i = 0; i < nParticles; i += 1) {
-      this.mouseField.interact(particles[i]);
+    switch (this.selectedAction) {
+      case 'push':
+        for (let i = 0; i < nParticles; i += 1) {
+          this.mouseField.interact(particles[i]);
+        }
+        break;
+      case 'paint':
+        for (let i = 0; i <= PAINT_RATE; i += 1) this.newAttractor();
+        break;
+      default:
+        break;
     }
   }
 
   createMouseField() {
-    this.mouseField = new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["default"]({
+    this.mouseField = new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["HardSphere"]({
       pos: this.mouse,
-      fieldType: 'noEffect',
       radius: 0.01,
     });
+  }
+
+  toggleWalls() {
+    this.wall = !this.wall;
+    return this.wall;
   }
 
   addEvents() {
@@ -262,44 +282,28 @@ class Client {
 
     document.onmouseup = this.mouseUp();
     document.ontouchend = this.mouseUp();
-
-    const toggleWalls = () => {
-      this.wall = !this.wall;
-      return this.wall;
-    };
-
-    document
-      .getElementById('walls')
-      .addEventListener('click', function wallButton() {
-        if (toggleWalls()) {
-          this.classList.remove('strike');
-        } else {
-          this.classList.add('strike');
-        }
-      });
   }
 
   mouseDown() {
     return e => {
       this.mouse.moveTo(
-        e.clientX / this.displayWidth,
-        e.clientY / this.displayHeight
+        e.clientX / window.innerWidth,
+        e.clientY / window.innerHeight
       );
       this.pressing = true;
 
-      if (this.selectedAction > 1) {
-        this[this.actions[this.selectedAction]]();
-      }
+      this.clickAction();
     };
   }
 
   mouseMove() {
     return e => {
+      e.preventDefault();
       this.mouseHistory.shift();
       this.mouseHistory.push(_simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse));
       this.mouse.moveTo(
-        e.clientX / this.displayWidth,
-        e.clientY / this.displayHeight
+        e.clientX / window.innerWidth,
+        e.clientY / window.innerHeight
       );
     };
   }
@@ -314,20 +318,25 @@ class Client {
     return e => {
       switch (e.target.id) {
         case 'push':
-          this.mouseField.fieldType = 'radialPush';
-          this.selectedAction = 1;
+          this.selectedAction = 'push';
           break;
         case 'paint':
-          this.mouseField.fieldType = 'noEffect';
-          this.selectedAction = 3;
+          this.selectedAction = 'paint';
           break;
         case 'make one':
-          this.mouseField.fieldType = 'noEffect';
-          this.selectedAction = 2;
+          this.selectedAction = 'make one';
           break;
         case 'reset':
           this.state.reset();
           break;
+        case 'walls': {
+          if (this.toggleWalls()) {
+            e.target.classList.remove('strike');
+          } else {
+            e.target.classList.add('strike');
+          }
+          break;
+        }
         default:
           break;
       }
@@ -463,11 +472,13 @@ class UIElements {
 /*!********************************!*\
   !*** ./src/simulator/field.js ***!
   \********************************/
-/*! exports provided: default */
+/*! exports provided: Attractor, HardSphere */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Attractor", function() { return Attractor; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HardSphere", function() { return HardSphere; });
 /* harmony import */ var _particle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./particle */ "./src/simulator/particle.js");
 /* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./vector */ "./src/simulator/vector.js");
 
@@ -475,59 +486,8 @@ __webpack_require__.r(__webpack_exports__);
 
 const FUN_CONSTANT = -3e-9;
 
-class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  constructor({ pos, vel, acc, mass, charge, fieldType, radius }) {
-    super({ pos, vel, acc, mass, charge });
-    this.fieldType = fieldType || '';
-    this.radius = radius;
-  }
-
+class Attractor extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   interact(particle) {
-    if (this !== particle) {
-      this[this.fieldType](particle);
-    }
-  }
-
-  isInRadius(pos) {
-    const distance = this.pos.sqDist(pos);
-
-    return distance && distance < this.radius;
-  }
-
-  radialAccelerate(particle, amount) {
-    particle.accelerate(
-      _vector__WEBPACK_IMPORTED_MODULE_1__["default"].clone(particle.pos)
-        .subtract(this.pos)
-        .scale(amount)
-    );
-  }
-
-  noEffect() {
-    return this.fieldType;
-  }
-
-  radialPush(particle) {
-    if (this.isInRadius(particle.pos)) {
-      particle.move(
-        _vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(particle.pos, this.pos).scale(
-          this.radius - this.pos.sqDist(particle.pos)
-        )
-      );
-    }
-  }
-
-  absorb(particle) {
-    this.mass += particle.mass;
-    particle.delete();
-  }
-
-  inelasticCollide(particle) {
-    this.vel = particle.momentum
-      .add(this.momentum)
-      .scale(1 / (this.mass + particle.mass));
-  }
-
-  funCombinationField(particle) {
     const sqDistance = this.pos.sqDist(particle.pos);
     if (sqDistance > 5e-7 * this.mass) {
       this.radialAccelerate(particle, (this.mass * FUN_CONSTANT) / sqDistance);
@@ -538,7 +498,17 @@ class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 }
 
-/* harmony default export */ __webpack_exports__["default"] = (Field);
+class HardSphere extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
+  interact(particle) {
+    if (this.isInRadius(particle.pos)) {
+      particle.move(
+        _vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(particle.pos, this.pos).scale(
+          this.radius - this.pos.sqDist(particle.pos)
+        )
+      );
+    }
+  }
+}
 
 
 /***/ }),
@@ -557,15 +527,17 @@ __webpack_require__.r(__webpack_exports__);
 
 class Particle {
   constructor({
-    pos = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
-    vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
+    pos = new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0),
+    vel = new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0),
     mass = 0,
-    charge = 0
+    charge = 0,
+    radius = 0,
   }) {
     this.pos = pos;
     this.vel = vel;
     this.mass = mass;
     this.charge = charge;
+    this.radius = radius;
 
     this.protected = true;
   }
@@ -591,17 +563,36 @@ class Particle {
   }
 
   receiveFrom(amount, location) {
-    this.vel.add(
-      _vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location)
-        .scale(amount),
-    );
+    this.vel.add(_vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location).scale(amount));
   }
 
   moveAwayFrom(distance, location) {
-    this.pos.add(
-      _vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location)
-        .scale(distance),
+    this.pos.add(_vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location).scale(distance));
+  }
+
+  absorb(particle) {
+    this.mass += particle.mass;
+    particle.delete();
+  }
+
+  inelasticCollide(particle) {
+    this.vel = particle.momentum
+      .add(this.momentum)
+      .scale(1 / (this.mass + particle.mass));
+  }
+
+  radialAccelerate(particle, amount) {
+    particle.accelerate(
+      _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(particle.pos)
+        .subtract(this.pos)
+        .scale(amount)
     );
+  }
+
+  isInRadius(pos) {
+    const distance = this.pos.sqDist(pos);
+
+    return distance && distance < this.radius;
   }
 
   static random(initial) {
@@ -649,7 +640,9 @@ class State {
   calculateInteractions(nParticles) {
     for (let i = 0; i < nParticles; i += 1) {
       for (let j = 0; j < nParticles; j += 1) {
-        this.particles[j].interact(this.particles[i]);
+        if (i !== j) {
+          this.particles[i].interact(this.particles[j]);
+        }
       }
     }
   }

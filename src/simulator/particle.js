@@ -2,15 +2,17 @@ import Vector from './vector';
 
 class Particle {
   constructor({
-    pos = Vector.origin(),
-    vel = Vector.origin(),
+    pos = new Vector(0, 0),
+    vel = new Vector(0, 0),
     mass = 0,
-    charge = 0
+    charge = 0,
+    radius = 0,
   }) {
     this.pos = pos;
     this.vel = vel;
     this.mass = mass;
     this.charge = charge;
+    this.radius = radius;
 
     this.protected = true;
   }
@@ -36,17 +38,36 @@ class Particle {
   }
 
   receiveFrom(amount, location) {
-    this.vel.add(
-      Vector.direction(this.pos, location)
-        .scale(amount),
-    );
+    this.vel.add(Vector.direction(this.pos, location).scale(amount));
   }
 
   moveAwayFrom(distance, location) {
-    this.pos.add(
-      Vector.direction(this.pos, location)
-        .scale(distance),
+    this.pos.add(Vector.direction(this.pos, location).scale(distance));
+  }
+
+  absorb(particle) {
+    this.mass += particle.mass;
+    particle.delete();
+  }
+
+  inelasticCollide(particle) {
+    this.vel = particle.momentum
+      .add(this.momentum)
+      .scale(1 / (this.mass + particle.mass));
+  }
+
+  radialAccelerate(particle, amount) {
+    particle.accelerate(
+      Vector.clone(particle.pos)
+        .subtract(this.pos)
+        .scale(amount)
     );
+  }
+
+  isInRadius(pos) {
+    const distance = this.pos.sqDist(pos);
+
+    return distance && distance < this.radius;
   }
 
   static random(initial) {
