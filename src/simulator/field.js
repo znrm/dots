@@ -17,7 +17,7 @@ export class Attractor extends Particle {
 
 export class HardSphere extends Particle {
   interact(particle) {
-    if (this.isInRadius(particle.pos)) {
+    if (this.isInRadius(particle)) {
       particle.move(
         Vector.direction(particle.pos, this.pos).scale(
           this.radius - this.pos.sqDist(particle.pos)

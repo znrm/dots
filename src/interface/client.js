@@ -1,8 +1,9 @@
 import Vector from '../simulator/vector';
 import { HardSphere, Attractor } from '../simulator/field';
 
-const PAINT_RATE = 10;
+const PAINT_RATE = 1;
 const PAINT_SPREAD = 0.02;
+const PAINT_VELOCITY = 0.0001;
 
 class Client {
   constructor(state) {
@@ -21,6 +22,10 @@ class Client {
 
   get pointer() {
     return Vector.direction(this.mouse, this.mouseHistory[0]);
+  }
+
+  spreadPosition() {
+    return Vector.randomDir(PAINT_SPREAD * Math.random()).add(this.mouse);
   }
 
   resetMouse() {
@@ -45,8 +50,8 @@ class Client {
     particles.push(
       new Attractor({
         mass: 0.05,
-        vel: Vector.randomDir(0.00005),
-        pos: Vector.randomDir(PAINT_SPREAD * Math.random()).add(this.mouse),
+        vel: Vector.randomDir(PAINT_VELOCITY),
+        pos: this.spreadPosition(),
       })
     );
   }
@@ -55,11 +60,10 @@ class Client {
     const { particles } = this.state;
 
     particles.push(
-      new Attractor({
-        mass: 0.05,
-        vel: Vector.randomDir(0.00005),
-        pos: Vector.randomDir(0.01 * Math.random()).add(this.mouse),
-        radius: 100,
+      new HardSphere({
+        pos: this.spreadPosition(),
+        radius: 0.003,
+        vel: Vector.randomDir(10 * PAINT_VELOCITY),
       })
     );
   }
@@ -68,10 +72,12 @@ class Client {
     if (this.walls) {
       if (particle.pos.x > 1 || particle.pos.x < 0) {
         particle.vel.subtract(new Vector(particle.vel.x, 0).scale(2));
+        particle.pos.x = Math.round(particle.pos.x);
       }
 
       if (particle.pos.y > 1 || particle.pos.y < 0) {
         particle.vel.subtract(new Vector(0, particle.vel.y).scale(2));
+        particle.pos.y = Math.round(particle.pos.y);
       }
     }
   }
@@ -104,6 +110,9 @@ class Client {
         break;
       case 'paint':
         for (let i = 0; i <= PAINT_RATE; i += 1) this.newAttractor();
+        break;
+      case 'gas':
+        for (let i = 0; i <= PAINT_RATE; i += 1) this.newHardSphere();
         break;
       default:
         break;
@@ -172,15 +181,6 @@ class Client {
   integrateUI() {
     return e => {
       switch (e.target.id) {
-        case 'push':
-          this.selectedAction = 'push';
-          break;
-        case 'paint':
-          this.selectedAction = 'paint';
-          break;
-        case 'make one':
-          this.selectedAction = 'make one';
-          break;
         case 'reset':
           this.state.reset();
           break;
@@ -193,7 +193,7 @@ class Client {
           break;
         }
         default:
-          break;
+          this.selectedAction = e.target.id;
       }
     };
   }

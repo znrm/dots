@@ -146,8 +146,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const PAINT_RATE = 10;
+const PAINT_RATE = 1;
 const PAINT_SPREAD = 0.02;
+const PAINT_VELOCITY = 0.0001;
 
 class Client {
   constructor(state) {
@@ -166,6 +167,10 @@ class Client {
 
   get pointer() {
     return _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.mouse, this.mouseHistory[0]);
+  }
+
+  spreadPosition() {
+    return _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(PAINT_SPREAD * Math.random()).add(this.mouse);
   }
 
   resetMouse() {
@@ -190,8 +195,8 @@ class Client {
     particles.push(
       new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["Attractor"]({
         mass: 0.05,
-        vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
-        pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(PAINT_SPREAD * Math.random()).add(this.mouse),
+        vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(PAINT_VELOCITY),
+        pos: this.spreadPosition(),
       })
     );
   }
@@ -200,11 +205,10 @@ class Client {
     const { particles } = this.state;
 
     particles.push(
-      new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["Attractor"]({
-        mass: 0.05,
-        vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
-        pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.01 * Math.random()).add(this.mouse),
-        radius: 100,
+      new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["HardSphere"]({
+        pos: this.spreadPosition(),
+        radius: 0.003,
+        vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(10 * PAINT_VELOCITY),
       })
     );
   }
@@ -213,10 +217,12 @@ class Client {
     if (this.walls) {
       if (particle.pos.x > 1 || particle.pos.x < 0) {
         particle.vel.subtract(new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](particle.vel.x, 0).scale(2));
+        particle.pos.x = Math.round(particle.pos.x);
       }
 
       if (particle.pos.y > 1 || particle.pos.y < 0) {
         particle.vel.subtract(new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, particle.vel.y).scale(2));
+        particle.pos.y = Math.round(particle.pos.y);
       }
     }
   }
@@ -249,6 +255,9 @@ class Client {
         break;
       case 'paint':
         for (let i = 0; i <= PAINT_RATE; i += 1) this.newAttractor();
+        break;
+      case 'gas':
+        for (let i = 0; i <= PAINT_RATE; i += 1) this.newHardSphere();
         break;
       default:
         break;
@@ -317,15 +326,6 @@ class Client {
   integrateUI() {
     return e => {
       switch (e.target.id) {
-        case 'push':
-          this.selectedAction = 'push';
-          break;
-        case 'paint':
-          this.selectedAction = 'paint';
-          break;
-        case 'make one':
-          this.selectedAction = 'make one';
-          break;
         case 'reset':
           this.state.reset();
           break;
@@ -338,7 +338,7 @@ class Client {
           break;
         }
         default:
-          break;
+          this.selectedAction = e.target.id;
       }
     };
   }
@@ -448,7 +448,14 @@ class Display {
 __webpack_require__.r(__webpack_exports__);
 class UIElements {
   constructor() {
-    this.buttonsRight = ['push', 'paint', 'make one', 'walls', 'reset'];
+    this.buttonsRight = [
+      'push',
+      'paint',
+      'make one',
+      'walls',
+      'reset',
+      'gas',
+    ];
     this.buildUI();
   }
 
@@ -500,7 +507,7 @@ class Attractor extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 class HardSphere extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   interact(particle) {
-    if (this.isInRadius(particle.pos)) {
+    if (this.isInRadius(particle)) {
       particle.move(
         _vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(particle.pos, this.pos).scale(
           this.radius - this.pos.sqDist(particle.pos)
@@ -589,10 +596,10 @@ class Particle {
     );
   }
 
-  isInRadius(pos) {
-    const distance = this.pos.sqDist(pos);
+  isInRadius(particle) {
+    const distance = this.pos.sqDist(particle.pos);
 
-    return distance && distance < this.radius;
+    return distance && distance < (this.radius);
   }
 
   static random(initial) {

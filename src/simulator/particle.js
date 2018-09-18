@@ -64,10 +64,10 @@ class Particle {
     );
   }
 
-  isInRadius(pos) {
-    const distance = this.pos.sqDist(pos);
+  isInRadius(particle) {
+    const distance = this.pos.sqDist(particle.pos);
 
-    return distance && distance < this.radius;
+    return distance && distance < (this.radius);
   }
 
   static random(initial) {

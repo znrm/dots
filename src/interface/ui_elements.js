@@ -1,6 +1,13 @@
 class UIElements {
   constructor() {
-    this.buttonsRight = ['push', 'paint', 'make one', 'walls', 'reset'];
+    this.buttonsRight = [
+      'push',
+      'paint',
+      'make one',
+      'walls',
+      'reset',
+      'gas',
+    ];
     this.buildUI();
   }
 
