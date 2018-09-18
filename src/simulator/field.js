@@ -43,7 +43,7 @@ class Field extends Particle {
   }
 
   inverseSq(particle, sqDistance, constant) {
-    return (this.mass * constant) / (this.pos.dist(particle.pos) * sqDistance);
+    return (this.mass * constant) / (sqDistance);
   }
 
   absorb(particle) {

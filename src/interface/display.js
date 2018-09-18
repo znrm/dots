@@ -14,13 +14,22 @@ class Display {
   }
 
   render() {
-    const { particles, fields } = this.state;
-    const nParticles = particles.length;
-    const nFields = fields.length;
-
-    for (let i = 0; i < nParticles; i += 1) this.dot(particles[i]);
-    for (let i = 0; i < nFields; i += 1) this.circle(fields[i]);
     this.mouse(this.client.mouse);
+    this.renderParticles();
+  }
+
+  renderParticles() {
+    const { particles } = this.state;
+    const nParticles = particles.length;
+
+    for (let i = 0; i < nParticles; i += 1) {
+      const particle = particles[i];
+      if (particle.mass < 1) {
+        this.dot(particle);
+      } else {
+        this.circle(particle);
+      }
+    }
   }
 
   resize() {
@@ -45,13 +54,6 @@ class Display {
     this.ctx.stroke();
   }
 
-  line(from, to) {
-    this.ctx.beginPath();
-    this.ctx.moveTo(from.x * this.width, from.y * this.height);
-    this.ctx.lineTo(to.x * this.width, to.y * this.height);
-    this.ctx.stroke();
-  }
-
   circle({ pos, mass }) {
     this.ctx.beginPath();
     this.ctx.arc(
@@ -60,7 +62,7 @@ class Display {
       Math.sqrt(mass),
       0,
       2 * Math.PI,
-      false,
+      false
     );
     this.ctx.fill();
   }

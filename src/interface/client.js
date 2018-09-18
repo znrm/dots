@@ -2,17 +2,6 @@ import Vector from '../simulator/vector';
 import Particle from '../simulator/particle';
 import Field from '../simulator/field';
 
-function buildUi() {
-  const buttonsRight = ['push', 'make many', 'make one', 'walls', 'reset'];
-
-  for (let i = 0; i < buttonsRight.length; i += 1) {
-    const uiElement = document.createElement('li');
-    uiElement.className = 'options-text';
-    uiElement.id = buttonsRight[i];
-    uiElement.innerText = buttonsRight[i];
-    document.getElementById('ui').appendChild(uiElement);
-  }
-}
 
 class Client {
   constructor(state) {
@@ -25,14 +14,15 @@ class Client {
 
     this.wall = true;
     this.pressing = false;
-    this.selectedAction = 2;
+    this.selectedAction = 0;
 
     this.actions = {
+      0: 'noEffect',
       1: 'mouseField',
       2: 'newGravityField',
-      3: 'makeDots',
+      3: 'newParticle',
     };
-    buildUi();
+
     this.addEvents();
     this.createMouseField();
   }
@@ -43,11 +33,6 @@ class Client {
 
   resetMouse() {
     this.pressed = false;
-  }
-
-  newParticle() {
-    const { particles } = this.state;
-    particles.push(Particle.random(this.mouse));
   }
 
   newGravityField() {
@@ -63,13 +48,15 @@ class Client {
     );
   }
 
-  makeDots() {
-    const { particles } = this.state;
+  newParticle() {
+    const { fields } = this.state;
 
-    particles.push(
-      new Particle({
-        vel: Vector.randomDir(0.00005),
-        pos: Vector.randomDir(0.01).add(this.mouse),
+    fields.push(
+      new Field({
+        fieldType: 'funCombinationField',
+        vel: Vector.randomDir(0.000005),
+        pos: Vector.randomDir(0.02 * Math.random()).add(this.mouse),
+        radius: 100
       })
     );
   }
@@ -91,7 +78,7 @@ class Client {
     const nParticles = particles.length;
     const nFields = fields.length;
     if (this.pressing && this.selectedAction === 3) {
-      for (let i = 0; i < 5; i += 1) this.makeDots();
+      for (let i = 0; i < 5; i += 1) this.newParticle();
     }
 
     for (let i = 0; i < nParticles; i += 1) {
@@ -157,7 +144,7 @@ class Client {
       );
       this.pressing = true;
 
-      if (this.selectedAction !== 1) {
+      if (this.selectedAction > 1) {
         this[this.actions[this.selectedAction]]();
       }
     };
@@ -186,7 +173,7 @@ class Client {
           this.mouseField.fieldType = 'radialPush';
           this.selectedAction = 1;
           break;
-        case 'make many':
+        case 'paint':
           this.mouseField.fieldType = 'noEffect';
           this.selectedAction = 3;
           break;

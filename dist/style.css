@@ -35,12 +35,13 @@ canvas {
 }
 
 .options ul {
-  -webkit-touch-callout: none;
+  user-select: none;
+  -ms-user-select: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
 
   display: flex;
   justify-content: space-around;

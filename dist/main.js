@@ -97,15 +97,19 @@
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _interface_display__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./interface/display */ "./src/interface/display.js");
 /* harmony import */ var _interface_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./interface/client */ "./src/interface/client.js");
-/* harmony import */ var _simulator_state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./simulator/state */ "./src/simulator/state.js");
-/* harmony import */ var _simulator_vector__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./simulator/vector */ "./src/simulator/vector.js");
+/* harmony import */ var _interface_ui_elements__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./interface/ui_elements */ "./src/interface/ui_elements.js");
+/* harmony import */ var _simulator_state__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./simulator/state */ "./src/simulator/state.js");
+/* harmony import */ var _simulator_vector__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./simulator/vector */ "./src/simulator/vector.js");
+
 
 
 
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  const state = new _simulator_state__WEBPACK_IMPORTED_MODULE_2__["default"]();
+  const uiElements = new _interface_ui_elements__WEBPACK_IMPORTED_MODULE_2__["default"]();
+
+  const state = new _simulator_state__WEBPACK_IMPORTED_MODULE_3__["default"]();
   const client = new _interface_client__WEBPACK_IMPORTED_MODULE_1__["default"](state);
   const display = new _interface_display__WEBPACK_IMPORTED_MODULE_0__["default"](state, client);
 
@@ -121,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.update();
     state.cleanup();
   };
-  window.Vector = _simulator_vector__WEBPACK_IMPORTED_MODULE_3__["default"];
+  window.Vector = _simulator_vector__WEBPACK_IMPORTED_MODULE_4__["default"];
   run();
 });
 
@@ -144,17 +148,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function buildUi() {
-  const buttonsRight = ['push', 'make many', 'make one', 'walls', 'reset'];
-
-  for (let i = 0; i < buttonsRight.length; i += 1) {
-    const uiElement = document.createElement('li');
-    uiElement.className = 'options-text';
-    uiElement.id = buttonsRight[i];
-    uiElement.innerText = buttonsRight[i];
-    document.getElementById('ui').appendChild(uiElement);
-  }
-}
 
 class Client {
   constructor(state) {
@@ -167,14 +160,15 @@ class Client {
 
     this.wall = true;
     this.pressing = false;
-    this.selectedAction = 2;
+    this.selectedAction = 0;
 
     this.actions = {
+      0: 'noEffect',
       1: 'mouseField',
       2: 'newGravityField',
-      3: 'makeDots',
+      3: 'newParticle',
     };
-    buildUi();
+
     this.addEvents();
     this.createMouseField();
   }
@@ -185,11 +179,6 @@ class Client {
 
   resetMouse() {
     this.pressed = false;
-  }
-
-  newParticle() {
-    const { particles } = this.state;
-    particles.push(_simulator_particle__WEBPACK_IMPORTED_MODULE_1__["default"].random(this.mouse));
   }
 
   newGravityField() {
@@ -205,13 +194,15 @@ class Client {
     );
   }
 
-  makeDots() {
-    const { particles } = this.state;
+  newParticle() {
+    const { fields } = this.state;
 
-    particles.push(
-      new _simulator_particle__WEBPACK_IMPORTED_MODULE_1__["default"]({
-        vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
-        pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.01).add(this.mouse),
+    fields.push(
+      new _simulator_field__WEBPACK_IMPORTED_MODULE_2__["default"]({
+        fieldType: 'funCombinationField',
+        vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.000005),
+        pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.02 * Math.random()).add(this.mouse),
+        radius: 100
       })
     );
   }
@@ -233,7 +224,7 @@ class Client {
     const nParticles = particles.length;
     const nFields = fields.length;
     if (this.pressing && this.selectedAction === 3) {
-      for (let i = 0; i < 5; i += 1) this.makeDots();
+      for (let i = 0; i < 5; i += 1) this.newParticle();
     }
 
     for (let i = 0; i < nParticles; i += 1) {
@@ -299,7 +290,7 @@ class Client {
       );
       this.pressing = true;
 
-      if (this.selectedAction !== 1) {
+      if (this.selectedAction > 1) {
         this[this.actions[this.selectedAction]]();
       }
     };
@@ -328,7 +319,7 @@ class Client {
           this.mouseField.fieldType = 'radialPush';
           this.selectedAction = 1;
           break;
-        case 'make many':
+        case 'paint':
           this.mouseField.fieldType = 'noEffect';
           this.selectedAction = 3;
           break;
@@ -376,13 +367,22 @@ class Display {
   }
 
   render() {
-    const { particles, fields } = this.state;
-    const nParticles = particles.length;
-    const nFields = fields.length;
-
-    for (let i = 0; i < nParticles; i += 1) this.dot(particles[i]);
-    for (let i = 0; i < nFields; i += 1) this.circle(fields[i]);
     this.mouse(this.client.mouse);
+    this.renderParticles();
+  }
+
+  renderParticles() {
+    const { particles } = this.state;
+    const nParticles = particles.length;
+
+    for (let i = 0; i < nParticles; i += 1) {
+      const particle = particles[i];
+      if (particle.mass < 1) {
+        this.dot(particle);
+      } else {
+        this.circle(particle);
+      }
+    }
   }
 
   resize() {
@@ -407,13 +407,6 @@ class Display {
     this.ctx.stroke();
   }
 
-  line(from, to) {
-    this.ctx.beginPath();
-    this.ctx.moveTo(from.x * this.width, from.y * this.height);
-    this.ctx.lineTo(to.x * this.width, to.y * this.height);
-    this.ctx.stroke();
-  }
-
   circle({ pos, mass }) {
     this.ctx.beginPath();
     this.ctx.arc(
@@ -422,7 +415,7 @@ class Display {
       Math.sqrt(mass),
       0,
       2 * Math.PI,
-      false,
+      false
     );
     this.ctx.fill();
   }
@@ -433,6 +426,38 @@ class Display {
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Display);
+
+
+/***/ }),
+
+/***/ "./src/interface/ui_elements.js":
+/*!**************************************!*\
+  !*** ./src/interface/ui_elements.js ***!
+  \**************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class UIElements {
+  constructor() {
+    this.buttonsRight = ['push', 'paint', 'make one', 'walls', 'reset'];
+    this.buildUI();
+
+  }
+
+  buildUI() {
+    for (let i = 0; i < this.buttonsRight.length; i += 1) {
+      const uiElement = document.createElement('li');
+      uiElement.className = 'options-text';
+      uiElement.id = this.buttonsRight[i];
+      uiElement.innerText = this.buttonsRight[i];
+      document.getElementById('ui').appendChild(uiElement);
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (UIElements);
 
 
 /***/ }),
@@ -493,7 +518,7 @@ class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   inverseSq(particle, sqDistance, constant) {
-    return (this.mass * constant) / (this.pos.dist(particle.pos) * sqDistance);
+    return (this.mass * constant) / (sqDistance);
   }
 
   absorb(particle) {
