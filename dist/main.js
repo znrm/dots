@@ -146,7 +146,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const PAINT_RATE = 1;
+const PAINT_RATE = 10;
 const PAINT_SPREAD = 0.02;
 const PAINT_VELOCITY = 0.0001;
 
@@ -491,7 +491,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const FUN_CONSTANT = -3e-9;
+const FUN_CONSTANT = -8e-9;
 
 class Attractor extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   interact(particle) {

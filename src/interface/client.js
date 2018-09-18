@@ -1,7 +1,7 @@
 import Vector from '../simulator/vector';
 import { HardSphere, Attractor } from '../simulator/field';
 
-const PAINT_RATE = 1;
+const PAINT_RATE = 10;
 const PAINT_SPREAD = 0.02;
 const PAINT_VELOCITY = 0.0001;
 

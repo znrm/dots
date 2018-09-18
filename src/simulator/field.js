@@ -1,7 +1,7 @@
 import Particle from './particle';
 import Vector from './vector';
 
-const FUN_CONSTANT = -3e-9;
+const FUN_CONSTANT = -8e-9;
 
 export class Attractor extends Particle {
   interact(particle) {
