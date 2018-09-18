@@ -142,10 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _simulator_vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../simulator/vector */ "./src/simulator/vector.js");
-/* harmony import */ var _simulator_particle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../simulator/particle */ "./src/simulator/particle.js");
-/* harmony import */ var _simulator_field__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../simulator/field */ "./src/simulator/field.js");
-
-
+/* harmony import */ var _simulator_field__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../simulator/field */ "./src/simulator/field.js");
 
 
 
@@ -182,9 +179,9 @@ class Client {
   }
 
   newGravityField() {
-    const { fields } = this.state;
-    fields.push(
-      new _simulator_field__WEBPACK_IMPORTED_MODULE_2__["default"]({
+    const { particles } = this.state;
+    particles.push(
+      new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["default"]({
         fieldType: 'funCombinationField',
         mass: 1 + 20 * Math.random(),
         pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse),
@@ -195,14 +192,15 @@ class Client {
   }
 
   newParticle() {
-    const { fields } = this.state;
+    const { particles } = this.state;
 
-    fields.push(
-      new _simulator_field__WEBPACK_IMPORTED_MODULE_2__["default"]({
+    particles.push(
+      new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["default"]({
         fieldType: 'funCombinationField',
-        vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.000005),
-        pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.02 * Math.random()).add(this.mouse),
-        radius: 100
+        mass: 0.05,
+        vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005),
+        pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.01 * Math.random()).add(this.mouse),
+        radius: 100,
       })
     );
   }
@@ -220,30 +218,29 @@ class Client {
   }
 
   handleActions() {
-    const { particles, fields } = this.state;
+    const { particles } = this.state;
     const nParticles = particles.length;
-    const nFields = fields.length;
-    if (this.pressing && this.selectedAction === 3) {
-      for (let i = 0; i < 5; i += 1) this.newParticle();
+    if (this.pressing) this.continuousAction();
+
+    for (let i = 0; i < nParticles; i += 1) {
+      if (this.wall) this.walls(particles[i]);
+    }
+  }
+
+  continuousAction() {
+    const { particles } = this.state;
+    const nParticles = particles.length;
+    if (this.selectedAction === 3) {
+      for (let i = 0; i < 4; i += 1) this.newParticle();
     }
 
     for (let i = 0; i < nParticles; i += 1) {
-      if (this.pressing) this.mouseField.interact(particles[i]);
-      if (this.wall) this.walls(particles[i]);
+      this.mouseField.interact(particles[i]);
     }
-    for (let i = 0; i < nFields; i += 1) {
-      if (this.pressing) this.mouseField.interact(fields[i]);
-      if (this.wall) this.walls(fields[i]);
-    }
-  }
-
-  recordMouse(prevMouse) {
-    this.mouseHistory.shift();
-    this.mouseHistory.push(_simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(prevMouse));
   }
 
   createMouseField() {
-    this.mouseField = new _simulator_field__WEBPACK_IMPORTED_MODULE_2__["default"]({
+    this.mouseField = new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["default"]({
       pos: this.mouse,
       fieldType: 'noEffect',
       radius: 0.01,
@@ -298,7 +295,8 @@ class Client {
 
   mouseMove() {
     return e => {
-      this.recordMouse(this.mouse);
+      this.mouseHistory.shift();
+      this.mouseHistory.push(_simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse));
       this.mouse.moveTo(
         e.clientX / this.displayWidth,
         e.clientY / this.displayHeight
@@ -443,7 +441,6 @@ class UIElements {
   constructor() {
     this.buttonsRight = ['push', 'paint', 'make one', 'walls', 'reset'];
     this.buildUI();
-
   }
 
   buildUI() {
@@ -486,7 +483,7 @@ class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   interact(particle) {
-    if (this.isInRadius(particle.pos)) {
+    if (this !== particle) {
       this[this.fieldType](particle);
     }
   }
@@ -510,15 +507,13 @@ class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   radialPush(particle) {
-    particle.move(
-      _vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(particle.pos, this.pos).scale(
-        this.radius - this.pos.sqDist(particle.pos)
-      )
-    );
-  }
-
-  inverseSq(particle, sqDistance, constant) {
-    return (this.mass * constant) / (sqDistance);
+    if (this.isInRadius(particle.pos)) {
+      particle.move(
+        _vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(particle.pos, this.pos).scale(
+          this.radius - this.pos.sqDist(particle.pos)
+        )
+      );
+    }
   }
 
   absorb(particle) {
@@ -534,12 +529,7 @@ class Field extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
   funCombinationField(particle) {
     const sqDistance = this.pos.sqDist(particle.pos);
-    if (sqDistance > 5e-3) {
-      this.radialAccelerate(
-        particle,
-        this.inverseSq(particle, sqDistance, FUN_CONSTANT)
-      );
-    } else if (sqDistance > 5e-7 * this.mass) {
+    if (sqDistance > 5e-7 * this.mass) {
       this.radialAccelerate(particle, (this.mass * FUN_CONSTANT) / sqDistance);
     } else if (this.protected && particle.protected) {
       this.inelasticCollide(particle);
@@ -569,7 +559,7 @@ class Particle {
   constructor({
     pos = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
     vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].origin(),
-    mass = 0.05,
+    mass = 0,
     charge = 0
   }) {
     this.pos = pos;
@@ -614,10 +604,6 @@ class Particle {
     );
   }
 
-  interact(particle) {
-    this.action(particle);
-  }
-
   static random(initial) {
     const pos = initial || _vector__WEBPACK_IMPORTED_MODULE_0__["default"].random();
     const vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005);
@@ -641,39 +627,35 @@ class Particle {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 class State {
-  constructor(particles = [], fields = []) {
+  constructor(particles = []) {
     this.particles = particles;
-    this.fields = fields;
   }
 
   cleanup() {
     this.particles = this.particles.filter(particle => particle.protected);
-    this.fields = this.fields.filter(field => field.protected);
   }
 
   update() {
     const nParticles = this.particles.length;
-    const nFields = this.fields.length;
 
-    for (let i = 0; i < nParticles; i += 1) {
-      for (let j = 0; j < nFields; j += 1) {
-        this.fields[j].interact(this.particles[i]);
-      }
-    }
+    this.calculateInteractions(nParticles);
+    this.updateParticles(nParticles);
+  }
 
-    for (let i = 0; i < nFields; i += 1) {
-      for (let j = 0; j < nFields; j += 1) {
-        this.fields[j].interact(this.fields[i]);
-      }
-    }
-
+  updateParticles(nParticles) {
     for (let i = 0; i < nParticles; i += 1) this.particles[i].update();
-    for (let i = 0; i < nFields; i += 1) this.fields[i].update();
+  }
+
+  calculateInteractions(nParticles) {
+    for (let i = 0; i < nParticles; i += 1) {
+      for (let j = 0; j < nParticles; j += 1) {
+        this.particles[j].interact(this.particles[i]);
+      }
+    }
   }
 
   reset() {
     this.particles = [];
-    this.fields = [];
   }
 }
 

@@ -4,7 +4,7 @@ class Particle {
   constructor({
     pos = Vector.origin(),
     vel = Vector.origin(),
-    mass = 0.05,
+    mass = 0,
     charge = 0
   }) {
     this.pos = pos;
@@ -47,10 +47,6 @@ class Particle {
       Vector.direction(this.pos, location)
         .scale(distance),
     );
-  }
-
-  interact(particle) {
-    this.action(particle);
   }
 
   static random(initial) {

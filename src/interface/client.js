@@ -1,7 +1,5 @@
 import Vector from '../simulator/vector';
-import Particle from '../simulator/particle';
 import Field from '../simulator/field';
-
 
 class Client {
   constructor(state) {
@@ -36,8 +34,8 @@ class Client {
   }
 
   newGravityField() {
-    const { fields } = this.state;
-    fields.push(
+    const { particles } = this.state;
+    particles.push(
       new Field({
         fieldType: 'funCombinationField',
         mass: 1 + 20 * Math.random(),
@@ -49,14 +47,15 @@ class Client {
   }
 
   newParticle() {
-    const { fields } = this.state;
+    const { particles } = this.state;
 
-    fields.push(
+    particles.push(
       new Field({
         fieldType: 'funCombinationField',
-        vel: Vector.randomDir(0.000005),
-        pos: Vector.randomDir(0.02 * Math.random()).add(this.mouse),
-        radius: 100
+        mass: 0.05,
+        vel: Vector.randomDir(0.00005),
+        pos: Vector.randomDir(0.01 * Math.random()).add(this.mouse),
+        radius: 100,
       })
     );
   }
@@ -74,26 +73,25 @@ class Client {
   }
 
   handleActions() {
-    const { particles, fields } = this.state;
+    const { particles } = this.state;
     const nParticles = particles.length;
-    const nFields = fields.length;
-    if (this.pressing && this.selectedAction === 3) {
-      for (let i = 0; i < 5; i += 1) this.newParticle();
-    }
+    if (this.pressing) this.continuousAction();
 
     for (let i = 0; i < nParticles; i += 1) {
-      if (this.pressing) this.mouseField.interact(particles[i]);
       if (this.wall) this.walls(particles[i]);
-    }
-    for (let i = 0; i < nFields; i += 1) {
-      if (this.pressing) this.mouseField.interact(fields[i]);
-      if (this.wall) this.walls(fields[i]);
     }
   }
 
-  recordMouse(prevMouse) {
-    this.mouseHistory.shift();
-    this.mouseHistory.push(Vector.clone(prevMouse));
+  continuousAction() {
+    const { particles } = this.state;
+    const nParticles = particles.length;
+    if (this.selectedAction === 3) {
+      for (let i = 0; i < 4; i += 1) this.newParticle();
+    }
+
+    for (let i = 0; i < nParticles; i += 1) {
+      this.mouseField.interact(particles[i]);
+    }
   }
 
   createMouseField() {
@@ -152,7 +150,8 @@ class Client {
 
   mouseMove() {
     return e => {
-      this.recordMouse(this.mouse);
+      this.mouseHistory.shift();
+      this.mouseHistory.push(Vector.clone(this.mouse));
       this.mouse.moveTo(
         e.clientX / this.displayWidth,
         e.clientY / this.displayHeight

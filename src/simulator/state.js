@@ -1,37 +1,33 @@
 class State {
-  constructor(particles = [], fields = []) {
+  constructor(particles = []) {
     this.particles = particles;
-    this.fields = fields;
   }
 
   cleanup() {
     this.particles = this.particles.filter(particle => particle.protected);
-    this.fields = this.fields.filter(field => field.protected);
   }
 
   update() {
     const nParticles = this.particles.length;
-    const nFields = this.fields.length;
 
-    for (let i = 0; i < nParticles; i += 1) {
-      for (let j = 0; j < nFields; j += 1) {
-        this.fields[j].interact(this.particles[i]);
-      }
-    }
+    this.calculateInteractions(nParticles);
+    this.updateParticles(nParticles);
+  }
 
-    for (let i = 0; i < nFields; i += 1) {
-      for (let j = 0; j < nFields; j += 1) {
-        this.fields[j].interact(this.fields[i]);
-      }
-    }
-
+  updateParticles(nParticles) {
     for (let i = 0; i < nParticles; i += 1) this.particles[i].update();
-    for (let i = 0; i < nFields; i += 1) this.fields[i].update();
+  }
+
+  calculateInteractions(nParticles) {
+    for (let i = 0; i < nParticles; i += 1) {
+      for (let j = 0; j < nParticles; j += 1) {
+        this.particles[j].interact(this.particles[i]);
+      }
+    }
   }
 
   reset() {
     this.particles = [];
-    this.fields = [];
   }
 }
 
