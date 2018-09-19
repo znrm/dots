@@ -24,8 +24,9 @@
   text-align: center;
 }
 
+
 .hidden {
-  display: none;
+  display:none;
 }
 
 @keyframes fade-in {
@@ -43,6 +44,7 @@
   }
   100% {
     opacity: 0;
+    display:none;
   }
 }
 
@@ -64,14 +66,15 @@
   animation-timing-function: ease-in-out;
 }
 
+.fade-in {
+  animation-name: fade-in;
+  animation-duration: 1s;
+  animation-timing-function: ease;
+}
+
 .fade-out {
   animation-name: fade-out;
   animation-duration: 1s;
-  animation-timing-function: ease-out;
-}
-
-.fade-in {
-  animation-name: fade-in;
-  animation-duration: 2s;
   animation-timing-function: ease;
 }
+

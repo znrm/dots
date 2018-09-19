@@ -451,9 +451,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "buildUI", function() { return buildUI; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "startTutorial", function() { return startTutorial; });
 const BUTTONS_RIGHT = ['push', 'paint', 'make one', 'walls', 'reset', 'gas'];
-const BUTTONS_TOP = ['benchmark', 'space', 'fluids'];
+const BUTTONS_TOP = ['space', 'fluid', 'benchmark'];
 
-const timesTutorialSeen = window.localStorage.getItem('dotsTutorial') || 0;
+const timesTutorialLeft = window.localStorage.getItem('dotsTutorial') || 2;
 
 const addClass = (id, className) =>
   document.getElementById(id).classList.add(className);
@@ -486,16 +486,23 @@ const startTutorial = async () => {
   removeClass('title', 'hidden');
   await sleep(4);
   addClass('title', 'hidden');
-  if (timesTutorialSeen < 2) {
-    removeClass('select-options', 'hidden');
-    document.querySelector('.options').onclick = async () => {
-      removeClass('select-options', 'fade-in');
-      addClass('select-options', 'fade-out');
-      await sleep(1);
+  if (timesTutorialLeft !== '0') {
+    removeClass('select-mode', 'hidden');
+    document.querySelector('.mode').onclick = async () => {
+      addClass('select-mode', 'fade-out');
+      await sleep(0.99);
+      addClass('select-mode', 'hidden');
+      removeClass('select-options', 'hidden');
+      document.querySelector('.options').onclick = async () => {
+        addClass('select-options', 'fade-out');
+        await sleep(0.99);
+        addClass('welcome', 'hidden');
+      };
     };
+    window.localStorage.setItem('dotsTutorial', timesTutorialLeft - 1);
+  } else {
+    addClass('welcome', 'hidden');
   }
-  addClass('welcome', 'hidden');
-  window.localStorage.setItem('dotsTutorial', timesTutorialSeen + 1);
 };
 
 
