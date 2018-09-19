@@ -49,7 +49,22 @@ li {
   right: 0;
 }
 
-.options ul {
+.mode {
+  cursor: initial;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  position: absolute;
+  width: 100%;
+  top: -80px;
+  transition: all 0.25s cubic-bezier(0.1, 0.65, 0.3, 1);
+}
+
+.mode:hover {
+  top: 0;
+}
+
+.button-list {
   display: flex;
   justify-content: space-around;
   flex-direction: column;
@@ -57,7 +72,7 @@ li {
   min-height: 80%;
   width: 80px;
   padding: 5px 3px;
-  margin: 10px;
+  margin: 15px;
   box-sizing: border-box;
 
   background-color: rgba(255, 255, 255, 0.05);
@@ -65,9 +80,16 @@ li {
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-.options:hover ul {
+.options:hover .button-list {
   background-color: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.mode .button-list {
+  min-width: 50%;
+  height: 80px;
+  padding: 3px 5px;
+  flex-direction: row;
 }
 
 .options-text {
