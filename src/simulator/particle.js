@@ -22,7 +22,7 @@ class Particle {
   }
 
   get size() {
-    return Math.sqrt(this.mass);
+    return this.radius;
   }
 
   update() {
@@ -37,13 +37,22 @@ class Particle {
     this.pos.add(amount);
   }
 
+  grow(amount) {
+    this.mass += amount;
+  }
+
   delete() {
     this.protected = false;
   }
 
-  inRadius(pos, radius) {
+  isTouching(pos, offset) {
     const distance = this.pos.dist(pos);
-    return distance < this.radius + radius;
+    return distance < this.size + offset;
+  }
+
+  isContained(pos, offset) {
+    const distance = this.pos.dist(pos);
+    return distance < this.size - offset;
   }
 
   receiveFrom(amount, location) {

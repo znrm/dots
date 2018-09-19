@@ -1,70 +1,88 @@
 import Particle from '../simulator/particle';
 import Vector from '../simulator/vector';
 
-const FUN_CONSTANT = -8e-9;
+const GRAVITATIONAL_CONSTANT = 0.05;
 
-const absorb = (thisParticle, thatParticle) {
-  thisParticle.mass += thatParticle.mass;
+const absorb = (thisParticle, thatParticle) => {
+  thisParticle.grow(thatParticle.mass);
   thatParticle.delete();
-}
+};
 
-const inelasticCollide = (thisParticle, thatParticle) {
+const inelasticCollide = (thisParticle, thatParticle) => {
+  thisParticle.accelerate(
+    thatParticle.momentum.scale(
+      thisParticle.mass / (thisParticle.mass + thatParticle.mass)
+    )
+  );
+};
 
-}
+const fakeGravity = (thisParticle, thatParticle) => {
+  const scalar = thisParticle.mass / thisParticle.pos.dist(thatParticle.pos);
+  const direction = Vector.direction(thisParticle.pos, thatParticle.pos);
+  thatParticle.accelerate(direction.scale(GRAVITATIONAL_CONSTANT * scalar));
+};
 
-inelasticCollide(particle) {
-  this.vel = particle.momentum
-    .add(this.momentum)
-    .scale(1 / (this.mass + particle.mass));
-}
-
-class Attractor extends Particle {
-
+class SpaceDebris extends Particle {
   get size() {
     return Math.sqrt(this.mass);
   }
 
   interact(particle) {
-    const sqDistance = this.pos.sqDist(particle.pos);
-    if (sqDistance > 5e-7 * this.mass) {
-      this.radialAccelerate(particle, (this.mass * FUN_CONSTANT) / sqDistance);
-    } else if (this.protected && particle.protected) {
+    const { pos, size } = particle;
+
+    if (this.isContained(pos, size / 4) && this.protected) {
       inelasticCollide(this, particle);
       absorb(this, particle);
+    } else {
+      fakeGravity(this, particle);
     }
   }
 }
 
-class HardSphere extends Particle {
-  interact(particle) {
-    if (this.inRadius(particle.pos)) {
-      particle.move(
-        Vector.direction(particle.pos, this.pos).scale(
-          (this.radius + particle.radius) - this.pos.dist(particle.pos)
-        )
-      );
-    }
-  }
-}
+const spreadPosition = mouse =>
+  Vector.randomDir(0.02 * Math.random()).add(mouse);
 
-class Automata extends Particle {
-  get size() {
-    return this.radius;
-  }
+export const airbrush = {
+  stars: mouse =>
+    new SpaceDebris({
+      mass: 5e-7,
+      vel: Vector.randomDir(0.00001),
+      pos: spreadPosition(mouse)
+    })
+};
 
-  isInRadius(particle, offset) {
-    const distance = this.pos.dist(particle.pos);
+export const emit = {};
 
-    return distance < (this.radius + particle.radius);
-  }
+// class HardSphere extends Particle {
+//   interact(particle) {
+//     if (this.inRadius(particle.pos)) {
+//       particle.move(
+//         Vector.direction(particle.pos, this.pos).scale(
+//           (this.radius + particle.radius) - this.pos.dist(particle.pos)
+//         )
+//       );
+//     }
+//   }
+// }
 
-  interact(particle) {
-    if (this.inRadius(particle.pos)) {
-      particle.move(
-        Vector.direction(particle.pos, this.pos).scale(
-          (this.radius + particle.radius) - this.pos.dist(particle.pos)
-        )
-      );
-    }
-  }
-}
+// class Automata extends Particle {
+//   get size() {
+//     return this.radius;
+//   }
+
+//   isInRadius(particle, offset) {
+//     const distance = this.pos.dist(particle.pos);
+
+//     return distance < (this.radius + particle.radius);
+//   }
+
+//   interact(particle) {
+//     if (this.inRadius(particle.pos)) {
+//       particle.move(
+//         Vector.direction(particle.pos, this.pos).scale(
+//           (this.radius + particle.radius) - this.pos.dist(particle.pos)
+//         )
+//       );
+//     }
+//   }
+//

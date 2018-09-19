@@ -12,7 +12,7 @@ const sleep = seconds =>
 const startTutorial = async () => {
   await sleep(0);
   removeClass('title', 'hidden');
-  await sleep(4);
+  await sleep(3);
   addClass('title', 'hidden');
   if (timesTutorialLeft !== '0') {
     removeClass('select-mode', 'hidden');

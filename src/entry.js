@@ -1,6 +1,7 @@
 import Display from './interface/display';
 import Client from './interface/client';
-import { startTutorial, buildUI } from './interface/ui_elements';
+import buildUI from './interface/ui_builder';
+import startTutorial from './interface/intro';
 import State from './simulator/state';
 import Vector from './simulator/vector';
 

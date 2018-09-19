@@ -1,6 +1,9 @@
+import Vector from './vector';
+
 class State {
   constructor(particles = []) {
     this.particles = particles;
+    this.wall = true;
   }
 
   cleanup() {
@@ -22,6 +25,7 @@ class State {
 
     this.calculateInteractions(nParticles);
     this.updateParticles(nParticles);
+    if (this.wall) this.walls(nParticles);
   }
 
   updateParticles(nParticles) {
@@ -34,6 +38,19 @@ class State {
         if (i !== j) {
           this.particles[i].interact(this.particles[j]);
         }
+      }
+    }
+  }
+
+  walls(nParticles) {
+    for (let i = 0; i < nParticles; i += 1) {
+      const { pos, vel, size } = this.particles[i];
+      if (pos.x + size > 1 || pos.x - size < 0) {
+        vel.subtract(new Vector(vel.x, 0).scale(2));
+      }
+
+      if (pos.y + size > 1 || pos.y + size < 0) {
+        vel.subtract(new Vector(0, vel.y).scale(2));
       }
     }
   }
