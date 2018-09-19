@@ -4,7 +4,17 @@ class State {
   }
 
   cleanup() {
-    this.particles = this.particles.filter(particle => particle.protected);
+    const nParticles = this.particles.length;
+    let validParticles = 0;
+    for (let i = 0; i < nParticles; i += 1) {
+      const particle = this.particles[i];
+
+      if (particle.protected) {
+        if (i !== validParticles) this.particles[validParticles] = particle;
+        validParticles += 1;
+      }
+    }
+    this.particles.length = validParticles;
   }
 
   update() {
@@ -29,7 +39,7 @@ class State {
   }
 
   reset() {
-    this.particles = [];
+    this.particles.length = 0;
   }
 }
 

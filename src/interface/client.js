@@ -1,5 +1,5 @@
 import Vector from '../simulator/vector';
-import { HardSphere, Attractor } from '../simulator/field';
+import { HardSphere, Attractor, defaultAttractor } from './presets';
 
 const PAINT_RATE = 10;
 const PAINT_SPREAD = 0.02;
@@ -62,22 +62,20 @@ class Client {
     particles.push(
       new HardSphere({
         pos: this.spreadPosition(),
-        radius: 0.003,
-        vel: Vector.randomDir(10 * PAINT_VELOCITY),
+        radius: 0.01,
+        vel: Vector.randomDir(5 * PAINT_VELOCITY),
       })
     );
   }
 
   walls(particle) {
     if (this.walls) {
-      if (particle.pos.x > 1 || particle.pos.x < 0) {
+      if ((particle.pos.x + particle.radius) > 1 || (particle.pos.x - particle.radius) < 0) {
         particle.vel.subtract(new Vector(particle.vel.x, 0).scale(2));
-        particle.pos.x = Math.round(particle.pos.x);
       }
 
       if (particle.pos.y > 1 || particle.pos.y < 0) {
         particle.vel.subtract(new Vector(0, particle.vel.y).scale(2));
-        particle.pos.y = Math.round(particle.pos.y);
       }
     }
   }

@@ -18,7 +18,11 @@ class Particle {
   }
 
   get momentum() {
-    return Vector.clone(this.vel).scale(this.mass);
+    return new Vector(0, 0).add(this.vel).scale(this.mass);
+  }
+
+  get size() {
+    return Math.sqrt(this.mass);
   }
 
   update() {
@@ -37,23 +41,17 @@ class Particle {
     this.protected = false;
   }
 
+  inRadius(pos, radius) {
+    const distance = this.pos.dist(pos);
+    return distance < this.radius + radius;
+  }
+
   receiveFrom(amount, location) {
     this.vel.add(Vector.direction(this.pos, location).scale(amount));
   }
 
   moveAwayFrom(distance, location) {
     this.pos.add(Vector.direction(this.pos, location).scale(distance));
-  }
-
-  absorb(particle) {
-    this.mass += particle.mass;
-    particle.delete();
-  }
-
-  inelasticCollide(particle) {
-    this.vel = particle.momentum
-      .add(this.momentum)
-      .scale(1 / (this.mass + particle.mass));
   }
 
   radialAccelerate(particle, amount) {
@@ -63,19 +61,6 @@ class Particle {
         .subtract(this.pos)
         .scale(amount)
     );
-  }
-
-  isInRadius(particle) {
-    const distance = this.pos.sqDist(particle.pos);
-
-    return distance && distance < this.radius;
-  }
-
-  static random(initial) {
-    const pos = initial || Vector.random();
-    const vel = Vector.randomDir(0.00005);
-
-    return new Particle({ pos, vel });
   }
 }
 

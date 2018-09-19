@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _simulator_vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../simulator/vector */ "./src/simulator/vector.js");
-/* harmony import */ var _simulator_field__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../simulator/field */ "./src/simulator/field.js");
+/* harmony import */ var _presets__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./presets */ "./src/interface/presets.js");
 
 
 
@@ -183,7 +183,7 @@ class Client {
     const { particles } = this.state;
 
     particles.push(
-      new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["Attractor"]({
+      new _presets__WEBPACK_IMPORTED_MODULE_1__["Attractor"]({
         mass: 1 + 20 * Math.random(),
         pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.mouse),
         vel: this.pointer.scale(0.002),
@@ -195,7 +195,7 @@ class Client {
     const { particles } = this.state;
 
     particles.push(
-      new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["Attractor"]({
+      new _presets__WEBPACK_IMPORTED_MODULE_1__["Attractor"]({
         mass: 0.05,
         vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(PAINT_VELOCITY),
         pos: this.spreadPosition(),
@@ -207,24 +207,22 @@ class Client {
     const { particles } = this.state;
 
     particles.push(
-      new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["HardSphere"]({
+      new _presets__WEBPACK_IMPORTED_MODULE_1__["HardSphere"]({
         pos: this.spreadPosition(),
-        radius: 0.003,
-        vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(10 * PAINT_VELOCITY),
+        radius: 0.01,
+        vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(5 * PAINT_VELOCITY),
       })
     );
   }
 
   walls(particle) {
     if (this.walls) {
-      if (particle.pos.x > 1 || particle.pos.x < 0) {
+      if ((particle.pos.x + particle.radius) > 1 || (particle.pos.x - particle.radius) < 0) {
         particle.vel.subtract(new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](particle.vel.x, 0).scale(2));
-        particle.pos.x = Math.round(particle.pos.x);
       }
 
       if (particle.pos.y > 1 || particle.pos.y < 0) {
         particle.vel.subtract(new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, particle.vel.y).scale(2));
-        particle.pos.y = Math.round(particle.pos.y);
       }
     }
   }
@@ -267,7 +265,7 @@ class Client {
   }
 
   createMouseField() {
-    this.mouseField = new _simulator_field__WEBPACK_IMPORTED_MODULE_1__["HardSphere"]({
+    this.mouseField = new _presets__WEBPACK_IMPORTED_MODULE_1__["HardSphere"]({
       pos: this.mouse,
       radius: 0.01,
     });
@@ -386,7 +384,7 @@ class Display {
 
     for (let i = 0; i < nParticles; i += 1) {
       const particle = particles[i];
-      if (particle.mass < 1) {
+      if (particle.size <= 1) {
         this.dot(particle);
       } else {
         this.circle(particle);
@@ -416,12 +414,12 @@ class Display {
     this.ctx.stroke();
   }
 
-  circle({ pos, mass }) {
+  circle({ pos, size }) {
     this.ctx.beginPath();
     this.ctx.arc(
       pos.x * this.width,
       pos.y * this.height,
-      Math.sqrt(mass),
+      size,
       0,
       2 * Math.PI,
       false
@@ -439,213 +437,25 @@ class Display {
 
 /***/ }),
 
+/***/ "./src/interface/presets.js":
+/*!**********************************!*\
+  !*** ./src/interface/presets.js ***!
+  \**********************************/
+/*! no exports provided */
+/***/ (function(module, exports) {
+
+throw new Error("Module parse failed: Unexpected token (6:44)\nYou may need an appropriate loader to handle this file type.\n| const FUN_CONSTANT = -8e-9;\n| \n> const absorb = (thisParticle, thatParticle) {\n|   thisParticle.mass += thatParticle.mass;\n|   thatParticle.delete();");
+
+/***/ }),
+
 /***/ "./src/interface/ui_elements.js":
 /*!**************************************!*\
   !*** ./src/interface/ui_elements.js ***!
   \**************************************/
 /*! exports provided: buildUI, startTutorial */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "buildUI", function() { return buildUI; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "startTutorial", function() { return startTutorial; });
-const BUTTONS_RIGHT = ['push', 'paint', 'make one', 'walls', 'reset', 'gas'];
-const BUTTONS_TOP = ['space', 'fluid', 'benchmark'];
-
-const timesTutorialLeft = window.localStorage.getItem('dotsTutorial') || 2;
-
-const addClass = (id, className) =>
-  document.getElementById(id).classList.add(className);
-const removeClass = (id, className) =>
-  document.getElementById(id).classList.remove(className);
-
-const sleep = seconds =>
-  new Promise(resolve => setTimeout(resolve, seconds * 1000));
-
-const buildUI = () => {
-  for (let i = 0; i < BUTTONS_RIGHT.length; i += 1) {
-    const uiElement = document.createElement('li');
-    uiElement.className = 'options-text';
-    uiElement.id = BUTTONS_RIGHT[i];
-    uiElement.innerText = BUTTONS_RIGHT[i];
-    document.getElementById('options-buttons').appendChild(uiElement);
-  }
-
-  for (let i = 0; i < BUTTONS_TOP.length; i += 1) {
-    const uiElement = document.createElement('li');
-    uiElement.className = 'options-text';
-    uiElement.id = BUTTONS_TOP[i];
-    uiElement.innerText = BUTTONS_TOP[i];
-    document.getElementById('mode-buttons').appendChild(uiElement);
-  }
-};
-
-const startTutorial = async () => {
-  await sleep(0);
-  removeClass('title', 'hidden');
-  await sleep(4);
-  addClass('title', 'hidden');
-  if (timesTutorialLeft !== '0') {
-    removeClass('select-mode', 'hidden');
-    document.querySelector('.mode').onclick = async () => {
-      addClass('select-mode', 'fade-out');
-      await sleep(0.99);
-      addClass('select-mode', 'hidden');
-      removeClass('select-options', 'hidden');
-      document.querySelector('.options').onclick = async () => {
-        addClass('select-options', 'fade-out');
-        await sleep(0.99);
-        addClass('welcome', 'hidden');
-      };
-    };
-    window.localStorage.setItem('dotsTutorial', timesTutorialLeft - 1);
-  } else {
-    addClass('welcome', 'hidden');
-  }
-};
-
-
-/***/ }),
-
-/***/ "./src/simulator/field.js":
-/*!********************************!*\
-  !*** ./src/simulator/field.js ***!
-  \********************************/
-/*! exports provided: Attractor, HardSphere */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Attractor", function() { return Attractor; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HardSphere", function() { return HardSphere; });
-/* harmony import */ var _particle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./particle */ "./src/simulator/particle.js");
-/* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./vector */ "./src/simulator/vector.js");
-
-
-
-const FUN_CONSTANT = -8e-9;
-
-class Attractor extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  interact(particle) {
-    const sqDistance = this.pos.sqDist(particle.pos);
-    if (sqDistance > 5e-7 * this.mass) {
-      this.radialAccelerate(particle, (this.mass * FUN_CONSTANT) / sqDistance);
-    } else if (this.protected && particle.protected) {
-      this.inelasticCollide(particle);
-      this.absorb(particle);
-    }
-  }
-}
-
-class HardSphere extends _particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  interact(particle) {
-    if (this.isInRadius(particle)) {
-      particle.move(
-        _vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(particle.pos, this.pos).scale(
-          this.radius - this.pos.sqDist(particle.pos)
-        )
-      );
-    }
-  }
-}
-
-
-/***/ }),
-
-/***/ "./src/simulator/particle.js":
-/*!***********************************!*\
-  !*** ./src/simulator/particle.js ***!
-  \***********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./vector */ "./src/simulator/vector.js");
-
-
-class Particle {
-  constructor({
-    pos = new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0),
-    vel = new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0),
-    mass = 0,
-    charge = 0,
-    radius = 0,
-  }) {
-    this.pos = pos;
-    this.vel = vel;
-    this.mass = mass;
-    this.charge = charge;
-    this.radius = radius;
-
-    this.protected = true;
-  }
-
-  get momentum() {
-    return _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(this.vel).scale(this.mass);
-  }
-
-  update() {
-    this.pos.add(this.vel);
-  }
-
-  accelerate(amount) {
-    this.vel.add(amount);
-  }
-
-  move(amount) {
-    this.pos.add(amount);
-  }
-
-  delete() {
-    this.protected = false;
-  }
-
-  receiveFrom(amount, location) {
-    this.vel.add(_vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location).scale(amount));
-  }
-
-  moveAwayFrom(distance, location) {
-    this.pos.add(_vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location).scale(distance));
-  }
-
-  absorb(particle) {
-    this.mass += particle.mass;
-    particle.delete();
-  }
-
-  inelasticCollide(particle) {
-    this.vel = particle.momentum
-      .add(this.momentum)
-      .scale(1 / (this.mass + particle.mass));
-  }
-
-  radialAccelerate(particle, amount) {
-    particle.accelerate(
-      new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0)
-        .add(particle.pos)
-        .subtract(this.pos)
-        .scale(amount)
-    );
-  }
-
-  isInRadius(particle) {
-    const distance = this.pos.sqDist(particle.pos);
-
-    return distance && distance < this.radius;
-  }
-
-  static random(initial) {
-    const pos = initial || _vector__WEBPACK_IMPORTED_MODULE_0__["default"].random();
-    const vel = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00005);
-
-    return new Particle({ pos, vel });
-  }
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (Particle);
-
+throw new Error("Module build failed: Error: ENOENT: no such file or directory, open '/media/Cloud/OneDrive/Active/dots/src/interface/ui_elements.js'");
 
 /***/ }),
 
@@ -664,7 +474,17 @@ class State {
   }
 
   cleanup() {
-    this.particles = this.particles.filter(particle => particle.protected);
+    const nParticles = this.particles.length;
+    let validParticles = 0;
+    for (let i = 0; i < nParticles; i += 1) {
+      const particle = this.particles[i];
+
+      if (particle.protected) {
+        if (i !== validParticles) this.particles[validParticles] = particle;
+        validParticles += 1;
+      }
+    }
+    this.particles.length = validParticles;
   }
 
   update() {
@@ -689,7 +509,7 @@ class State {
   }
 
   reset() {
-    this.particles = [];
+    this.particles.length = 0;
   }
 }
 

@@ -24,7 +24,7 @@ class Display {
 
     for (let i = 0; i < nParticles; i += 1) {
       const particle = particles[i];
-      if (particle.mass < 1) {
+      if (particle.size <= 1) {
         this.dot(particle);
       } else {
         this.circle(particle);
@@ -54,12 +54,12 @@ class Display {
     this.ctx.stroke();
   }
 
-  circle({ pos, mass }) {
+  circle({ pos, size }) {
     this.ctx.beginPath();
     this.ctx.arc(
       pos.x * this.width,
       pos.y * this.height,
-      Math.sqrt(mass),
+      size,
       0,
       2 * Math.PI,
       false
