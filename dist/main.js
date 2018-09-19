@@ -107,8 +107,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  const uiElements = new _interface_ui_elements__WEBPACK_IMPORTED_MODULE_2__["default"]();
-  uiElements.startTutorial();
+  Object(_interface_ui_elements__WEBPACK_IMPORTED_MODULE_2__["buildUI"])();
+  Object(_interface_ui_elements__WEBPACK_IMPORTED_MODULE_2__["startTutorial"])();
 
   const state = new _simulator_state__WEBPACK_IMPORTED_MODULE_3__["default"]();
   const client = new _interface_client__WEBPACK_IMPORTED_MODULE_1__["default"](state);
@@ -442,49 +442,49 @@ class Display {
 /*!**************************************!*\
   !*** ./src/interface/ui_elements.js ***!
   \**************************************/
-/*! exports provided: default */
+/*! exports provided: buildUI, startTutorial */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-class UIElements {
-  constructor() {
-    this.buttonsRight = [
-      'push',
-      'paint',
-      'make one',
-      'walls',
-      'reset',
-      'gas',
-    ];
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "buildUI", function() { return buildUI; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "startTutorial", function() { return startTutorial; });
+const BUTTONS_RIGHT = ['push', 'paint', 'make one', 'walls', 'reset', 'gas'];
+const BUTTONS_TOP = ['benchmark', 'space', 'fluids'];
 
-    this.buttonsTop = [
-      'space',
-      'gas'
-    ];
+// const timesTutorialSeen = window.localStorage.getItem('dotsTutorial') || 0;
 
-    this.tutorial = true;
-    this.navSeen = false;
-    this.buildUI();
+const addClass = (id, className) =>
+  document.getElementById(id).classList.add(className);
+const removeClass = (id, className) =>
+  document.getElementById(id).classList.remove(className);
+
+const sleep = seconds =>
+  new Promise(resolve => setTimeout(resolve, seconds * 1000));
+
+const buildUI = () => {
+  for (let i = 0; i < BUTTONS_RIGHT.length; i += 1) {
+    const uiElement = document.createElement('li');
+    uiElement.className = 'options-text';
+    uiElement.id = BUTTONS_RIGHT[i];
+    uiElement.innerText = BUTTONS_RIGHT[i];
+    document.getElementById('options-buttons').appendChild(uiElement);
   }
+};
 
-  buildUI() {
-    for (let i = 0; i < this.buttonsRight.length; i += 1) {
-      const uiElement = document.createElement('li');
-      uiElement.className = 'options-text';
-      uiElement.id = this.buttonsRight[i];
-      uiElement.innerText = this.buttonsRight[i];
-      document.getElementById('options-buttons').appendChild(uiElement);
-    }
-  }
-
-  startTutorial() {
-    // document.getElementById('tutorial1').classList.remove('waiting')
-    // document.getElementById
-  }
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (UIElements);
+const startTutorial = async () => {
+  await sleep(0);
+  removeClass('title', 'hidden');
+  await sleep(4);
+  addClass('title', 'hidden');
+  removeClass('select-options', 'hidden');
+  document.querySelector('.options').onclick = async () => {
+    removeClass('select-options', 'fade-in');
+    addClass('select-options', 'fade-out');
+    await sleep(1);
+    addClass('welcome', 'hidden');
+  };
+};
 
 
 /***/ }),

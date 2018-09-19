@@ -8,17 +8,22 @@
   <link href="https://fonts.googleapis.com/css?family=Dawning+of+a+New+Day|Satisfy" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Arima+Madurai" rel="stylesheet">
   <script src="dist/main.js"></script>
+
+  <link rel="stylesheet" href="dist/normalize.css">
+  <link rel="stylesheet" href="dist/tutorial.css">
   <link rel="stylesheet" href="dist/style.css">
   <title>dots</title>
 </head>
 
 <body>
-  <header class='welcome'>
-    <h2 id="tutorial2" class='select fade-slow'>select particle type above</h2>
-    <h1 class='title fade'>dots</h1>
-    <h2 id="tutorial1" class='select fade-slow'>select options on the right</h2>
+  <header id="welcome" class='welcome'>
+    <h2 id="select-mode" class='select fade-in hidden'>select particle type above</h2>
+    <h1 id="title" class='title fade-in-out'>dots</h1>
+    <h2 id="select-options" class='select fade-in hidden'>select options on the right</h2>
   </header>
-  <div class="mode"><ul id="mode-buttons"></ul></div>
+  <div class="mode">
+    <ul id="mode-buttons"></ul>
+  </div>
   <div class="options">
     <ul id="options-buttons"></ul>
   </div>

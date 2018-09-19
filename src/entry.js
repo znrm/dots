@@ -1,12 +1,12 @@
 import Display from './interface/display';
 import Client from './interface/client';
-import UIElements from './interface/ui_elements';
+import { startTutorial, buildUI } from './interface/ui_elements';
 import State from './simulator/state';
 import Vector from './simulator/vector';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const uiElements = new UIElements();
-  uiElements.startTutorial();
+  buildUI();
+  startTutorial();
 
   const state = new State();
   const client = new Client(state);
