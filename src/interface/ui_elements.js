@@ -8,6 +8,14 @@ class UIElements {
       'reset',
       'gas',
     ];
+
+    this.buttonsTop = [
+      'space',
+      'gas'
+    ];
+
+    this.tutorial = true;
+    this.navSeen = false;
     this.buildUI();
   }
 
@@ -17,8 +25,13 @@ class UIElements {
       uiElement.className = 'options-text';
       uiElement.id = this.buttonsRight[i];
       uiElement.innerText = this.buttonsRight[i];
-      document.getElementById('ui').appendChild(uiElement);
+      document.getElementById('options-buttons').appendChild(uiElement);
     }
+  }
+
+  startTutorial() {
+    // document.getElementById('tutorial1').classList.remove('waiting')
+    // document.getElementById
   }
 }
 

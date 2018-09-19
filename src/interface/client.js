@@ -132,7 +132,7 @@ class Client {
   }
 
   addEvents() {
-    const ui = document.getElementById('ui');
+    const ui = document.getElementById('options-buttons');
     const canvas = document.querySelector('canvas');
 
     ui.onclick = this.integrateUI();

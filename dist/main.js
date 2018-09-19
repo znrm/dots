@@ -108,6 +108,7 @@ __webpack_require__.r(__webpack_exports__);
 
 document.addEventListener('DOMContentLoaded', () => {
   const uiElements = new _interface_ui_elements__WEBPACK_IMPORTED_MODULE_2__["default"]();
+  uiElements.startTutorial();
 
   const state = new _simulator_state__WEBPACK_IMPORTED_MODULE_3__["default"]();
   const client = new _interface_client__WEBPACK_IMPORTED_MODULE_1__["default"](state);
@@ -277,7 +278,7 @@ class Client {
   }
 
   addEvents() {
-    const ui = document.getElementById('ui');
+    const ui = document.getElementById('options-buttons');
     const canvas = document.querySelector('canvas');
 
     ui.onclick = this.integrateUI();
@@ -456,6 +457,14 @@ class UIElements {
       'reset',
       'gas',
     ];
+
+    this.buttonsTop = [
+      'space',
+      'gas'
+    ];
+
+    this.tutorial = true;
+    this.navSeen = false;
     this.buildUI();
   }
 
@@ -465,8 +474,13 @@ class UIElements {
       uiElement.className = 'options-text';
       uiElement.id = this.buttonsRight[i];
       uiElement.innerText = this.buttonsRight[i];
-      document.getElementById('ui').appendChild(uiElement);
+      document.getElementById('options-buttons').appendChild(uiElement);
     }
+  }
+
+  startTutorial() {
+    // document.getElementById('tutorial1').classList.remove('waiting')
+    // document.getElementById
   }
 }
 

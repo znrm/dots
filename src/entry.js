@@ -6,6 +6,7 @@ import Vector from './simulator/vector';
 
 document.addEventListener('DOMContentLoaded', () => {
   const uiElements = new UIElements();
+  uiElements.startTutorial();
 
   const state = new State();
   const client = new Client(state);
