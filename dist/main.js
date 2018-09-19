@@ -127,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.cleanup();
   };
   window.Vector = _simulator_vector__WEBPACK_IMPORTED_MODULE_4__["default"];
+  window.state = state;
   run();
 });
 
@@ -452,7 +453,7 @@ __webpack_require__.r(__webpack_exports__);
 const BUTTONS_RIGHT = ['push', 'paint', 'make one', 'walls', 'reset', 'gas'];
 const BUTTONS_TOP = ['benchmark', 'space', 'fluids'];
 
-// const timesTutorialSeen = window.localStorage.getItem('dotsTutorial') || 0;
+const timesTutorialSeen = window.localStorage.getItem('dotsTutorial') || 0;
 
 const addClass = (id, className) =>
   document.getElementById(id).classList.add(className);
@@ -477,13 +478,16 @@ const startTutorial = async () => {
   removeClass('title', 'hidden');
   await sleep(4);
   addClass('title', 'hidden');
-  removeClass('select-options', 'hidden');
-  document.querySelector('.options').onclick = async () => {
-    removeClass('select-options', 'fade-in');
-    addClass('select-options', 'fade-out');
-    await sleep(1);
-    addClass('welcome', 'hidden');
-  };
+  if (timesTutorialSeen < 2) {
+    removeClass('select-options', 'hidden');
+    document.querySelector('.options').onclick = async () => {
+      removeClass('select-options', 'fade-in');
+      addClass('select-options', 'fade-out');
+      await sleep(1);
+    };
+  }
+  addClass('welcome', 'hidden');
+  window.localStorage.setItem('dotsTutorial', timesTutorialSeen + 1);
 };
 
 
@@ -604,7 +608,8 @@ class Particle {
 
   radialAccelerate(particle, amount) {
     particle.accelerate(
-      _vector__WEBPACK_IMPORTED_MODULE_0__["default"].clone(particle.pos)
+      new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0)
+        .add(particle.pos)
         .subtract(this.pos)
         .scale(amount)
     );
@@ -613,7 +618,7 @@ class Particle {
   isInRadius(particle) {
     const distance = this.pos.sqDist(particle.pos);
 
-    return distance && distance < (this.radius);
+    return distance && distance < this.radius;
   }
 
   static random(initial) {
@@ -724,9 +729,9 @@ class Vector {
   }
 
   sqDist(that) {
-    const dX = this.x - that.x;
-    const dY = this.y - that.y;
-    return dX * dX + dY * dY;
+    const dX = (this.x - that.x) ** 2;
+    const dY = (this.y - that.y) ** 2;
+    return dX + dY;
   }
 
   dist(that) {
@@ -753,7 +758,7 @@ class Vector {
   static randomDir(scale = 1) {
     return new Vector(
       Math.random() - Math.random(),
-      Math.random() - Math.random(),
+      Math.random() - Math.random()
     )
       .normalize()
       .scale(scale);

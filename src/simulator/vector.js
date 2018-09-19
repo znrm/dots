@@ -35,9 +35,9 @@ class Vector {
   }
 
   sqDist(that) {
-    const dX = this.x - that.x;
-    const dY = this.y - that.y;
-    return dX * dX + dY * dY;
+    const dX = (this.x - that.x) ** 2;
+    const dY = (this.y - that.y) ** 2;
+    return dX + dY;
   }
 
   dist(that) {
@@ -64,7 +64,7 @@ class Vector {
   static randomDir(scale = 1) {
     return new Vector(
       Math.random() - Math.random(),
-      Math.random() - Math.random(),
+      Math.random() - Math.random()
     )
       .normalize()
       .scale(scale);

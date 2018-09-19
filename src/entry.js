@@ -25,5 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     state.cleanup();
   };
   window.Vector = Vector;
+  window.state = state;
   run();
 });

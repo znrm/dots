@@ -1,7 +1,7 @@
 const BUTTONS_RIGHT = ['push', 'paint', 'make one', 'walls', 'reset', 'gas'];
 const BUTTONS_TOP = ['benchmark', 'space', 'fluids'];
 
-// const timesTutorialSeen = window.localStorage.getItem('dotsTutorial') || 0;
+const timesTutorialSeen = window.localStorage.getItem('dotsTutorial') || 0;
 
 const addClass = (id, className) =>
   document.getElementById(id).classList.add(className);
@@ -26,11 +26,14 @@ export const startTutorial = async () => {
   removeClass('title', 'hidden');
   await sleep(4);
   addClass('title', 'hidden');
-  removeClass('select-options', 'hidden');
-  document.querySelector('.options').onclick = async () => {
-    removeClass('select-options', 'fade-in');
-    addClass('select-options', 'fade-out');
-    await sleep(1);
-    addClass('welcome', 'hidden');
-  };
+  if (timesTutorialSeen < 2) {
+    removeClass('select-options', 'hidden');
+    document.querySelector('.options').onclick = async () => {
+      removeClass('select-options', 'fade-in');
+      addClass('select-options', 'fade-out');
+      await sleep(1);
+    };
+  }
+  addClass('welcome', 'hidden');
+  window.localStorage.setItem('dotsTutorial', timesTutorialSeen + 1);
 };

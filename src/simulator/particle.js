@@ -58,7 +58,8 @@ class Particle {
 
   radialAccelerate(particle, amount) {
     particle.accelerate(
-      Vector.clone(particle.pos)
+      new Vector(0, 0)
+        .add(particle.pos)
         .subtract(this.pos)
         .scale(amount)
     );
@@ -67,7 +68,7 @@ class Particle {
   isInRadius(particle) {
     const distance = this.pos.sqDist(particle.pos);
 
-    return distance && distance < (this.radius);
+    return distance && distance < this.radius;
   }
 
   static random(initial) {
