@@ -32,8 +32,8 @@ const fakeGravity = (thisParticle, thatParticle) => {
 };
 
 class SpaceDebris extends Particle {
-  get size() {
-    return Math.sqrt(this.mass);
+  visualSize(scale) {
+    return Math.sqrt(this.mass) * scale;
   }
 
   interact(particle) {
@@ -50,19 +50,24 @@ class SpaceDebris extends Particle {
 
 class Automata extends Particle {
   inReach(pos, size) {
-    return this.pos.dist(pos) < 1.4 * this.size + size;
+    return this.pos.dist(pos) < Math.SQRT2 * this.size + size;
   }
 
   interact(particle) {
     if (this.inReach(particle.pos, particle.size)) {
-      moveAway(this, particle, 0.9);
+      moveAway(this, particle, Math.SQRT1_2);
     }
   }
 }
 
-class Fluid extends Particle {
-  update() {
-    this.pos.add(this.vel.add(new Vector(0, 1e-5)));
+class Network extends Particle {
+  constructor(particleParams) {
+    super(particleParams);
+    this.nearby = [];
+  }
+
+  interact({ pos }) {
+    if (this.isTouching(pos, 0)) this.nearby.push(pos);
   }
 }
 
@@ -78,19 +83,21 @@ export const paint = {
     }),
   automata: mouse =>
     new Automata({
-      radius: 1e-2,
+      radius: 5e-3,
       vel: Vector.randomDir(0.001),
       pos: spreadPosition(mouse, 0.01)
     }),
-  fluids: mouse =>
-    new Fluid({
-      radius: 3e-2,
-      vel: Vector.randomDir(0.001),
-      pos: spreadPosition(mouse, 0.001)
+  networks: mouse =>
+    new Network({
+      radius: 1e-1,
+      vel: Vector.randomDir(0.0002),
+      pos: spreadPosition(mouse, 0.15)
     })
 };
 
-export const emit = {};
+export const shoot = {};
+
+export const place = {};
 
 class HardSphere extends Particle {
   interact(particle) {

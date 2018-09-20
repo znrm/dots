@@ -164,6 +164,8 @@ class Client {
     this.action = 'paint';
 
     this.paint = _presets__WEBPACK_IMPORTED_MODULE_1__["paint"];
+    this.shoot = _presets__WEBPACK_IMPORTED_MODULE_1__["shoot"];
+    this.place = _presets__WEBPACK_IMPORTED_MODULE_1__["place"];
 
     this.addEvents();
   }
@@ -181,8 +183,8 @@ class Client {
   }
 
   clickAction() {
-    if (this.selectedAction === 'make one') {
-      this.newLargeAttractor();
+    if (this.action === 'place') {
+      this.place[this.mode](this.mouse);
     }
   }
 
@@ -295,18 +297,41 @@ class Display {
     window.onresize = () => this.resize();
   }
 
+  get scale() {
+    return Math.min(this.width, this.height);
+  }
+
   render() {
     this.mouse(this.client.mouse);
     this.renderParticles();
   }
 
   renderParticles() {
+    switch (this.client.mode) {
+      case 'stars':
+        this.renderStars();
+        break;
+      case 'automata':
+        this.renderAutomata();
+        break;
+      case 'networks':
+        this.renderNetworks();
+        break;
+      case 'gases':
+        this.renderGases();
+        break;
+      default:
+        break;
+    }
+  }
+
+  renderStars() {
     const { particles } = this.state;
     const nParticles = particles.length;
 
     for (let i = 0; i < nParticles; i += 1) {
       const particle = particles[i];
-      if (this.client.mode === 'dots' || particle.size * Math.min(this.width, this.height) < 1) {
+      if (particle.visualSize(this.scale) < 1) {
         this.dot(particle);
       } else {
         this.circle(particle);
@@ -314,13 +339,39 @@ class Display {
     }
   }
 
+  renderAutomata() {
+    const { particles } = this.state;
+    const nParticles = particles.length;
+
+    for (let i = 0; i < nParticles; i += 1) this.circle(particles[i]);
+  }
+
+  renderNetworks() {
+    this.ctx.lineWidth = 0.3;
+    this.ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    const { particles } = this.state;
+    const nParticles = particles.length;
+
+    for (let i = 0; i < nParticles; i += 1) {
+      const particle = particles[i];
+      const nAdjacentParticles = particle.nearby.length;
+      for (let j = 0; j < nAdjacentParticles; j += 1) {
+        this.line(particle.pos, particle.nearby[j]);
+      }
+      particle.nearby.length = 0;
+    }
+  }
+
   resize() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
+
     this.client.displayWidth = this.width;
     this.client.displayHeight = this.height;
+
     this.canvas.width = this.width;
     this.canvas.height = this.height;
+
     this.ctx.fillStyle = 'rgba(255,255,255,1)';
     this.ctx.strokeStyle = 'rgba(255,255,255,1)';
   }
@@ -333,16 +384,26 @@ class Display {
     this.ctx.lineWidth = 1.5;
     this.strokeStyle = 'rgba(255,255,255,0.2)';
     this.ctx.beginPath();
-    this.ctx.arc(x * this.width, y * this.height, 5, 0, 2 * Math.PI, false);
+    this.ctx.arc(
+      x * this.width,
+      y * this.height,
+      0.008 * this.scale,
+      0,
+      2 * Math.PI,
+      false
+    );
     this.ctx.stroke();
   }
 
-  circle({ pos, size }) {
+  circle(particle) {
+    const { pos } = particle;
+    const size = particle.visualSize(this.scale);
+
     this.ctx.beginPath();
     this.ctx.arc(
       pos.x * this.width,
       pos.y * this.height,
-      size * Math.min(this.width, this.height),
+      size,
       0,
       2 * Math.PI,
       false
@@ -352,6 +413,13 @@ class Display {
 
   dot({ pos }) {
     this.ctx.fillRect(pos.x * this.width, pos.y * this.height, 1, 1);
+  }
+
+  line(from, to) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(from.x * this.width, from.y * this.height);
+    this.ctx.lineTo(to.x * this.width, to.y * this.height);
+    this.ctx.stroke();
   }
 }
 
@@ -423,13 +491,14 @@ const startTutorial = async () => {
 /*!**********************************!*\
   !*** ./src/interface/presets.js ***!
   \**********************************/
-/*! exports provided: paint, emit */
+/*! exports provided: paint, shoot, place */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "paint", function() { return paint; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "emit", function() { return emit; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "shoot", function() { return shoot; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "place", function() { return place; });
 /* harmony import */ var _simulator_particle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../simulator/particle */ "./src/simulator/particle.js");
 /* harmony import */ var _simulator_vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../simulator/vector */ "./src/simulator/vector.js");
 
@@ -466,8 +535,8 @@ const fakeGravity = (thisParticle, thatParticle) => {
 };
 
 class SpaceDebris extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  get size() {
-    return Math.sqrt(this.mass);
+  visualSize(scale) {
+    return Math.sqrt(this.mass) * scale;
   }
 
   interact(particle) {
@@ -484,19 +553,24 @@ class SpaceDebris extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["defa
 
 class Automata extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   inReach(pos, size) {
-    return this.pos.dist(pos) < 1.4 * this.size + size;
+    return this.pos.dist(pos) < Math.SQRT2 * this.size + size;
   }
 
   interact(particle) {
     if (this.inReach(particle.pos, particle.size)) {
-      moveAway(this, particle, 0.9);
+      moveAway(this, particle, Math.SQRT1_2);
     }
   }
 }
 
-class Fluid extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  update() {
-    this.pos.add(this.vel.add(new _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"](0, 1e-5)));
+class Network extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
+  constructor(particleParams) {
+    super(particleParams);
+    this.nearby = [];
+  }
+
+  interact({ pos }) {
+    if (this.isTouching(pos, 0)) this.nearby.push(pos);
   }
 }
 
@@ -512,19 +586,21 @@ const paint = {
     }),
   automata: mouse =>
     new Automata({
-      radius: 1e-2,
+      radius: 5e-3,
       vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(0.001),
       pos: spreadPosition(mouse, 0.01)
     }),
-  fluids: mouse =>
-    new Fluid({
-      radius: 3e-2,
-      vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(0.001),
-      pos: spreadPosition(mouse, 0.001)
+  networks: mouse =>
+    new Network({
+      radius: 1e-1,
+      vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(0.0002),
+      pos: spreadPosition(mouse, 0.15)
     })
 };
 
-const emit = {};
+const shoot = {};
+
+const place = {};
 
 class HardSphere extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   interact(particle) {
@@ -550,8 +626,8 @@ class HardSphere extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["defau
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-const BUTTONS_RIGHT = ['paint', 'reset'];
-const BUTTONS_TOP = ['stars', 'automata'];
+const BUTTONS_RIGHT = ['paint', 'shoot', 'place', 'reset'];
+const BUTTONS_TOP = ['stars', 'gases', 'networks', 'automata'];
 
 const buildUI = () => {
   for (let i = 0; i < BUTTONS_RIGHT.length; i += 1) {
@@ -611,6 +687,10 @@ class Particle {
 
   get size() {
     return this.radius;
+  }
+
+  visualSize(scale) {
+    return this.radius * scale;
   }
 
   update() {

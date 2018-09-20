@@ -13,18 +13,41 @@ class Display {
     window.onresize = () => this.resize();
   }
 
+  get scale() {
+    return Math.min(this.width, this.height);
+  }
+
   render() {
     this.mouse(this.client.mouse);
     this.renderParticles();
   }
 
   renderParticles() {
+    switch (this.client.mode) {
+      case 'stars':
+        this.renderStars();
+        break;
+      case 'automata':
+        this.renderAutomata();
+        break;
+      case 'networks':
+        this.renderNetworks();
+        break;
+      case 'gases':
+        this.renderGases();
+        break;
+      default:
+        break;
+    }
+  }
+
+  renderStars() {
     const { particles } = this.state;
     const nParticles = particles.length;
 
     for (let i = 0; i < nParticles; i += 1) {
       const particle = particles[i];
-      if (this.client.mode === 'dots' || particle.size * Math.min(this.width, this.height) < 1) {
+      if (particle.visualSize(this.scale) < 1) {
         this.dot(particle);
       } else {
         this.circle(particle);
@@ -32,13 +55,39 @@ class Display {
     }
   }
 
+  renderAutomata() {
+    const { particles } = this.state;
+    const nParticles = particles.length;
+
+    for (let i = 0; i < nParticles; i += 1) this.circle(particles[i]);
+  }
+
+  renderNetworks() {
+    this.ctx.lineWidth = 0.3;
+    this.ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    const { particles } = this.state;
+    const nParticles = particles.length;
+
+    for (let i = 0; i < nParticles; i += 1) {
+      const particle = particles[i];
+      const nAdjacentParticles = particle.nearby.length;
+      for (let j = 0; j < nAdjacentParticles; j += 1) {
+        this.line(particle.pos, particle.nearby[j]);
+      }
+      particle.nearby.length = 0;
+    }
+  }
+
   resize() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
+
     this.client.displayWidth = this.width;
     this.client.displayHeight = this.height;
+
     this.canvas.width = this.width;
     this.canvas.height = this.height;
+
     this.ctx.fillStyle = 'rgba(255,255,255,1)';
     this.ctx.strokeStyle = 'rgba(255,255,255,1)';
   }
@@ -51,16 +100,26 @@ class Display {
     this.ctx.lineWidth = 1.5;
     this.strokeStyle = 'rgba(255,255,255,0.2)';
     this.ctx.beginPath();
-    this.ctx.arc(x * this.width, y * this.height, 5, 0, 2 * Math.PI, false);
+    this.ctx.arc(
+      x * this.width,
+      y * this.height,
+      0.008 * this.scale,
+      0,
+      2 * Math.PI,
+      false
+    );
     this.ctx.stroke();
   }
 
-  circle({ pos, size }) {
+  circle(particle) {
+    const { pos } = particle;
+    const size = particle.visualSize(this.scale);
+
     this.ctx.beginPath();
     this.ctx.arc(
       pos.x * this.width,
       pos.y * this.height,
-      size * Math.min(this.width, this.height),
+      size,
       0,
       2 * Math.PI,
       false
@@ -70,6 +129,13 @@ class Display {
 
   dot({ pos }) {
     this.ctx.fillRect(pos.x * this.width, pos.y * this.height, 1, 1);
+  }
+
+  line(from, to) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(from.x * this.width, from.y * this.height);
+    this.ctx.lineTo(to.x * this.width, to.y * this.height);
+    this.ctx.stroke();
   }
 }
 

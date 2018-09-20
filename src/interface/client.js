@@ -1,5 +1,5 @@
 import Vector from '../simulator/vector';
-import { paint } from './presets';
+import { paint, shoot, place } from './presets';
 
 class Client {
   constructor(state) {
@@ -14,6 +14,8 @@ class Client {
     this.action = 'paint';
 
     this.paint = paint;
+    this.shoot = shoot;
+    this.place = place;
 
     this.addEvents();
   }
@@ -31,8 +33,8 @@ class Client {
   }
 
   clickAction() {
-    if (this.selectedAction === 'make one') {
-      this.newLargeAttractor();
+    if (this.action === 'place') {
+      this.place[this.mode](this.mouse);
     }
   }
 

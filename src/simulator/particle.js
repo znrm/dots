@@ -25,6 +25,10 @@ class Particle {
     return this.radius;
   }
 
+  visualSize(scale) {
+    return this.radius * scale;
+  }
+
   update() {
     this.pos.add(this.vel);
   }
