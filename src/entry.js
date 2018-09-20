@@ -27,5 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   window.Vector = Vector;
   window.state = state;
+  window.client = client;
   run();
 });

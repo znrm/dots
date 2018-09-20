@@ -130,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   window.Vector = _simulator_vector__WEBPACK_IMPORTED_MODULE_5__["default"];
   window.state = state;
+  window.client = client;
   run();
 });
 
@@ -197,11 +198,15 @@ class Client {
   }
 
   addEvents() {
-    const ui = document.getElementById('options-buttons');
+    const options = document.getElementById('options-buttons');
+    const mode = document.getElementById('mode-buttons');
     const canvas = document.querySelector('canvas');
 
-    ui.onclick = this.integrateUI();
-    ui.ontouchstart = this.integrateUI();
+    options.onclick = this.selectAction();
+    options.ontouchstart = this.selectAction();
+
+    mode.onclick = this.selectMode();
+    mode.ontouchstart = this.selectMode();
 
     canvas.onmousedown = this.mouseDown();
     canvas.ontouchstart = this.mouseDown();
@@ -242,20 +247,20 @@ class Client {
     };
   }
 
-  integrateUI() {
+  selectMode() {
+    return e => {
+      this.mode = e.target.id;
+    };
+  }
+
+  selectAction() {
     return e => {
       switch (e.target.id) {
         case 'reset':
           this.state.reset();
           break;
-        case 'stars':
-          this.mode = 'stars';
-          break;
-        case 'airbrush':
-          this.selectedAction = 'airbrush';
-          break;
         default:
-          break;
+          this.action = e.target.id;
       }
     };
   }
@@ -301,7 +306,7 @@ class Display {
 
     for (let i = 0; i < nParticles; i += 1) {
       const particle = particles[i];
-      if (particle.size * Math.min(this.width, this.height) < 1) {
+      if (this.client.mode === 'dots' || particle.size * Math.min(this.width, this.height) < 1) {
         this.dot(particle);
       } else {
         this.circle(particle);
@@ -325,6 +330,7 @@ class Display {
   }
 
   mouse({ x, y }) {
+    this.ctx.lineWidth = 1.5;
     this.strokeStyle = 'rgba(255,255,255,0.2)';
     this.ctx.beginPath();
     this.ctx.arc(x * this.width, y * this.height, 5, 0, 2 * Math.PI, false);
@@ -434,6 +440,15 @@ const inelasticCollide = (thisParticle, thatParticle) => {
   );
 };
 
+const moveAway = (thisParticle, thatParticle, a) => {
+  thatParticle.move(
+    _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(thatParticle.pos, thisParticle.pos).scale(
+      a * (thisParticle.size + thatParticle.size) -
+        thisParticle.pos.dist(thatParticle.pos)
+    )
+  );
+};
+
 const fakeGravity = (thisParticle, thatParticle) => {
   const scalar = thisParticle.mass / thisParticle.pos.dist(thatParticle.pos);
   const direction = _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(thisParticle.pos, thatParticle.pos);
@@ -457,53 +472,61 @@ class SpaceDebris extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["defa
   }
 }
 
-const spreadPosition = mouse =>
-  _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(0.02 * Math.random()).add(mouse);
+class Automata extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
+  inReach(pos, size) {
+    return this.pos.dist(pos) < 1.4 * this.size + size;
+  }
+
+  interact(particle) {
+    if (this.inReach(particle.pos, particle.size)) {
+      moveAway(this, particle, 0.9);
+    }
+  }
+}
+
+class Fluid extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
+  update() {
+    this.pos.add(this.vel.add(new _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"](0, 1e-5)));
+  }
+}
+
+const spreadPosition = (mouse, spread) =>
+  _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(spread * Math.random()).add(mouse);
 
 const airbrush = {
   stars: mouse =>
     new SpaceDebris({
       mass: 5e-7,
       vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(0.00001),
-      pos: spreadPosition(mouse)
+      pos: spreadPosition(mouse, 0.03)
+    }),
+  automata: mouse =>
+    new Automata({
+      radius: 1e-2,
+      vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(0.001),
+      pos: spreadPosition(mouse, 0.01)
+    }),
+  fluids: mouse =>
+    new Fluid({
+      radius: 3e-2,
+      vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(0.001),
+      pos: spreadPosition(mouse, 0.001)
     })
 };
 
 const emit = {};
 
-// class HardSphere extends Particle {
-//   interact(particle) {
-//     if (this.inRadius(particle.pos)) {
-//       particle.move(
-//         Vector.direction(particle.pos, this.pos).scale(
-//           (this.radius + particle.radius) - this.pos.dist(particle.pos)
-//         )
-//       );
-//     }
-//   }
-// }
-
-// class Automata extends Particle {
-//   get size() {
-//     return this.radius;
-//   }
-
-//   isInRadius(particle, offset) {
-//     const distance = this.pos.dist(particle.pos);
-
-//     return distance < (this.radius + particle.radius);
-//   }
-
-//   interact(particle) {
-//     if (this.inRadius(particle.pos)) {
-//       particle.move(
-//         Vector.direction(particle.pos, this.pos).scale(
-//           (this.radius + particle.radius) - this.pos.dist(particle.pos)
-//         )
-//       );
-//     }
-//   }
-//
+class HardSphere extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
+  interact(particle) {
+    if (this.isTouching(particle.pos, particle.size)) {
+      particle.move(
+        _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(particle.pos, this.pos).scale(
+          this.radius + particle.radius - this.pos.dist(particle.pos)
+        )
+      );
+    }
+  }
+}
 
 
 /***/ }),
@@ -561,7 +584,7 @@ class Particle {
     vel = new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0),
     mass = 0,
     charge = 0,
-    radius = 0,
+    radius = 0
   }) {
     this.pos = pos;
     this.vel = vel;
@@ -601,30 +624,11 @@ class Particle {
   }
 
   isTouching(pos, offset) {
-    const distance = this.pos.dist(pos);
-    return distance < this.size + offset;
+    return this.pos.dist(pos) < this.size + offset;
   }
 
   isContained(pos, offset) {
-    const distance = this.pos.dist(pos);
-    return distance < this.size - offset;
-  }
-
-  receiveFrom(amount, location) {
-    this.vel.add(_vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location).scale(amount));
-  }
-
-  moveAwayFrom(distance, location) {
-    this.pos.add(_vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(this.pos, location).scale(distance));
-  }
-
-  radialAccelerate(particle, amount) {
-    particle.accelerate(
-      new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0)
-        .add(particle.pos)
-        .subtract(this.pos)
-        .scale(amount)
-    );
+    return this.pos.dist(pos) < this.size - offset;
   }
 }
 

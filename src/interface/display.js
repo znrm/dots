@@ -24,7 +24,7 @@ class Display {
 
     for (let i = 0; i < nParticles; i += 1) {
       const particle = particles[i];
-      if (particle.size * Math.min(this.width, this.height) < 1) {
+      if (this.client.mode === 'dots' || particle.size * Math.min(this.width, this.height) < 1) {
         this.dot(particle);
       } else {
         this.circle(particle);
@@ -48,6 +48,7 @@ class Display {
   }
 
   mouse({ x, y }) {
+    this.ctx.lineWidth = 1.5;
     this.strokeStyle = 'rgba(255,255,255,0.2)';
     this.ctx.beginPath();
     this.ctx.arc(x * this.width, y * this.height, 5, 0, 2 * Math.PI, false);

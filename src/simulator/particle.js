@@ -6,7 +6,7 @@ class Particle {
     vel = new Vector(0, 0),
     mass = 0,
     charge = 0,
-    radius = 0,
+    radius = 0
   }) {
     this.pos = pos;
     this.vel = vel;
@@ -46,30 +46,11 @@ class Particle {
   }
 
   isTouching(pos, offset) {
-    const distance = this.pos.dist(pos);
-    return distance < this.size + offset;
+    return this.pos.dist(pos) < this.size + offset;
   }
 
   isContained(pos, offset) {
-    const distance = this.pos.dist(pos);
-    return distance < this.size - offset;
-  }
-
-  receiveFrom(amount, location) {
-    this.vel.add(Vector.direction(this.pos, location).scale(amount));
-  }
-
-  moveAwayFrom(distance, location) {
-    this.pos.add(Vector.direction(this.pos, location).scale(distance));
-  }
-
-  radialAccelerate(particle, amount) {
-    particle.accelerate(
-      new Vector(0, 0)
-        .add(particle.pos)
-        .subtract(this.pos)
-        .scale(amount)
-    );
+    return this.pos.dist(pos) < this.size - offset;
   }
 }
 

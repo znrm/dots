@@ -16,6 +16,15 @@ const inelasticCollide = (thisParticle, thatParticle) => {
   );
 };
 
+const moveAway = (thisParticle, thatParticle, a) => {
+  thatParticle.move(
+    Vector.direction(thatParticle.pos, thisParticle.pos).scale(
+      a * (thisParticle.size + thatParticle.size) -
+        thisParticle.pos.dist(thatParticle.pos)
+    )
+  );
+};
+
 const fakeGravity = (thisParticle, thatParticle) => {
   const scalar = thisParticle.mass / thisParticle.pos.dist(thatParticle.pos);
   const direction = Vector.direction(thisParticle.pos, thatParticle.pos);
@@ -39,50 +48,58 @@ class SpaceDebris extends Particle {
   }
 }
 
-const spreadPosition = mouse =>
-  Vector.randomDir(0.02 * Math.random()).add(mouse);
+class Automata extends Particle {
+  inReach(pos, size) {
+    return this.pos.dist(pos) < 1.4 * this.size + size;
+  }
+
+  interact(particle) {
+    if (this.inReach(particle.pos, particle.size)) {
+      moveAway(this, particle, 0.9);
+    }
+  }
+}
+
+class Fluid extends Particle {
+  update() {
+    this.pos.add(this.vel.add(new Vector(0, 1e-5)));
+  }
+}
+
+const spreadPosition = (mouse, spread) =>
+  Vector.randomDir(spread * Math.random()).add(mouse);
 
 export const airbrush = {
   stars: mouse =>
     new SpaceDebris({
       mass: 5e-7,
       vel: Vector.randomDir(0.00001),
-      pos: spreadPosition(mouse)
+      pos: spreadPosition(mouse, 0.03)
+    }),
+  automata: mouse =>
+    new Automata({
+      radius: 1e-2,
+      vel: Vector.randomDir(0.001),
+      pos: spreadPosition(mouse, 0.01)
+    }),
+  fluids: mouse =>
+    new Fluid({
+      radius: 3e-2,
+      vel: Vector.randomDir(0.001),
+      pos: spreadPosition(mouse, 0.001)
     })
 };
 
 export const emit = {};
 
-// class HardSphere extends Particle {
-//   interact(particle) {
-//     if (this.inRadius(particle.pos)) {
-//       particle.move(
-//         Vector.direction(particle.pos, this.pos).scale(
-//           (this.radius + particle.radius) - this.pos.dist(particle.pos)
-//         )
-//       );
-//     }
-//   }
-// }
-
-// class Automata extends Particle {
-//   get size() {
-//     return this.radius;
-//   }
-
-//   isInRadius(particle, offset) {
-//     const distance = this.pos.dist(particle.pos);
-
-//     return distance < (this.radius + particle.radius);
-//   }
-
-//   interact(particle) {
-//     if (this.inRadius(particle.pos)) {
-//       particle.move(
-//         Vector.direction(particle.pos, this.pos).scale(
-//           (this.radius + particle.radius) - this.pos.dist(particle.pos)
-//         )
-//       );
-//     }
-//   }
-//
+class HardSphere extends Particle {
+  interact(particle) {
+    if (this.isTouching(particle.pos, particle.size)) {
+      particle.move(
+        Vector.direction(particle.pos, this.pos).scale(
+          this.radius + particle.radius - this.pos.dist(particle.pos)
+        )
+      );
+    }
+  }
+}

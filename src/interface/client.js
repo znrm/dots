@@ -48,11 +48,15 @@ class Client {
   }
 
   addEvents() {
-    const ui = document.getElementById('options-buttons');
+    const options = document.getElementById('options-buttons');
+    const mode = document.getElementById('mode-buttons');
     const canvas = document.querySelector('canvas');
 
-    ui.onclick = this.integrateUI();
-    ui.ontouchstart = this.integrateUI();
+    options.onclick = this.selectAction();
+    options.ontouchstart = this.selectAction();
+
+    mode.onclick = this.selectMode();
+    mode.ontouchstart = this.selectMode();
 
     canvas.onmousedown = this.mouseDown();
     canvas.ontouchstart = this.mouseDown();
@@ -93,20 +97,20 @@ class Client {
     };
   }
 
-  integrateUI() {
+  selectMode() {
+    return e => {
+      this.mode = e.target.id;
+    };
+  }
+
+  selectAction() {
     return e => {
       switch (e.target.id) {
         case 'reset':
           this.state.reset();
           break;
-        case 'stars':
-          this.mode = 'stars';
-          break;
-        case 'airbrush':
-          this.selectedAction = 'airbrush';
-          break;
         default:
-          break;
+          this.action = e.target.id;
       }
     };
   }
