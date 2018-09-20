@@ -9,11 +9,11 @@ const absorb = (thisParticle, thatParticle) => {
 };
 
 const inelasticCollide = (thisParticle, thatParticle) => {
-  thisParticle.accelerate(
-    thatParticle.momentum.scale(
-      thisParticle.mass / (thisParticle.mass + thatParticle.mass)
-    )
-  );
+  const newVelocity = thisParticle.momentum
+    .add(thatParticle.momentum)
+    .scale(1 / (thisParticle.mass + thatParticle.mass));
+  thisParticle.vel.scale(0);
+  thisParticle.accelerate(newVelocity);
 };
 
 const moveAway = (thisParticle, thatParticle, a) => {
@@ -34,6 +34,10 @@ const fakeGravity = (thisParticle, thatParticle) => {
 class SpaceDebris extends Particle {
   visualSize(scale) {
     return Math.sqrt(this.mass) * scale;
+  }
+
+  get size() {
+    return Math.sqrt(this.mass);
   }
 
   interact(particle) {
@@ -95,9 +99,47 @@ export const paint = {
     })
 };
 
-export const shoot = {};
+export const shoot = {
+  stars: (mouse, pointer) =>
+    new SpaceDebris({
+      mass: 3e-6,
+      vel: pointer.scale(0.007),
+      pos: Vector.clone(mouse)
+    }),
+  automata: (mouse, pointer) =>
+    new Automata({
+      radius: 5e-3,
+      vel: pointer.scale(0.007),
+      pos: spreadPosition(mouse, 0.01)
+    }),
+  networks: (mouse, pointer) =>
+    new Network({
+      radius: 1e-1,
+      vel: pointer.scale(0.01),
+      pos: spreadPosition(mouse, 0.05)
+    })
+};
 
-export const place = {};
+export const place = {
+  stars: mouse =>
+    new SpaceDebris({
+      mass: 5e-5,
+      vel: new Vector(0, 0),
+      pos: spreadPosition(mouse, 1e-3)
+    }),
+  automata: mouse =>
+    new Automata({
+      radius: 5e-3,
+      vel: new Vector(0, 0),
+      pos: spreadPosition(mouse, 1e-3)
+    }),
+  networks: mouse =>
+    new Network({
+      radius: 1e-1,
+      vel: new Vector(0, 0),
+      pos: spreadPosition(mouse, 1e-3)
+    })
+};
 
 class HardSphere extends Particle {
   interact(particle) {

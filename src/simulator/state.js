@@ -35,7 +35,7 @@ class State {
   calculateInteractions(nParticles) {
     for (let i = 0; i < nParticles; i += 1) {
       for (let j = 0; j < nParticles; j += 1) {
-        if (i !== j) {
+        if (i !== j && this.particles[i].protected) {
           this.particles[i].interact(this.particles[j]);
         }
       }
@@ -49,7 +49,7 @@ class State {
         vel.subtract(new Vector(vel.x, 0).scale(2));
       }
 
-      if (pos.y + size > 1 || pos.y + size < 0) {
+      if (pos.y + size > 1 || pos.y - size < 0) {
         vel.subtract(new Vector(0, vel.y).scale(2));
       }
     }

@@ -33,15 +33,17 @@ class Client {
   }
 
   clickAction() {
+    const { particles } = this.state;
     if (this.action === 'place') {
-      this.place[this.mode](this.mouse);
+      particles.push(this.place[this.mode](this.mouse));
     }
   }
 
   continuousAction() {
     const { particles } = this.state;
-
-    particles.push(this[this.action][this.mode](this.mouse));
+    if (this.action !== 'place') {
+      particles.push(this[this.action][this.mode](this.mouse, this.pointer));
+    }
   }
 
   toggleWalls() {
@@ -101,7 +103,10 @@ class Client {
 
   selectMode() {
     return e => {
-      this.mode = e.target.id;
+      if (this.mode !== e.target.id) {
+        this.state.reset();
+        this.mode = e.target.id;
+      }
     };
   }
 

@@ -183,15 +183,17 @@ class Client {
   }
 
   clickAction() {
+    const { particles } = this.state;
     if (this.action === 'place') {
-      this.place[this.mode](this.mouse);
+      particles.push(this.place[this.mode](this.mouse));
     }
   }
 
   continuousAction() {
     const { particles } = this.state;
-
-    particles.push(this[this.action][this.mode](this.mouse));
+    if (this.action !== 'place') {
+      particles.push(this[this.action][this.mode](this.mouse, this.pointer));
+    }
   }
 
   toggleWalls() {
@@ -251,7 +253,10 @@ class Client {
 
   selectMode() {
     return e => {
-      this.mode = e.target.id;
+      if (this.mode !== e.target.id) {
+        this.state.reset();
+        this.mode = e.target.id;
+      }
     };
   }
 
@@ -512,11 +517,11 @@ const absorb = (thisParticle, thatParticle) => {
 };
 
 const inelasticCollide = (thisParticle, thatParticle) => {
-  thisParticle.accelerate(
-    thatParticle.momentum.scale(
-      thisParticle.mass / (thisParticle.mass + thatParticle.mass)
-    )
-  );
+  const newVelocity = thisParticle.momentum
+    .add(thatParticle.momentum)
+    .scale(1 / (thisParticle.mass + thatParticle.mass));
+  thisParticle.vel.scale(0);
+  thisParticle.accelerate(newVelocity);
 };
 
 const moveAway = (thisParticle, thatParticle, a) => {
@@ -537,6 +542,10 @@ const fakeGravity = (thisParticle, thatParticle) => {
 class SpaceDebris extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   visualSize(scale) {
     return Math.sqrt(this.mass) * scale;
+  }
+
+  get size() {
+    return Math.sqrt(this.mass);
   }
 
   interact(particle) {
@@ -598,9 +607,47 @@ const paint = {
     })
 };
 
-const shoot = {};
+const shoot = {
+  stars: (mouse, pointer) =>
+    new SpaceDebris({
+      mass: 3e-6,
+      vel: pointer.scale(0.007),
+      pos: _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].clone(mouse)
+    }),
+  automata: (mouse, pointer) =>
+    new Automata({
+      radius: 5e-3,
+      vel: pointer.scale(0.007),
+      pos: spreadPosition(mouse, 0.01)
+    }),
+  networks: (mouse, pointer) =>
+    new Network({
+      radius: 1e-1,
+      vel: pointer.scale(0.01),
+      pos: spreadPosition(mouse, 0.05)
+    })
+};
 
-const place = {};
+const place = {
+  stars: mouse =>
+    new SpaceDebris({
+      mass: 5e-5,
+      vel: new _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"](0, 0),
+      pos: spreadPosition(mouse, 1e-3)
+    }),
+  automata: mouse =>
+    new Automata({
+      radius: 5e-3,
+      vel: new _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"](0, 0),
+      pos: spreadPosition(mouse, 1e-3)
+    }),
+  networks: mouse =>
+    new Network({
+      radius: 1e-1,
+      vel: new _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"](0, 0),
+      pos: spreadPosition(mouse, 1e-3)
+    })
+};
 
 class HardSphere extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   interact(particle) {
@@ -774,7 +821,7 @@ class State {
   calculateInteractions(nParticles) {
     for (let i = 0; i < nParticles; i += 1) {
       for (let j = 0; j < nParticles; j += 1) {
-        if (i !== j) {
+        if (i !== j && this.particles[i].protected) {
           this.particles[i].interact(this.particles[j]);
         }
       }
@@ -788,7 +835,7 @@ class State {
         vel.subtract(new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](vel.x, 0).scale(2));
       }
 
-      if (pos.y + size > 1 || pos.y + size < 0) {
+      if (pos.y + size > 1 || pos.y - size < 0) {
         vel.subtract(new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, vel.y).scale(2));
       }
     }
