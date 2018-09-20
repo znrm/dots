@@ -1,5 +1,5 @@
-const BUTTONS_RIGHT = ['paint', 'emit many', 'make one', 'reset'];
-const BUTTONS_TOP = ['stars', 'fluids', 'automata', 'dots'];
+const BUTTONS_RIGHT = ['paint', 'reset'];
+const BUTTONS_TOP = ['stars', 'automata'];
 
 const buildUI = () => {
   for (let i = 0; i < BUTTONS_RIGHT.length; i += 1) {
