@@ -1,5 +1,5 @@
 import Vector from '../simulator/vector';
-import { airbrush } from './presets';
+import { paint } from './presets';
 
 class Client {
   constructor(state) {
@@ -11,9 +11,9 @@ class Client {
     this.pressing = false;
 
     this.mode = 'stars';
-    this.action = 'airbrush';
+    this.action = 'paint';
 
-    this.airbrush = airbrush;
+    this.paint = paint;
 
     this.addEvents();
   }
@@ -48,12 +48,12 @@ class Client {
   }
 
   addEvents() {
-    const options = document.getElementById('options-buttons');
+    const option = document.getElementById('option-buttons');
     const mode = document.getElementById('mode-buttons');
     const canvas = document.querySelector('canvas');
 
-    options.onclick = this.selectAction();
-    options.ontouchstart = this.selectAction();
+    option.onclick = this.selectAction();
+    option.ontouchstart = this.selectAction();
 
     mode.onclick = this.selectMode();
     mode.ontouchstart = this.selectMode();

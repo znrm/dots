@@ -161,9 +161,9 @@ class Client {
     this.pressing = false;
 
     this.mode = 'stars';
-    this.action = 'airbrush';
+    this.action = 'paint';
 
-    this.airbrush = _presets__WEBPACK_IMPORTED_MODULE_1__["airbrush"];
+    this.paint = _presets__WEBPACK_IMPORTED_MODULE_1__["paint"];
 
     this.addEvents();
   }
@@ -198,12 +198,12 @@ class Client {
   }
 
   addEvents() {
-    const options = document.getElementById('options-buttons');
+    const option = document.getElementById('option-buttons');
     const mode = document.getElementById('mode-buttons');
     const canvas = document.querySelector('canvas');
 
-    options.onclick = this.selectAction();
-    options.ontouchstart = this.selectAction();
+    option.onclick = this.selectAction();
+    option.ontouchstart = this.selectAction();
 
     mode.onclick = this.selectMode();
     mode.ontouchstart = this.selectMode();
@@ -387,14 +387,24 @@ const startTutorial = async () => {
   addClass('title', 'hidden');
   if (timesTutorialLeft !== '0') {
     removeClass('select-mode', 'hidden');
+    addClass('mode', 'top-peek');
     document.querySelector('.mode').onclick = async () => {
+      removeClass('mode', 'top-peek');
       addClass('select-mode', 'fade-out');
       await sleep(0.99);
       addClass('select-mode', 'hidden');
-      removeClass('select-options', 'hidden');
-      document.querySelector('.options').onclick = async () => {
-        addClass('select-options', 'fade-out');
-        await sleep(0.99);
+      removeClass('select-option', 'hidden');
+      addClass('option', 'right-peek');
+      document.querySelector('.option').onclick = async () => {
+        removeClass('option', 'right-peek');
+        addClass('select-option', 'fade-out');
+        await sleep(1);
+        addClass('select-option', 'hidden');
+        removeClass('enjoy', 'hidden');
+        await sleep(1);
+        addClass('enjoy', 'fade-out');
+        await sleep(0.49);
+        addClass('enjoy', 'hidden');
         addClass('welcome', 'hidden');
       };
     };
@@ -413,12 +423,12 @@ const startTutorial = async () => {
 /*!**********************************!*\
   !*** ./src/interface/presets.js ***!
   \**********************************/
-/*! exports provided: airbrush, emit */
+/*! exports provided: paint, emit */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "airbrush", function() { return airbrush; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "paint", function() { return paint; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "emit", function() { return emit; });
 /* harmony import */ var _simulator_particle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../simulator/particle */ "./src/simulator/particle.js");
 /* harmony import */ var _simulator_vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../simulator/vector */ "./src/simulator/vector.js");
@@ -493,7 +503,7 @@ class Fluid extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] 
 const spreadPosition = (mouse, spread) =>
   _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(spread * Math.random()).add(mouse);
 
-const airbrush = {
+const paint = {
   stars: mouse =>
     new SpaceDebris({
       mass: 5e-7,
@@ -540,21 +550,21 @@ class HardSphere extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["defau
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-const BUTTONS_RIGHT = ['airbrush', 'emit many', 'make one', 'reset'];
+const BUTTONS_RIGHT = ['paint', 'emit many', 'make one', 'reset'];
 const BUTTONS_TOP = ['stars', 'fluids', 'automata', 'dots'];
 
 const buildUI = () => {
   for (let i = 0; i < BUTTONS_RIGHT.length; i += 1) {
-    const uiElement = document.createElement('li');
-    uiElement.className = 'options-text';
+    const uiElement = document.createElement('button');
+    uiElement.className = 'btn';
     uiElement.id = BUTTONS_RIGHT[i];
     uiElement.innerText = BUTTONS_RIGHT[i];
-    document.getElementById('options-buttons').appendChild(uiElement);
+    document.getElementById('option-buttons').appendChild(uiElement);
   }
 
   for (let i = 0; i < BUTTONS_TOP.length; i += 1) {
-    const uiElement = document.createElement('li');
-    uiElement.className = 'options-text';
+    const uiElement = document.createElement('button');
+    uiElement.className = 'btn';
     uiElement.id = BUTTONS_TOP[i];
     uiElement.innerText = BUTTONS_TOP[i];
     document.getElementById('mode-buttons').appendChild(uiElement);

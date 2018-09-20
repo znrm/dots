@@ -17,15 +17,19 @@
 
 <body>
   <header id="welcome" class='welcome'>
-    <h2 id="select-mode" class='select fade-in hidden'>select particle type above</h2>
+    <h2 id="select-mode" class='select fade-in hidden'>pick particle types above</h2>
     <h1 id="title" class='title fade-in-out'>dots</h1>
-    <h2 id="select-options" class='select fade-in hidden'>select options on the right</h2>
+    <h2 id="select-option" class='select fade-in hidden'>choose how particles are made on the right</h2>
+    <h2 id="enjoy" class='select fade-in hidden'>click around and have fun!</h2>
+    <div id="start" class="hidden select btn">start</div>
   </header>
-  <div class="mode">
-    <ul id="mode-buttons" class="button-list"></ul>
+
+  <div id="mode" class="mode box-container">
+    <ul id="mode-buttons" class="box"></ul>
   </div>
-  <div class="options">
-    <ul id="options-buttons" class="button-list"></ul>
+
+  <div id="option" class="option box-container">
+    <ul id="option-buttons" class="box"></ul>
   </div>
 
   <canvas class="no-cursor"></canvas>

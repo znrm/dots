@@ -16,14 +16,24 @@ const startTutorial = async () => {
   addClass('title', 'hidden');
   if (timesTutorialLeft !== '0') {
     removeClass('select-mode', 'hidden');
+    addClass('mode', 'top-peek');
     document.querySelector('.mode').onclick = async () => {
+      removeClass('mode', 'top-peek');
       addClass('select-mode', 'fade-out');
       await sleep(0.99);
       addClass('select-mode', 'hidden');
-      removeClass('select-options', 'hidden');
-      document.querySelector('.options').onclick = async () => {
-        addClass('select-options', 'fade-out');
-        await sleep(0.99);
+      removeClass('select-option', 'hidden');
+      addClass('option', 'right-peek');
+      document.querySelector('.option').onclick = async () => {
+        removeClass('option', 'right-peek');
+        addClass('select-option', 'fade-out');
+        await sleep(1);
+        addClass('select-option', 'hidden');
+        removeClass('enjoy', 'hidden');
+        await sleep(1);
+        addClass('enjoy', 'fade-out');
+        await sleep(0.49);
+        addClass('enjoy', 'hidden');
         addClass('welcome', 'hidden');
       };
     };

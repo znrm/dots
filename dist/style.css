@@ -3,7 +3,8 @@ body,
 li,
 ul,
 h1,
-h2 {
+h2,
+button {
   margin: 0;
   padding: 0;
 }
@@ -12,7 +13,7 @@ body {
   font-size: 2vmin;
   background-color: black;
   overflow: hidden;
-  height: 100%;
+  height: 100vh;
   width: 100vw;
 
   font-family: 'Courier New', Courier, monospace;
@@ -26,90 +27,97 @@ body {
   -webkit-user-drag: none;
 }
 
-li {
-  list-style: none;
+button {
+  background: none;
+  border: none;
+  outline: none;
+  display: inline-block;
 }
 
-.no-cursor {
-  cursor: none;
-}
-
-
-
-
-.options {
-  cursor: initial;
+.box-container {
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  position: absolute;
-  height: 100%;
-  right: -80px;
   transition: all 0.25s cubic-bezier(0.1, 0.65, 0.3, 1);
+  position: absolute;
+  cursor: initial;
 }
 
-.options:hover {
-  right: 0;
+.option {
+  height: 100vh;
+  right: -95px;
 }
 
 .mode {
-  cursor: initial;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  position: absolute;
-  width: 100%;
+  width: 100vw;
   top: -80px;
-  transition: all 0.25s cubic-bezier(0.1, 0.65, 0.3, 1);
+}
+
+.option:hover {
+  right: 0;
 }
 
 .mode:hover {
   top: 0;
 }
 
-.button-list {
+.box {
+  flex: 1;
   display: flex;
   justify-content: space-around;
-  flex-direction: column;
-  align-content: center;
-  min-height: 80%;
-  width: 80px;
-  padding: 5px 3px;
-  margin: 15px;
   box-sizing: border-box;
 
-  background-color: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-.options:hover .button-list {
+.box-container:hover .box {
   background-color: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-.mode .button-list {
-  min-width: 50%;
-  height: 80px;
-  padding: 3px 5px;
+.mode .box {
   flex-direction: row;
+  height: 80px;
+  margin: 20px auto;
+  max-width: 50%;
 }
 
-.options-text {
+.option .box {
+  flex-direction: column;
+  justify-content: center;
+  min-height: 60%;
+  width: 90px;
+  margin: auto 20px;
+  padding: 5px;
+}
+
+.btn {
+  padding:5px;
+  flex: 1;
+  height: 100%;
   color: rgba(255, 255, 255, 0.6);
   text-align: center;
   cursor: pointer;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.options-text:hover {
+.btn:hover {
   color: rgba(255, 255, 255, 1);
   font-weight: bold;
 }
 
-.strike {
-  text-decoration-line: line-through;
+.top-peek {
+  top: 0px;
+}
+
+.right-peek {
+  right: 0px;
+}
+
+.hidden {
+  display: none;
+}
+
+.no-cursor {
+  cursor: none;
 }

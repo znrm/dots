@@ -69,7 +69,7 @@ class Fluid extends Particle {
 const spreadPosition = (mouse, spread) =>
   Vector.randomDir(spread * Math.random()).add(mouse);
 
-export const airbrush = {
+export const paint = {
   stars: mouse =>
     new SpaceDebris({
       mass: 5e-7,
