@@ -1,7 +1,8 @@
 import Particle from '../simulator/particle';
 import Vector from '../simulator/vector';
 
-const GRAVITATIONAL_CONSTANT = 0.05;
+const GRAVITATIONAL_CONSTANT = 0.03;
+const GAS_CONSTANT = 1e-10;
 
 const absorb = (thisParticle, thatParticle) => {
   thisParticle.grow(thatParticle.mass);
@@ -31,6 +32,12 @@ const fakeGravity = (thisParticle, thatParticle) => {
   thatParticle.accelerate(direction.scale(GRAVITATIONAL_CONSTANT * scalar));
 };
 
+const pushAway = (thisParticle, thatParticle) => {
+  const scalar = 1 / thisParticle.pos.dist(thatParticle.pos) ** 3;
+  const direction = Vector.direction(thatParticle.pos, thisParticle.pos);
+  thatParticle.accelerate(direction.scale(GAS_CONSTANT * scalar));
+};
+
 class SpaceDebris extends Particle {
   visualSize(scale) {
     return Math.sqrt(this.mass) * scale;
@@ -52,14 +59,24 @@ class SpaceDebris extends Particle {
   }
 }
 
+class Gas extends Particle {
+  interact(particle) {
+    if (this.isTouching(particle.pos, 0.7 * particle.size)) {
+      moveAway(this, particle, 1);
+    } else {
+      pushAway(this, particle);
+    }
+  }
+}
+
 class Automata extends Particle {
   inReach(pos, size) {
-    return this.pos.dist(pos) < Math.SQRT2 * this.size + size;
+    return this.pos.dist(pos) < 1.4 * this.size + size;
   }
 
   interact(particle) {
     if (this.inReach(particle.pos, particle.size)) {
-      moveAway(this, particle, Math.SQRT1_2);
+      moveAway(this, particle, 0.8);
     }
   }
 }
@@ -85,9 +102,15 @@ export const paint = {
       vel: Vector.randomDir(0.00001),
       pos: spreadPosition(mouse, 0.03)
     }),
+  gases: mouse =>
+    new Gas({
+      radius: 3e-3,
+      vel: Vector.randomDir(0.0001),
+      pos: spreadPosition(mouse, 0.1)
+    }),
   automata: mouse =>
     new Automata({
-      radius: 5e-3,
+      radius: 6e-3,
       vel: Vector.randomDir(0.001),
       pos: spreadPosition(mouse, 0.01)
     }),
@@ -104,18 +127,24 @@ export const shoot = {
     new SpaceDebris({
       mass: 3e-6,
       vel: pointer.scale(0.007),
-      pos: Vector.clone(mouse)
+      pos: spreadPosition(mouse, 1e-2)
+    }),
+  gases: (mouse, pointer) =>
+    new Gas({
+      radius: 3e-3,
+      vel: pointer.scale(0.006),
+      pos: spreadPosition(mouse, 1e-4)
     }),
   automata: (mouse, pointer) =>
     new Automata({
-      radius: 5e-3,
-      vel: pointer.scale(0.007),
+      radius: 6e-3,
+      vel: pointer.scale(0.006),
       pos: spreadPosition(mouse, 0.01)
     }),
   networks: (mouse, pointer) =>
     new Network({
       radius: 1e-1,
-      vel: pointer.scale(0.01),
+      vel: pointer.scale(0.008),
       pos: spreadPosition(mouse, 0.05)
     })
 };
@@ -127,9 +156,15 @@ export const place = {
       vel: new Vector(0, 0),
       pos: spreadPosition(mouse, 1e-3)
     }),
+  gases: mouse =>
+    new Gas({
+      vel: new Vector(0, 0),
+      pos: spreadPosition(mouse, 1e-3),
+      radius: 3e-3
+    }),
   automata: mouse =>
     new Automata({
-      radius: 5e-3,
+      radius: 6e-3,
       vel: new Vector(0, 0),
       pos: spreadPosition(mouse, 1e-3)
     }),

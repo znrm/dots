@@ -1,3 +1,31 @@
+const sizeToRGB = size => {
+  const rC = -(18 ** 4);
+  const gC = -(15 ** 4);
+  const bC = -(11 ** 4);
+
+  const rExp = (size - 0.045) ** 4;
+  const gExp = (size - 0.07) ** 4;
+  const bExp = (size - 0.11) ** 4;
+
+  const red = 255 * (rC * rExp + 1);
+  const green = 255 * (gC * gExp + 1);
+  const blue = 255 * (bC * bExp + 1);
+
+  return `${red},${green},${blue}`;
+};
+
+const speedToHSL = vel => {
+  const speed = vel.magnitude();
+  const hue = Math.min(120 * (speed / 0.01) + 240, 360);
+  return `hsl(${hue},100%,50%)`;
+};
+
+const directionToColor = ({ x, y }) => {
+  if (x > 0) return 'blue';
+  if (x < 0) return 'green';
+  return 'white';
+};
+
 class Display {
   constructor(state, client) {
     this.canvas = document.querySelector('canvas');
@@ -23,6 +51,10 @@ class Display {
   }
 
   renderParticles() {
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowColor = 'rgba(0, 0, 0, 0)';
+    this.ctx.fillStyle = 'white';
+
     switch (this.client.mode) {
       case 'stars':
         this.renderStars();
@@ -50,7 +82,7 @@ class Display {
       if (particle.visualSize(this.scale) < 1) {
         this.dot(particle);
       } else {
-        this.circle(particle);
+        this.star(particle);
       }
     }
   }
@@ -59,12 +91,20 @@ class Display {
     const { particles } = this.state;
     const nParticles = particles.length;
 
-    for (let i = 0; i < nParticles; i += 1) this.circle(particles[i]);
+    for (let i = 0; i < nParticles; i += 1) this.automata(particles[i]);
+  }
+
+  renderGases() {
+    const { particles } = this.state;
+    const nParticles = particles.length;
+
+    for (let i = 0; i < nParticles; i += 1) this.gas(particles[i]);
   }
 
   renderNetworks() {
     this.ctx.lineWidth = 0.3;
     this.ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
     const { particles } = this.state;
     const nParticles = particles.length;
 
@@ -90,6 +130,7 @@ class Display {
 
     this.ctx.fillStyle = 'rgba(255,255,255,1)';
     this.ctx.strokeStyle = 'rgba(255,255,255,1)';
+    this.ctx.globalCompositeOperation = 'screen';
   }
 
   reset() {
@@ -99,6 +140,7 @@ class Display {
   mouse({ x, y }) {
     this.ctx.lineWidth = 1.5;
     this.strokeStyle = 'rgba(255,255,255,0.2)';
+
     this.ctx.beginPath();
     this.ctx.arc(
       x * this.width,
@@ -109,6 +151,26 @@ class Display {
       false
     );
     this.ctx.stroke();
+  }
+
+  star(particle) {
+    const { pos } = particle;
+    const size = particle.visualSize(this.scale);
+    const color = sizeToRGB(particle.size);
+    this.ctx.fillStyle = `rgba(${color},1)`;
+    this.ctx.shadowBlur = 2 * size;
+    this.ctx.shadowColor = `rgba(${color},1)`;
+
+    this.ctx.beginPath();
+    this.ctx.arc(
+      pos.x * this.width,
+      pos.y * this.height,
+      size,
+      0,
+      2 * Math.PI,
+      false
+    );
+    this.ctx.fill();
   }
 
   circle(particle) {
@@ -127,7 +189,42 @@ class Display {
     this.ctx.fill();
   }
 
+  automata(particle) {
+    const { pos } = particle;
+    const size = particle.visualSize(this.scale);
+    this.ctx.fillStyle = directionToColor(particle.vel);
+
+    this.ctx.beginPath();
+    this.ctx.arc(
+      pos.x * this.width,
+      pos.y * this.height,
+      size,
+      0,
+      2 * Math.PI,
+      false
+    );
+    this.ctx.fill();
+  }
+
+  gas(particle) {
+    const { pos } = particle;
+    const size = particle.visualSize(this.scale);
+    this.ctx.fillStyle = speedToHSL(particle.vel);
+
+    this.ctx.beginPath();
+    this.ctx.arc(
+      pos.x * this.width,
+      pos.y * this.height,
+      size,
+      0,
+      2 * Math.PI,
+      false
+    );
+    this.ctx.fill();
+  }
+
   dot({ pos }) {
+    this.ctx.fillStyle = 'SandyBrown';
     this.ctx.fillRect(pos.x * this.width, pos.y * this.height, 1, 1);
   }
 
