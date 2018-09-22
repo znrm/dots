@@ -112,6 +112,7 @@ class Display {
       const particle = particles[i];
       const nAdjacentParticles = particle.nearby.length;
       for (let j = 0; j < nAdjacentParticles; j += 1) {
+        this.dot(particle);
         this.line(particle.pos, particle.nearby[j]);
       }
       particle.nearby.length = 0;

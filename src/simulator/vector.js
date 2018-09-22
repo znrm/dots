@@ -29,8 +29,9 @@ class Vector {
   }
 
   normalize() {
-    if (!this.x && !this.y) return this;
-    this.scale(1 / this.magnitude());
+    if (this.x || this.y) {
+      this.scale(1 / this.magnitude());
+    }
     return this;
   }
 

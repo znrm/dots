@@ -50,7 +50,7 @@ class Particle {
   }
 
   isTouching(pos, offset) {
-    return this.pos.dist(pos) < this.size + offset;
+    return this.pos.sqDist(pos) < (this.size + offset) ** 2;
   }
 
   isContained(pos, offset) {

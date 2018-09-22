@@ -1,5 +1,5 @@
 import Vector from '../simulator/vector';
-import { paint, shoot, place } from './presets';
+import { paint, shoot, place } from './actions';
 
 class Client {
   constructor(state) {

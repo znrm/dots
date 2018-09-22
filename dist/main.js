@@ -137,6 +137,116 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /***/ }),
 
+/***/ "./src/interface/actions.js":
+/*!**********************************!*\
+  !*** ./src/interface/actions.js ***!
+  \**********************************/
+/*! exports provided: paint, shoot, place */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "paint", function() { return paint; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "shoot", function() { return shoot; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "place", function() { return place; });
+/* harmony import */ var _simulator_vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../simulator/vector */ "./src/simulator/vector.js");
+/* harmony import */ var _presets_star__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./presets/star */ "./src/interface/presets/star.js");
+/* harmony import */ var _presets_automaton__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./presets/automaton */ "./src/interface/presets/automaton.js");
+/* harmony import */ var _presets_gas__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./presets/gas */ "./src/interface/presets/gas.js");
+/* harmony import */ var _presets_network__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./presets/network */ "./src/interface/presets/network.js");
+
+
+
+
+
+
+const spreadPosition = (mouse, spread) =>
+  _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(spread * Math.random()).add(mouse);
+
+const paint = {
+  stars: mouse =>
+    new _presets_star__WEBPACK_IMPORTED_MODULE_1__["default"]({
+      mass: 5e-7,
+      vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.00001),
+      pos: spreadPosition(mouse, 0.03)
+    }),
+  gases: mouse =>
+    new _presets_gas__WEBPACK_IMPORTED_MODULE_3__["default"]({
+      radius: 35e-4,
+      vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.0001),
+      pos: spreadPosition(mouse, 0.1)
+    }),
+  automata: mouse =>
+    new _presets_automaton__WEBPACK_IMPORTED_MODULE_2__["default"]({
+      radius: 6e-3,
+      vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.001),
+      pos: spreadPosition(mouse, 0.01)
+    }),
+  networks: mouse =>
+    new _presets_network__WEBPACK_IMPORTED_MODULE_4__["default"]({
+      radius: 1e-1,
+      vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.0002),
+      pos: spreadPosition(mouse, 0.15)
+    })
+};
+
+const shoot = {
+  stars: (mouse, pointer) =>
+    new _presets_star__WEBPACK_IMPORTED_MODULE_1__["default"]({
+      mass: 3e-6,
+      vel: pointer.scale(0.007),
+      pos: spreadPosition(mouse, 1e-2)
+    }),
+  gases: (mouse, pointer) =>
+    new _presets_gas__WEBPACK_IMPORTED_MODULE_3__["default"]({
+      radius: 35e-4,
+      vel: pointer.scale(0.006),
+      pos: spreadPosition(mouse, 1e-4)
+    }),
+  automata: (mouse, pointer) =>
+    new _presets_automaton__WEBPACK_IMPORTED_MODULE_2__["default"]({
+      radius: 6e-3,
+      vel: pointer.scale(0.006),
+      pos: spreadPosition(mouse, 0.01)
+    }),
+  networks: (mouse, pointer) =>
+    new _presets_network__WEBPACK_IMPORTED_MODULE_4__["default"]({
+      radius: 1e-1,
+      vel: pointer.scale(0.008),
+      pos: spreadPosition(mouse, 0.05)
+    })
+};
+
+const place = {
+  stars: mouse =>
+    new _presets_star__WEBPACK_IMPORTED_MODULE_1__["default"]({
+      mass: 5e-5,
+      vel: new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0),
+      pos: spreadPosition(mouse, 1e-3)
+    }),
+  gases: mouse =>
+    new _presets_gas__WEBPACK_IMPORTED_MODULE_3__["default"]({
+      vel: new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0),
+      pos: spreadPosition(mouse, 1e-3),
+      radius: 35e-4
+    }),
+  automata: mouse =>
+    new _presets_automaton__WEBPACK_IMPORTED_MODULE_2__["default"]({
+      radius: 6e-3,
+      vel: new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0),
+      pos: spreadPosition(mouse, 1e-3)
+    }),
+  networks: mouse =>
+    new _presets_network__WEBPACK_IMPORTED_MODULE_4__["default"]({
+      radius: 1e-1,
+      vel: new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0),
+      pos: spreadPosition(mouse, 1e-3)
+    })
+};
+
+
+/***/ }),
+
 /***/ "./src/interface/client.js":
 /*!*********************************!*\
   !*** ./src/interface/client.js ***!
@@ -147,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _simulator_vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../simulator/vector */ "./src/simulator/vector.js");
-/* harmony import */ var _presets__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./presets */ "./src/interface/presets.js");
+/* harmony import */ var _actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./actions */ "./src/interface/actions.js");
 
 
 
@@ -163,9 +273,9 @@ class Client {
     this.mode = 'stars';
     this.action = 'paint';
 
-    this.paint = _presets__WEBPACK_IMPORTED_MODULE_1__["paint"];
-    this.shoot = _presets__WEBPACK_IMPORTED_MODULE_1__["shoot"];
-    this.place = _presets__WEBPACK_IMPORTED_MODULE_1__["place"];
+    this.paint = _actions__WEBPACK_IMPORTED_MODULE_1__["paint"];
+    this.shoot = _actions__WEBPACK_IMPORTED_MODULE_1__["shoot"];
+    this.place = _actions__WEBPACK_IMPORTED_MODULE_1__["place"];
 
     this.addEvents();
   }
@@ -401,6 +511,7 @@ class Display {
       const particle = particles[i];
       const nAdjacentParticles = particle.nearby.length;
       for (let j = 0; j < nAdjacentParticles; j += 1) {
+        this.dot(particle);
         this.line(particle.pos, particle.nearby[j]);
       }
       particle.nearby.length = 0;
@@ -589,25 +700,182 @@ const startTutorial = async () => {
 
 /***/ }),
 
-/***/ "./src/interface/presets.js":
-/*!**********************************!*\
-  !*** ./src/interface/presets.js ***!
-  \**********************************/
-/*! exports provided: paint, shoot, place */
+/***/ "./src/interface/presets/automaton.js":
+/*!********************************************!*\
+  !*** ./src/interface/presets/automaton.js ***!
+  \********************************************/
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "paint", function() { return paint; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "shoot", function() { return shoot; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "place", function() { return place; });
-/* harmony import */ var _simulator_particle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../simulator/particle */ "./src/simulator/particle.js");
-/* harmony import */ var _simulator_vector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../simulator/vector */ "./src/simulator/vector.js");
+/* harmony import */ var _simulator_particle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../simulator/particle */ "./src/simulator/particle.js");
+/* harmony import */ var _simulator_interactions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../simulator/interactions */ "./src/simulator/interactions.js");
 
 
 
-const GRAVITATIONAL_CONSTANT = 0.03;
-const GAS_CONSTANT = 1e-10;
+class Automaton extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
+  inReach(pos, size) {
+    return this.pos.sqDist(pos) < (2 * this.size + size) ** 2;
+  }
+
+  interact(particle) {
+    if (this.inReach(particle.pos, particle.size)) {
+      Object(_simulator_interactions__WEBPACK_IMPORTED_MODULE_1__["moveAway"])(this, particle, 1.1);
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Automaton);
+
+
+/***/ }),
+
+/***/ "./src/interface/presets/gas.js":
+/*!**************************************!*\
+  !*** ./src/interface/presets/gas.js ***!
+  \**************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _simulator_particle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../simulator/particle */ "./src/simulator/particle.js");
+/* harmony import */ var _simulator_interactions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../simulator/interactions */ "./src/simulator/interactions.js");
+
+
+
+class Gas extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
+  interact(particle) {
+    if (this.isTouching(particle.pos, 0.7 * particle.size)) {
+      Object(_simulator_interactions__WEBPACK_IMPORTED_MODULE_1__["moveAway"])(this, particle, 1);
+    } else {
+      Object(_simulator_interactions__WEBPACK_IMPORTED_MODULE_1__["pushAway"])(this, particle);
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Gas);
+
+
+/***/ }),
+
+/***/ "./src/interface/presets/network.js":
+/*!******************************************!*\
+  !*** ./src/interface/presets/network.js ***!
+  \******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _simulator_particle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../simulator/particle */ "./src/simulator/particle.js");
+
+
+class Network extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
+  constructor(particleParams) {
+    super(particleParams);
+    this.nearby = [];
+  }
+
+  interact({ pos }) {
+    if (this.isTouching(pos, 0)) this.nearby.push(pos);
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Network);
+
+
+/***/ }),
+
+/***/ "./src/interface/presets/star.js":
+/*!***************************************!*\
+  !*** ./src/interface/presets/star.js ***!
+  \***************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _simulator_particle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../simulator/particle */ "./src/simulator/particle.js");
+/* harmony import */ var _simulator_interactions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../simulator/interactions */ "./src/simulator/interactions.js");
+
+
+
+class Star extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
+  visualSize(scale) {
+    return Math.sqrt(this.mass) * scale;
+  }
+
+  get size() {
+    return Math.sqrt(this.mass);
+  }
+
+  interact(particle) {
+    const { pos, size } = particle;
+
+    if (this.isContained(pos, size / 4) && this.protected) {
+      Object(_simulator_interactions__WEBPACK_IMPORTED_MODULE_1__["inelasticCollide"])(this, particle);
+      Object(_simulator_interactions__WEBPACK_IMPORTED_MODULE_1__["absorb"])(this, particle);
+    } else {
+      Object(_simulator_interactions__WEBPACK_IMPORTED_MODULE_1__["fakeGravity"])(this, particle);
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Star);
+
+
+/***/ }),
+
+/***/ "./src/interface/ui_builder.js":
+/*!*************************************!*\
+  !*** ./src/interface/ui_builder.js ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+const buildButtons = (buttonNames, buttonContainerID) => {
+  for (let i = 0; i < buttonNames.length; i += 1) {
+    const uiElement = document.createElement('button');
+    uiElement.className = 'btn';
+    uiElement.id = buttonNames[i];
+    uiElement.innerText = buttonNames[i];
+    document.getElementById(buttonContainerID).appendChild(uiElement);
+  }
+};
+
+const buildUI = () => {
+  buildButtons(['paint', 'shoot', 'place', 'reset'], 'option-buttons');
+  buildButtons(['stars', 'gases', 'networks', 'automata'], 'mode-buttons');
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (buildUI);
+
+
+/***/ }),
+
+/***/ "./src/simulator/interactions.js":
+/*!***************************************!*\
+  !*** ./src/simulator/interactions.js ***!
+  \***************************************/
+/*! exports provided: absorb, inelasticCollide, moveAway, fakeGravity, pushAway */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "absorb", function() { return absorb; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "inelasticCollide", function() { return inelasticCollide; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "moveAway", function() { return moveAway; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fakeGravity", function() { return fakeGravity; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pushAway", function() { return pushAway; });
+/* harmony import */ var _vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./vector */ "./src/simulator/vector.js");
+
+
+const PULL_CONSTANT = 0.025;
+const PUSH_CONSTANT = 5e-12;
 
 const absorb = (thisParticle, thatParticle) => {
   thisParticle.grow(thatParticle.mass);
@@ -624,209 +892,25 @@ const inelasticCollide = (thisParticle, thatParticle) => {
 
 const moveAway = (thisParticle, thatParticle, a) => {
   thatParticle.move(
-    _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(thatParticle.pos, thisParticle.pos).scale(
-      a * (thisParticle.size + thatParticle.size) -
-        thisParticle.pos.dist(thatParticle.pos)
+    _vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(thatParticle.pos, thisParticle.pos).scale(
+      a * (thisParticle.size + thatParticle.size)
+        - thisParticle.pos.dist(thatParticle.pos)
     )
   );
 };
 
 const fakeGravity = (thisParticle, thatParticle) => {
   const scalar = thisParticle.mass / thisParticle.pos.dist(thatParticle.pos);
-  const direction = _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(thisParticle.pos, thatParticle.pos);
-  thatParticle.accelerate(direction.scale(GRAVITATIONAL_CONSTANT * scalar));
+  const direction = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(thisParticle.pos, thatParticle.pos);
+  thatParticle.accelerate(direction.scale(PULL_CONSTANT * scalar));
 };
 
 const pushAway = (thisParticle, thatParticle) => {
-  const scalar = 1 / thisParticle.pos.dist(thatParticle.pos) ** 3;
-  const direction = _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(thatParticle.pos, thisParticle.pos);
-  thatParticle.accelerate(direction.scale(GAS_CONSTANT * scalar));
+  const sqDist = thisParticle.pos.sqDist(thatParticle.pos);
+  const scalar = PUSH_CONSTANT / (sqDist * sqDist);
+  const direction = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(thatParticle.pos, thisParticle.pos);
+  thatParticle.accelerate(direction.scale(scalar));
 };
-
-class SpaceDebris extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  visualSize(scale) {
-    return Math.sqrt(this.mass) * scale;
-  }
-
-  get size() {
-    return Math.sqrt(this.mass);
-  }
-
-  interact(particle) {
-    const { pos, size } = particle;
-
-    if (this.isContained(pos, size / 4) && this.protected) {
-      inelasticCollide(this, particle);
-      absorb(this, particle);
-    } else {
-      fakeGravity(this, particle);
-    }
-  }
-}
-
-class Gas extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  interact(particle) {
-    if (this.isTouching(particle.pos, 0.7 * particle.size)) {
-      moveAway(this, particle, 1);
-    } else {
-      pushAway(this, particle);
-    }
-  }
-}
-
-class Automata extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  inReach(pos, size) {
-    return this.pos.dist(pos) < 1.4 * this.size + size;
-  }
-
-  interact(particle) {
-    if (this.inReach(particle.pos, particle.size)) {
-      moveAway(this, particle, 0.8);
-    }
-  }
-}
-
-class Network extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  constructor(particleParams) {
-    super(particleParams);
-    this.nearby = [];
-  }
-
-  interact({ pos }) {
-    if (this.isTouching(pos, 0)) this.nearby.push(pos);
-  }
-}
-
-const spreadPosition = (mouse, spread) =>
-  _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(spread * Math.random()).add(mouse);
-
-const paint = {
-  stars: mouse =>
-    new SpaceDebris({
-      mass: 5e-7,
-      vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(0.00001),
-      pos: spreadPosition(mouse, 0.03)
-    }),
-  gases: mouse =>
-    new Gas({
-      radius: 3e-3,
-      vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(0.0001),
-      pos: spreadPosition(mouse, 0.1)
-    }),
-  automata: mouse =>
-    new Automata({
-      radius: 6e-3,
-      vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(0.001),
-      pos: spreadPosition(mouse, 0.01)
-    }),
-  networks: mouse =>
-    new Network({
-      radius: 1e-1,
-      vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].randomDir(0.0002),
-      pos: spreadPosition(mouse, 0.15)
-    })
-};
-
-const shoot = {
-  stars: (mouse, pointer) =>
-    new SpaceDebris({
-      mass: 3e-6,
-      vel: pointer.scale(0.007),
-      pos: spreadPosition(mouse, 1e-2)
-    }),
-  gases: (mouse, pointer) =>
-    new Gas({
-      radius: 3e-3,
-      vel: pointer.scale(0.006),
-      pos: spreadPosition(mouse, 1e-4)
-    }),
-  automata: (mouse, pointer) =>
-    new Automata({
-      radius: 6e-3,
-      vel: pointer.scale(0.006),
-      pos: spreadPosition(mouse, 0.01)
-    }),
-  networks: (mouse, pointer) =>
-    new Network({
-      radius: 1e-1,
-      vel: pointer.scale(0.008),
-      pos: spreadPosition(mouse, 0.05)
-    })
-};
-
-const place = {
-  stars: mouse =>
-    new SpaceDebris({
-      mass: 5e-5,
-      vel: new _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"](0, 0),
-      pos: spreadPosition(mouse, 1e-3)
-    }),
-  gases: mouse =>
-    new Gas({
-      vel: new _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"](0, 0),
-      pos: spreadPosition(mouse, 1e-3),
-      radius: 3e-3
-    }),
-  automata: mouse =>
-    new Automata({
-      radius: 6e-3,
-      vel: new _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"](0, 0),
-      pos: spreadPosition(mouse, 1e-3)
-    }),
-  networks: mouse =>
-    new Network({
-      radius: 1e-1,
-      vel: new _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"](0, 0),
-      pos: spreadPosition(mouse, 1e-3)
-    })
-};
-
-class HardSphere extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  interact(particle) {
-    if (this.isTouching(particle.pos, particle.size)) {
-      particle.move(
-        _simulator_vector__WEBPACK_IMPORTED_MODULE_1__["default"].direction(particle.pos, this.pos).scale(
-          this.radius + particle.radius - this.pos.dist(particle.pos)
-        )
-      );
-    }
-  }
-}
-
-
-/***/ }),
-
-/***/ "./src/interface/ui_builder.js":
-/*!*************************************!*\
-  !*** ./src/interface/ui_builder.js ***!
-  \*************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-const BUTTONS_RIGHT = ['paint', 'shoot', 'place', 'reset'];
-const BUTTONS_TOP = ['stars', 'gases', 'networks', 'automata'];
-
-const buildUI = () => {
-  for (let i = 0; i < BUTTONS_RIGHT.length; i += 1) {
-    const uiElement = document.createElement('button');
-    uiElement.className = 'btn';
-    uiElement.id = BUTTONS_RIGHT[i];
-    uiElement.innerText = BUTTONS_RIGHT[i];
-    document.getElementById('option-buttons').appendChild(uiElement);
-  }
-
-  for (let i = 0; i < BUTTONS_TOP.length; i += 1) {
-    const uiElement = document.createElement('button');
-    uiElement.className = 'btn';
-    uiElement.id = BUTTONS_TOP[i];
-    uiElement.innerText = BUTTONS_TOP[i];
-    document.getElementById('mode-buttons').appendChild(uiElement);
-  }
-};
-
-/* harmony default export */ __webpack_exports__["default"] = (buildUI);
 
 
 /***/ }),
@@ -893,7 +977,7 @@ class Particle {
   }
 
   isTouching(pos, offset) {
-    return this.pos.dist(pos) < this.size + offset;
+    return this.pos.sqDist(pos) < (this.size + offset) ** 2;
   }
 
   isContained(pos, offset) {
@@ -1023,8 +1107,9 @@ class Vector {
   }
 
   normalize() {
-    if (!this.x && !this.y) return this;
-    this.scale(1 / this.magnitude());
+    if (this.x || this.y) {
+      this.scale(1 / this.magnitude());
+    }
     return this;
   }
 
