@@ -34,6 +34,19 @@ button {
   display: inline-block;
 }
 
+.logo {
+  font-family: 'Satisfy', cursive;
+  font-weight: 100;
+  font-size: 2em;
+  text-align: center;
+  line-height: 100%;
+  position: absolute;
+  padding: 1%;
+  top:0;
+  right:0;
+  color: white;
+}
+
 .box-container {
   display: flex;
   justify-content: center;
