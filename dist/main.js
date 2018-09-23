@@ -172,7 +172,7 @@ const paint = {
     }),
   gases: mouse =>
     new _presets_gas__WEBPACK_IMPORTED_MODULE_3__["default"]({
-      radius: 35e-4,
+      radius: 5e-3,
       vel: _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"].randomDir(0.0001),
       pos: spreadPosition(mouse, 0.1)
     }),
@@ -199,20 +199,20 @@ const shoot = {
     }),
   gases: (mouse, pointer) =>
     new _presets_gas__WEBPACK_IMPORTED_MODULE_3__["default"]({
-      radius: 35e-4,
+      radius: 5e-3,
       vel: pointer.scale(0.006),
-      pos: spreadPosition(mouse, 1e-4)
+      pos: spreadPosition(mouse, 1e-6)
     }),
   automata: (mouse, pointer) =>
     new _presets_automaton__WEBPACK_IMPORTED_MODULE_2__["default"]({
       radius: 6e-3,
-      vel: pointer.scale(0.006),
+      vel: pointer.scale(0.003),
       pos: spreadPosition(mouse, 0.01)
     }),
   networks: (mouse, pointer) =>
     new _presets_network__WEBPACK_IMPORTED_MODULE_4__["default"]({
       radius: 1e-1,
-      vel: pointer.scale(0.008),
+      vel: pointer.scale(0.003),
       pos: spreadPosition(mouse, 0.05)
     })
 };
@@ -228,7 +228,7 @@ const place = {
     new _presets_gas__WEBPACK_IMPORTED_MODULE_3__["default"]({
       vel: new _simulator_vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0),
       pos: spreadPosition(mouse, 1e-3),
-      radius: 35e-4
+      radius: 5e-3
     }),
   automata: mouse =>
     new _presets_automaton__WEBPACK_IMPORTED_MODULE_2__["default"]({
@@ -419,10 +419,10 @@ const speedToHSL = vel => {
   return `hsl(${hue},100%,50%)`;
 };
 
-const directionToColor = ({ x, y }) => {
+const directionToColor = ({ x }) => {
   if (x > 0) return 'blue';
   if (x < 0) return 'green';
-  return 'white';
+  return 'grey';
 };
 
 class Display {
@@ -746,12 +746,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Gas extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
+  get size() {
+    return 0.001;
+  }
+
   interact(particle) {
-    if (this.isTouching(particle.pos, 0.7 * particle.size)) {
-      Object(_simulator_interactions__WEBPACK_IMPORTED_MODULE_1__["moveAway"])(this, particle, 1);
-    } else {
-      Object(_simulator_interactions__WEBPACK_IMPORTED_MODULE_1__["pushAway"])(this, particle);
-    }
+    Object(_simulator_interactions__WEBPACK_IMPORTED_MODULE_1__["pushAway"])(this, particle, 0.0001);
   }
 }
 
@@ -814,7 +814,7 @@ class Star extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   interact(particle) {
     const { pos, size } = particle;
 
-    if (this.isContained(pos, size / 4) && this.protected) {
+    if (this.isTouching(pos, 0.1 * size) && this.protected) {
       Object(_simulator_interactions__WEBPACK_IMPORTED_MODULE_1__["inelasticCollide"])(this, particle);
       Object(_simulator_interactions__WEBPACK_IMPORTED_MODULE_1__["absorb"])(this, particle);
     } else {
@@ -875,7 +875,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const PULL_CONSTANT = 0.025;
-const PUSH_CONSTANT = 5e-12;
+const PUSH_CONSTANT = 2e-11;
 
 const absorb = (thisParticle, thatParticle) => {
   thisParticle.grow(thatParticle.mass);
@@ -900,14 +900,17 @@ const moveAway = (thisParticle, thatParticle, a) => {
 };
 
 const fakeGravity = (thisParticle, thatParticle) => {
-  const scalar = thisParticle.mass / thisParticle.pos.dist(thatParticle.pos);
-  const direction = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(thisParticle.pos, thatParticle.pos);
+  const scalar = thisParticle.mass / thisParticle.pos.sqDist(thatParticle.pos);
+  const direction = new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0)
+    .add(thisParticle.pos)
+    .subtract(thatParticle.pos);
+
   thatParticle.accelerate(direction.scale(PULL_CONSTANT * scalar));
 };
 
-const pushAway = (thisParticle, thatParticle) => {
+const pushAway = (thisParticle, thatParticle, maxAcc) => {
   const sqDist = thisParticle.pos.sqDist(thatParticle.pos);
-  const scalar = PUSH_CONSTANT / (sqDist * sqDist);
+  const scalar = Math.min(PUSH_CONSTANT / (sqDist * sqDist), maxAcc);
   const direction = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(thatParticle.pos, thisParticle.pos);
   thatParticle.accelerate(direction.scale(scalar));
 };

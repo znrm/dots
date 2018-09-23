@@ -1,13 +1,13 @@
 import Particle from '../../simulator/particle';
-import { moveAway, pushAway } from '../../simulator/interactions';
+import { pushAway } from '../../simulator/interactions';
 
 class Gas extends Particle {
+  get size() {
+    return 0.001;
+  }
+
   interact(particle) {
-    if (this.isTouching(particle.pos, 0.7 * particle.size)) {
-      moveAway(this, particle, 1);
-    } else {
-      pushAway(this, particle);
-    }
+    pushAway(this, particle, 0.0001);
   }
 }
 

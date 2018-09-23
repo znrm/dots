@@ -1,5 +1,9 @@
 import Particle from '../../simulator/particle';
-import { absorb, inelasticCollide, fakeGravity } from '../../simulator/interactions';
+import {
+  absorb,
+  inelasticCollide,
+  fakeGravity
+} from '../../simulator/interactions';
 
 class Star extends Particle {
   visualSize(scale) {
@@ -13,7 +17,7 @@ class Star extends Particle {
   interact(particle) {
     const { pos, size } = particle;
 
-    if (this.isContained(pos, size / 4) && this.protected) {
+    if (this.isTouching(pos, 0.1 * size) && this.protected) {
       inelasticCollide(this, particle);
       absorb(this, particle);
     } else {

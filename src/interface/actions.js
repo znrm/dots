@@ -16,7 +16,7 @@ export const paint = {
     }),
   gases: mouse =>
     new Gas({
-      radius: 35e-4,
+      radius: 5e-3,
       vel: Vector.randomDir(0.0001),
       pos: spreadPosition(mouse, 0.1)
     }),
@@ -43,20 +43,20 @@ export const shoot = {
     }),
   gases: (mouse, pointer) =>
     new Gas({
-      radius: 35e-4,
+      radius: 5e-3,
       vel: pointer.scale(0.006),
-      pos: spreadPosition(mouse, 1e-4)
+      pos: spreadPosition(mouse, 1e-6)
     }),
   automata: (mouse, pointer) =>
     new Automaton({
       radius: 6e-3,
-      vel: pointer.scale(0.006),
+      vel: pointer.scale(0.003),
       pos: spreadPosition(mouse, 0.01)
     }),
   networks: (mouse, pointer) =>
     new Network({
       radius: 1e-1,
-      vel: pointer.scale(0.008),
+      vel: pointer.scale(0.003),
       pos: spreadPosition(mouse, 0.05)
     })
 };
@@ -72,7 +72,7 @@ export const place = {
     new Gas({
       vel: new Vector(0, 0),
       pos: spreadPosition(mouse, 1e-3),
-      radius: 35e-4
+      radius: 5e-3
     }),
   automata: mouse =>
     new Automaton({

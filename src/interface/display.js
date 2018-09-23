@@ -20,10 +20,10 @@ const speedToHSL = vel => {
   return `hsl(${hue},100%,50%)`;
 };
 
-const directionToColor = ({ x, y }) => {
+const directionToColor = ({ x }) => {
   if (x > 0) return 'blue';
   if (x < 0) return 'green';
-  return 'white';
+  return 'grey';
 };
 
 class Display {
