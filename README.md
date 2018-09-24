@@ -10,7 +10,9 @@ Dots is written in **Vanilla JavaScript (ES6)**. It additionally utilizes the HT
 
 ## Features & Code Overview
 
-### Vector Prototype
+### Simulator
+
+The simulator is written to work well with the existing interface, but
 
 ```js
 class Vector {

@@ -9,6 +9,7 @@ class State {
   cleanup() {
     const nParticles = this.particles.length;
     let validParticles = 0;
+
     for (let i = 0; i < nParticles; i += 1) {
       const particle = this.particles[i];
 
@@ -45,12 +46,23 @@ class State {
   walls(nParticles) {
     for (let i = 0; i < nParticles; i += 1) {
       const { pos, vel, size } = this.particles[i];
-      if (pos.x + size > 1 || pos.x - size < 0) {
-        vel.subtract(new Vector(vel.x, 0).scale(2));
-      }
+      const rightDist = 1 - size - pos.x;
+      const bottomDist = 1 - size - pos.y;
+      const leftDist = pos.x - size;
+      const topDist = pos.y - size;
 
-      if (pos.y + size > 1 || pos.y - size < 0) {
+      if (rightDist < 0) {
+        vel.subtract(new Vector(vel.x, 0).scale(2));
+        pos.add(new Vector(rightDist, 0));
+      } else if (leftDist < 0) {
+        vel.subtract(new Vector(vel.x, 0).scale(2));
+        pos.subtract(new Vector(leftDist, 0));
+      } else if (bottomDist < 0) {
         vel.subtract(new Vector(0, vel.y).scale(2));
+        pos.add(new Vector(0, bottomDist));
+      } else if (topDist < 0) {
+        vel.subtract(new Vector(0, vel.y).scale(2));
+        pos.subtract(new Vector(0, topDist));
       }
     }
   }

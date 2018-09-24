@@ -107,11 +107,17 @@ class Display {
 
     for (let i = 0; i < nParticles; i += 1) {
       const particle = particles[i];
-      this.dot(particle);
+      const fromX = particle.pos.x * this.width;
+      const fromY = particle.pos.y * this.height;
+      this.ctx.fillRect(fromX, fromY, 1, 1);
 
       const nAdjacentParticles = particle.nearby.length;
       for (let j = 0; j < nAdjacentParticles; j += 1) {
-        this.subLine(particle.pos, particle.nearby[j]);
+        const toX = particle.nearby[j].x * this.width;
+        const toY = particle.nearby[j].y * this.height;
+
+        this.ctx.moveTo(fromX, fromY);
+        this.ctx.lineTo(toX, toY);
       }
       particle.nearby.length = 0;
     }

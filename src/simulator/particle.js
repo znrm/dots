@@ -25,12 +25,12 @@ class Particle {
     return this.radius;
   }
 
-  visualSize(scale) {
-    return this.radius * scale;
-  }
-
   update() {
     this.pos.add(this.vel);
+  }
+
+  visualSize(scale) {
+    return this.radius * scale;
   }
 
   accelerate(amount) {
@@ -51,10 +51,6 @@ class Particle {
 
   isTouching(pos, offset) {
     return this.pos.sqDist(pos) < (this.size + offset) ** 2;
-  }
-
-  isContained(pos, offset) {
-    return this.pos.dist(pos) < this.size - offset;
   }
 }
 

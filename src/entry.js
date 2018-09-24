@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     client.resetMouse();
 
     state.update();
-    state.cleanup();
+    if (client.mode === 'stars') state.cleanup();
   };
   window.Vector = Vector;
   window.state = state;
