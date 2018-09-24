@@ -1,13 +1,12 @@
 # Dots
 
 An entertaining, surprisingly sophisticated particle playground.
-
 [Try it live!](https://znrm.github.io/dots/)
 
-----
-This readme is a work in progress.
+Dots is written in **Vanilla JavaScript (ES6)**. It additionally utilizes the HTML5 Canvas API and is bundled with Webpack
 
-----
+![Image showing a variety of particle types](docs/dots-samples.gif?raw=true)
+
 
 ## Features & Code Overview
 
@@ -46,6 +45,7 @@ for (let i = 0; i < nFields; i += 1) {
   }
 }
 ```
+
 ### User Interface
 
 ## Performance
