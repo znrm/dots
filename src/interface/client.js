@@ -57,10 +57,10 @@ class Client {
     const canvas = document.querySelector('canvas');
 
     option.onclick = this.selectAction();
-    option.ontouchstart = this.selectAction();
+    option.ontouchend = this.selectAction();
 
     mode.onclick = this.selectMode();
-    mode.ontouchstart = this.selectMode();
+    mode.ontouchend = this.selectMode();
 
     canvas.onmousedown = this.mouseDown();
     canvas.ontouchstart = this.mouseDown();
@@ -68,8 +68,8 @@ class Client {
     document.onmousemove = this.mouseMove();
     document.ontouchmove = this.mouseMove();
 
-    document.onmouseup = this.mouseUp();
-    document.ontouchend = this.mouseUp();
+    canvas.onmouseup = this.mouseUp();
+    canvas.ontouchend = this.mouseUp();
   }
 
   mouseDown() {

@@ -28,17 +28,16 @@ const directionToColor = ({ x }) => {
 
 class Display {
   constructor(state, client) {
-    this.canvas = document.querySelector('canvas');
     this.state = state;
     this.client = client;
 
+    this.canvas = document.querySelector('canvas');
     this.ctx = this.canvas.getContext('2d', { alpha: false });
-    this.resize.bind(this)();
 
-    this.ctx.fillStyle = 'rgba(255,255,255,1)';
-    this.ctx.strokeStyle = 'rgba(255,255,255,1)';
+    this.resize()();
+    this.reset();
 
-    window.onresize = () => this.resize();
+    window.onresize = this.resize();
   }
 
   get scale() {
@@ -51,10 +50,6 @@ class Display {
   }
 
   renderParticles() {
-    this.ctx.shadowBlur = 0;
-    this.ctx.shadowColor = 'rgba(0, 0, 0, 0)';
-    this.ctx.fillStyle = 'white';
-
     switch (this.client.mode) {
       case 'stars':
         this.renderStars();
@@ -80,6 +75,7 @@ class Display {
     for (let i = 0; i < nParticles; i += 1) {
       const particle = particles[i];
       if (particle.visualSize(this.scale) < 1) {
+        this.ctx.fillStyle = 'SandyBrown';
         this.dot(particle);
       } else {
         this.star(particle);
@@ -102,47 +98,54 @@ class Display {
   }
 
   renderNetworks() {
+    this.ctx.beginPath();
     this.ctx.lineWidth = 0.3;
     this.ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-    this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
+
     const { particles } = this.state;
     const nParticles = particles.length;
 
     for (let i = 0; i < nParticles; i += 1) {
       const particle = particles[i];
+      this.dot(particle);
+
       const nAdjacentParticles = particle.nearby.length;
       for (let j = 0; j < nAdjacentParticles; j += 1) {
-        this.dot(particle);
-        this.line(particle.pos, particle.nearby[j]);
+        this.subLine(particle.pos, particle.nearby[j]);
       }
       particle.nearby.length = 0;
     }
+
+    this.ctx.stroke();
+    this.ctx.closePath();
   }
 
   resize() {
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
+    return () => {
+      this.width = window.innerWidth;
+      this.height = window.innerHeight;
 
-    this.client.displayWidth = this.width;
-    this.client.displayHeight = this.height;
+      this.client.displayWidth = this.width;
+      this.client.displayHeight = this.height;
 
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
-
-    this.ctx.fillStyle = 'rgba(255,255,255,1)';
-    this.ctx.strokeStyle = 'rgba(255,255,255,1)';
-    this.ctx.globalCompositeOperation = 'screen';
+      this.canvas.width = this.width;
+      this.canvas.height = this.height;
+    };
   }
 
   reset() {
     this.ctx.clearRect(0, 0, this.width, this.height);
+    this.ctx.fillStyle = 'rgba(255,255,255,1)';
+    this.ctx.strokeStyle = 'rgba(255,255,255,1)';
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowColor = 'rgba(0, 0, 0, 0)';
+    this.ctx.globalCompositeOperation = 'screen';
   }
 
   mouse({ x, y }) {
+    this.ctx.beginPath();
     this.ctx.lineWidth = 1.5;
     this.strokeStyle = 'rgba(255,255,255,0.2)';
-
-    this.ctx.beginPath();
     this.ctx.arc(
       x * this.width,
       y * this.height,
@@ -152,6 +155,7 @@ class Display {
       false
     );
     this.ctx.stroke();
+    this.ctx.closePath();
   }
 
   star(particle) {
@@ -193,9 +197,9 @@ class Display {
   automata(particle) {
     const { pos } = particle;
     const size = particle.visualSize(this.scale);
-    this.ctx.fillStyle = directionToColor(particle.vel);
 
     this.ctx.beginPath();
+    this.ctx.fillStyle = directionToColor(particle.vel);
     this.ctx.arc(
       pos.x * this.width,
       pos.y * this.height,
@@ -210,9 +214,9 @@ class Display {
   gas(particle) {
     const { pos } = particle;
     const size = particle.visualSize(this.scale);
-    this.ctx.fillStyle = speedToHSL(particle.vel);
 
     this.ctx.beginPath();
+    this.ctx.fillStyle = speedToHSL(particle.vel);
     this.ctx.arc(
       pos.x * this.width,
       pos.y * this.height,
@@ -225,7 +229,6 @@ class Display {
   }
 
   dot({ pos }) {
-    this.ctx.fillStyle = 'SandyBrown';
     this.ctx.fillRect(pos.x * this.width, pos.y * this.height, 1, 1);
   }
 
@@ -234,6 +237,12 @@ class Display {
     this.ctx.moveTo(from.x * this.width, from.y * this.height);
     this.ctx.lineTo(to.x * this.width, to.y * this.height);
     this.ctx.stroke();
+    this.ctx.closePath();
+  }
+
+  subLine(from, to) {
+    this.ctx.moveTo(from.x * this.width, from.y * this.height);
+    this.ctx.lineTo(to.x * this.width, to.y * this.height);
   }
 }
 
