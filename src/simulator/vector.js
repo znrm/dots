@@ -66,6 +66,14 @@ class Vector {
     return Math.abs(this.x) + Math.abs(this.y);
   }
 
+  static xAxis(length = 1) {
+    return new Vector(length, 0);
+  }
+
+  static yAxis(length = 1) {
+    return new Vector(0, length);
+  }
+
   static direction(from = new Vector(), to = new Vector()) {
     return new Vector(0, 0)
       .add(from)

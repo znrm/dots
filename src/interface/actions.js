@@ -3,11 +3,12 @@ import Star from './presets/star';
 import Automaton from './presets/automaton';
 import Gas from './presets/gas';
 import Network from './presets/network';
+import Particle from '../simulator/particle';
 
 const spreadPosition = (mouse, spread) =>
   Vector.random(spread * Math.random()).add(mouse);
 
-export const paint = {
+const paint = {
   stars: mouse =>
     new Star({
       mass: 5e-7,
@@ -31,10 +32,15 @@ export const paint = {
       radius: 1e-1,
       vel: Vector.random(0.0002),
       pos: spreadPosition(mouse, 0.15)
+    }),
+  dots: mouse =>
+    new Particle({
+      vel: Vector.random(0.00001),
+      pos: spreadPosition(mouse, 0.03)
     })
 };
 
-export const shoot = {
+const shoot = {
   stars: (mouse, pointer) =>
     new Star({
       mass: 3e-6,
@@ -58,10 +64,15 @@ export const shoot = {
       radius: 1e-1,
       vel: pointer.scale(0.003),
       pos: spreadPosition(mouse, 0.05)
+    }),
+  dots: (mouse, pointer) =>
+    new Particle({
+      vel: pointer.scale(0.003),
+      pos: spreadPosition(mouse, 1e-2)
     })
 };
 
-export const place = {
+const place = {
   stars: mouse =>
     new Star({
       mass: 5e-5,
@@ -85,5 +96,18 @@ export const place = {
       radius: 1e-1,
       vel: new Vector(0, 0),
       pos: spreadPosition(mouse, 1e-3)
+    }),
+  dots: mouse =>
+    new Particle({
+      vel: new Vector(0, 0),
+      pos: spreadPosition(mouse, 5e-3)
     })
 };
+
+const actions = {
+  paint,
+  shoot,
+  place
+};
+
+export default actions;

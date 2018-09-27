@@ -19,14 +19,15 @@ The simulator consists of three classes (Vector, Particle, and State) that handl
 
 Vector operations can be chained
 
+
 ```js
 class Vector {
-  constructor(x, y) {
+  constructor(x = 0, y = 0) {
     this.x = x;
     this.y = y;
   }
 
-  add(that) {
+  add(that = new Vector()) {
     this.x += that.x;
     this.y += that.y;
     return this;

@@ -5,6 +5,7 @@ class State {
   constructor(particles = []) {
     this.particles = particles;
     this.wall = true;
+    this.needsCleaning = false;
   }
 
   update() {
@@ -13,6 +14,7 @@ class State {
     this.calculateInteractions(nParticles);
     this.updateParticles(nParticles);
     if (this.wall) this.walls(nParticles);
+    if (this.needsCleaning) this.cleanup(nParticles);
   }
 
   addParticle(particle = new Particle()) {
@@ -24,8 +26,7 @@ class State {
     return this.wall;
   }
 
-  cleanup() {
-    const nParticles = this.particles.length;
+  cleanup(nParticles = this.particles.length) {
     let validParticles = 0;
 
     for (let i = 0; i < nParticles; i += 1) {
@@ -60,17 +61,17 @@ class State {
       const topDist = pos.y - size;
 
       if (rightDist < 0) {
-        vel.subtract(new Vector(vel.x, 0).scale(2));
-        pos.add(new Vector(rightDist, 0));
+        vel.subtract(Vector.xAxis(2 * vel.x));
+        pos.add(Vector.xAxis(rightDist));
       } else if (leftDist < 0) {
-        vel.subtract(new Vector(vel.x, 0).scale(2));
-        pos.subtract(new Vector(leftDist, 0));
+        vel.subtract(Vector.xAxis(2 * vel.x));
+        pos.subtract(Vector.xAxis(leftDist));
       } else if (bottomDist < 0) {
-        vel.subtract(new Vector(0, vel.y).scale(2));
-        pos.add(new Vector(0, bottomDist));
+        vel.subtract(Vector.yAxis(2 * vel.y));
+        pos.add(Vector.yAxis(bottomDist));
       } else if (topDist < 0) {
-        vel.subtract(new Vector(0, vel.y).scale(2));
-        pos.subtract(new Vector(0, topDist));
+        vel.subtract(Vector.yAxis(2 * vel.y));
+        pos.subtract(Vector.yAxis(topDist));
       }
     }
   }

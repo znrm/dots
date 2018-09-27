@@ -1,21 +1,21 @@
 import Vector from '../simulator/vector';
-import { paint, shoot, place } from './actions';
+import actions from './actions';
 
 class Client {
   constructor(state) {
     this.state = state;
+    this.state.needsCleaning = true;
 
     this.mouse = new Vector(0, 0);
     this.mouseHistory = Array.from({ length: 5 }, () => new Vector(0, 0));
 
     this.pressing = false;
 
-    this.mode = 'stars';
-    this.action = 'paint';
+    this.particleType = 'stars';
+    this.selectedAction = 'paint';
+    this.rate = 19;
 
-    this.paint = paint;
-    this.shoot = shoot;
-    this.place = place;
+    this.actions = actions;
 
     this.addEvents();
   }
@@ -24,39 +24,34 @@ class Client {
     return Vector.direction(this.mouse, this.mouseHistory[0]);
   }
 
-  resetMouse() {
-    this.pressed = false;
-  }
-
   handleActions() {
-    if (this.pressing) this.continuousAction();
-    this.resetMouse();
+    return () => {
+      if (this.selectedAction !== 'place') this.continuousAction();
+    };
   }
 
   clickAction() {
-    if (this.action === 'place') {
-      this.state.addParticle(this.place[this.mode](this.mouse));
+    if (this.selectedAction === 'place') {
+      this.state.addParticle(this.actions.place[this.particleType](this.mouse));
     }
   }
 
   continuousAction() {
-    if (this.action !== 'place') {
-      this.state.addParticle(
-        this[this.action][this.mode](this.mouse, this.pointer)
-      );
-    }
+    this.state.addParticle(
+      this.actions[this.selectedAction][this.particleType](this.mouse, this.pointer)
+    );
   }
 
   addEvents() {
     const option = document.getElementById('option-buttons');
-    const mode = document.getElementById('mode-buttons');
+    const particleType = document.getElementById('particle-type-buttons');
     const canvas = document.querySelector('canvas');
 
     option.onclick = this.selectAction();
     option.ontouchend = this.selectAction();
 
-    mode.onclick = this.selectMode();
-    mode.ontouchend = this.selectMode();
+    particleType.onclick = this.selectMode();
+    particleType.ontouchend = this.selectMode();
 
     canvas.onmousedown = this.mouseDown();
     canvas.ontouchstart = this.mouseDown();
@@ -75,6 +70,7 @@ class Client {
         e.clientY / window.innerHeight
       );
       this.pressing = true;
+      this.asyncActions = window.setInterval(this.handleActions(), this.rate);
     };
   }
 
@@ -92,17 +88,18 @@ class Client {
 
   mouseUp() {
     return () => {
-      this.pressing = false;
       this.clickAction();
+      window.clearInterval(this.asyncActions);
     };
   }
 
   selectMode() {
     return e => {
-      if (this.mode !== e.target.id) {
+      if (this.particleType !== e.target.id) {
         this.state.reset();
-        this.mode = e.target.id;
+        this.particleType = e.target.id;
       }
+      this.state.needsCleaning = this.particleType === 'stars';
     };
   }
 
@@ -113,7 +110,7 @@ class Client {
           this.state.reset();
           break;
         default:
-          this.action = e.target.id;
+          this.selectedAction = e.target.id;
       }
     };
   }

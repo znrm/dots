@@ -60,7 +60,7 @@ button {
   right: -95px;
 }
 
-.mode {
+.particle-type {
   width: 100vw;
   top: -80px;
 }
@@ -69,7 +69,7 @@ button {
   right: 0;
 }
 
-.mode:hover {
+.particle-type:hover {
   top: 0;
 }
 
@@ -89,7 +89,7 @@ button {
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-.mode .box {
+.particle-type .box {
   flex-direction: row;
   height: 80px;
   margin: 20px auto;

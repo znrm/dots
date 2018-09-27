@@ -51,7 +51,7 @@ class Display {
   }
 
   renderParticles() {
-    switch (this.client.mode) {
+    switch (this.client.particleType) {
       case 'stars':
         this.renderStars();
         break;
@@ -63,6 +63,9 @@ class Display {
         break;
       case 'gases':
         this.renderGases();
+        break;
+      case 'dots':
+        this.renderDots();
         break;
       default:
         break;
@@ -82,6 +85,14 @@ class Display {
         this.star(particle);
       }
     }
+  }
+
+  renderDots() {
+    const { particles } = this.state;
+    const nParticles = particles.length;
+    this.ctx.fillStyle = 'white';
+
+    for (let i = 0; i < nParticles; i += 1) this.dot(particles[i]);
   }
 
   renderAutomata() {

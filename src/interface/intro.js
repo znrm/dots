@@ -1,7 +1,11 @@
 const introsLeft = () => {
-  const dotsIntros = window.localStorage.getItem('dotsIntros') || 2;
-  window.localStorage.setItem('dotsIntros', Math.max(dotsIntros - 1, 0));
-  return parseInt(dotsIntros, 10);
+  const introsLeftString = window.localStorage.getItem('dotsIntros') || '2';
+  const introsLeftNumber = parseInt(introsLeftString, 10);
+  window.localStorage.setItem(
+    'dotsIntros',
+    Math.max(introsLeftNumber - 1, 0).toString()
+  );
+  return introsLeftNumber;
 };
 
 const addClass = (id, className) => () =>
@@ -19,27 +23,27 @@ const sleep = idealSeconds => () =>
 
 const waitForModeSelection = () =>
   new Promise(resolve => {
-    document.querySelector('.mode').onclick = resolve;
+    document.querySelector('.particle-type').addEventListener('click', resolve);
   });
 
 const waitForOptionSelection = () =>
   new Promise(resolve => {
-    document.querySelector('.option').onclick = resolve;
+    document.querySelector('.option').addEventListener('click', resolve);
   });
 
-const welcome = () => {
+const welcomeUser = () => {
   if (introsLeft()) {
     Promise.resolve()
       .then(show('title'))
       .then(sleep(3))
       .then(hide('title'))
-      .then(show('select-mode'))
-      .then(addClass('mode', 'top-peek'))
+      .then(show('select-particle-type'))
+      .then(addClass('particle-type', 'top-peek'))
       .then(waitForModeSelection)
-      .then(removeClass('mode', 'top-peek'))
-      .then(fade('select-mode'))
+      .then(removeClass('particle-type', 'top-peek'))
+      .then(fade('select-particle-type'))
       .then(sleep(1))
-      .then(hide('select-mode'))
+      .then(hide('select-particle-type'))
       .then(show('select-option'))
       .then(addClass('option', 'right-peek'))
       .then(waitForOptionSelection)
@@ -61,4 +65,4 @@ const welcome = () => {
   }
 };
 
-export default welcome;
+export default welcomeUser;

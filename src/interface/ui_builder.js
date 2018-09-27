@@ -8,9 +8,9 @@ const buildButtons = (buttonNames, buttonContainerID) => {
   }
 };
 
-const buildUI = () => {
+const buildInterface = () => {
   buildButtons(['paint', 'shoot', 'place', 'reset'], 'option-buttons');
-  buildButtons(['stars', 'gases', 'networks', 'automata'], 'mode-buttons');
+  buildButtons(['stars', 'gases', 'networks', 'automata'], 'particle-type-buttons');
 };
 
-export default buildUI;
+export default buildInterface;
