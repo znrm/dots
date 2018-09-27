@@ -3,7 +3,7 @@ import { moveAway } from '../../simulator/interactions';
 
 class Automaton extends Particle {
   inReach(pos, size) {
-    return this.pos.sqDist(pos) < (2 * this.size + size) ** 2;
+    return this.pos.distSq(pos) < (2 * this.size + size) ** 2;
   }
 
   interact(particle) {

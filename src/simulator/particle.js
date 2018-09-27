@@ -50,7 +50,7 @@ class Particle {
   }
 
   isTouching(pos, offset) {
-    return this.pos.sqDist(pos) < (this.size + offset) ** 2;
+    return this.pos.distSq(pos) < (this.size + offset) ** 2;
   }
 }
 

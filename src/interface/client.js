@@ -30,6 +30,7 @@ class Client {
 
   handleActions() {
     if (this.pressing) this.continuousAction();
+    this.resetMouse();
   }
 
   clickAction() {

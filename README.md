@@ -7,12 +7,18 @@ Dots is written in **Vanilla JavaScript (ES6)**. It additionally utilizes the HT
 
 ![Image showing a variety of particle types](docs/dots-samples.gif?raw=true)
 
-
 ## Features & Code Overview
+
+### Interface
+
+
+
 
 ### Simulator
 
-The simulator is written to work well with the existing interface, but
+The simulator consists of three classes (Vector, Particle, and State) that handle varying levels of the system complexity.
+
+Vector is a simple and highly optimized object that represents a 2D vector. It includes all of the necessary vector operations underlying 2D particle motion such as adding, scaling, normalizing, and finding distances.
 
 ```js
 class Vector {
@@ -28,29 +34,34 @@ class Vector {
   }
 ```
 
-### Particle Motion is Highly Extensible
+- Particle:
+- State
+-
+
+The simulator is written to work well with the existing interface, but
+
+### Particles Class is Highly Extensible
 
 ```js
-update() {
-  this.pos.add(this.vel.add(this.acc));
-  this.acc.moveTo(0, 0);
-  return this.pos;
-}
-```
+class Gas extends Particle {
+  get size() {
+    return 0.001;
+  }
 
-### n-Body Interactions
-
-```js
-for (let i = 0; i < nFields; i += 1) {
-  for (let j = 0; j < nFields; j += 1) {
-    fields[j].interact(fields[i]);
+  interact(particle) {
+    pushAway(this, particle, 0.0001);
   }
 }
 ```
 
+
+
 ### User Interface
 
 ## Performance
+
+On modest hardware, users can observe interactions between
+Dots attempts to balance efficiency with ease-of-use and flexibility and at times avoids optimizations that
 
 ### Optimizations
 
@@ -61,7 +72,7 @@ dist(that) {
   return Math.hypot(this.x - that.x, this.y - that.y);
 }
 
-sqDist(that) {
+distSq(that) {
   const dX = this.x - that.x;
   const dY = this.y - that.y;
   return dX * dX + dY * dY;
@@ -70,10 +81,18 @@ sqDist(that) {
 
 ### Existing Bottlenecks
 
+
+
+#### n-Body Interactions
+
+```js
+for (let i = 0; i < nParticles; i += 1) {
+  for (let j = 0; j < nParticles; j += 1) {
+    if (i !== j) this.particles[i].interact(this.particles[j]);
+  }
+}
+```
+
 ### Potential Solutions
 
 ## Future Directions
-
-### Improving User Interface
-
-### Collisions

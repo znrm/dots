@@ -35,10 +35,10 @@ class Vector {
     return this;
   }
 
-  sqDist(that) {
-    const dX = (this.x - that.x) ** 2;
-    const dY = (this.y - that.y) ** 2;
-    return dX + dY;
+  distSq(that) {
+    const dX = this.x - that.x;
+    const dY = this.y - that.y;
+    return dX * dX + dY * dY;
   }
 
   dist(that) {

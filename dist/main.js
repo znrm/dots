@@ -100,8 +100,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _interface_ui_builder__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./interface/ui_builder */ "./src/interface/ui_builder.js");
 /* harmony import */ var _interface_intro__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./interface/intro */ "./src/interface/intro.js");
 /* harmony import */ var _simulator_state__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./simulator/state */ "./src/simulator/state.js");
-/* harmony import */ var _simulator_vector__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./simulator/vector */ "./src/simulator/vector.js");
-
 
 
 
@@ -119,18 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const run = () => {
     window.requestAnimationFrame(run);
 
-    display.reset();
     display.render();
-
     client.handleActions();
-    client.resetMouse();
-
     state.update();
     if (client.mode === 'stars') state.cleanup();
   };
-  window.Vector = _simulator_vector__WEBPACK_IMPORTED_MODULE_5__["default"];
-  window.state = state;
-  window.client = client;
+
   run();
 });
 
@@ -290,6 +282,7 @@ class Client {
 
   handleActions() {
     if (this.pressing) this.continuousAction();
+    this.resetMouse();
   }
 
   clickAction() {
@@ -414,8 +407,8 @@ const sizeToRGB = size => {
 };
 
 const speedToHSL = vel => {
-  const speed = vel.magnitude();
-  const hue = Math.min(120 * (speed / 0.01) + 240, 360);
+  const speed = vel.dot(vel);
+  const hue = Math.min(120 * (speed * 1e-3) + 240, 360);
   return `hsl(${hue},100%,50%)`;
 };
 
@@ -431,7 +424,7 @@ class Display {
     this.client = client;
 
     this.canvas = document.querySelector('canvas');
-    this.ctx = this.canvas.getContext('2d', { alpha: false });
+    this.ctx = this.canvas.getContext('2d');
 
     this.resize()();
     this.reset();
@@ -444,6 +437,7 @@ class Display {
   }
 
   render() {
+    this.reset();
     this.mouse(this.client.mouse);
     this.renderParticles();
   }
@@ -749,7 +743,7 @@ __webpack_require__.r(__webpack_exports__);
 
 class Automaton extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   inReach(pos, size) {
-    return this.pos.sqDist(pos) < (2 * this.size + size) ** 2;
+    return this.pos.distSq(pos) < (2 * this.size + size) ** 2;
   }
 
   interact(particle) {
@@ -784,7 +778,7 @@ class Gas extends _simulator_particle__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   interact(particle) {
-    Object(_simulator_interactions__WEBPACK_IMPORTED_MODULE_1__["pushAway"])(this, particle, 0.0001);
+    Object(_simulator_interactions__WEBPACK_IMPORTED_MODULE_1__["pushAway"])(this, particle, 0.05);
   }
 }
 
@@ -908,7 +902,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const PULL_CONSTANT = 0.025;
-const PUSH_CONSTANT = 2e-11;
+const PUSH_CONSTANT = 5e-10;
 
 const absorb = (thisParticle, thatParticle) => {
   thisParticle.grow(thatParticle.mass);
@@ -933,7 +927,7 @@ const moveAway = (thisParticle, thatParticle, a) => {
 };
 
 const fakeGravity = (thisParticle, thatParticle) => {
-  const scalar = thisParticle.mass / thisParticle.pos.sqDist(thatParticle.pos);
+  const scalar = thisParticle.mass / thisParticle.pos.distSq(thatParticle.pos);
   const direction = new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0)
     .add(thisParticle.pos)
     .subtract(thatParticle.pos);
@@ -942,10 +936,13 @@ const fakeGravity = (thisParticle, thatParticle) => {
 };
 
 const pushAway = (thisParticle, thatParticle, maxAcc) => {
-  const sqDist = thisParticle.pos.sqDist(thatParticle.pos);
-  const scalar = Math.min(PUSH_CONSTANT / (sqDist * sqDist), maxAcc);
-  const direction = _vector__WEBPACK_IMPORTED_MODULE_0__["default"].direction(thatParticle.pos, thisParticle.pos);
-  thatParticle.accelerate(direction.scale(scalar));
+  const distSq = thisParticle.pos.distSq(thatParticle.pos);
+  const scalar = PUSH_CONSTANT / (distSq * distSq);
+  const direction = new _vector__WEBPACK_IMPORTED_MODULE_0__["default"](0, 0)
+    .add(thatParticle.pos)
+    .subtract(thisParticle.pos);
+
+  thatParticle.accelerate(direction.scale(Math.min(scalar, maxAcc)));
 };
 
 
@@ -1013,7 +1010,7 @@ class Particle {
   }
 
   isTouching(pos, offset) {
-    return this.pos.sqDist(pos) < (this.size + offset) ** 2;
+    return this.pos.distSq(pos) < (this.size + offset) ** 2;
   }
 }
 
@@ -1070,9 +1067,7 @@ class State {
   calculateInteractions(nParticles) {
     for (let i = 0; i < nParticles; i += 1) {
       for (let j = 0; j < nParticles; j += 1) {
-        if (i !== j && this.particles[i].protected) {
-          this.particles[i].interact(this.particles[j]);
-        }
+        if (i !== j) this.particles[i].interact(this.particles[j]);
       }
     }
   }
@@ -1157,10 +1152,10 @@ class Vector {
     return this;
   }
 
-  sqDist(that) {
-    const dX = (this.x - that.x) ** 2;
-    const dY = (this.y - that.y) ** 2;
-    return dX + dY;
+  distSq(that) {
+    const dX = this.x - that.x;
+    const dY = this.y - that.y;
+    return dX * dX + dY * dY;
   }
 
   dist(that) {

@@ -15,8 +15,8 @@ const sizeToRGB = size => {
 };
 
 const speedToHSL = vel => {
-  const speed = vel.magnitude();
-  const hue = Math.min(120 * (speed / 0.01) + 240, 360);
+  const speed = vel.dot(vel);
+  const hue = Math.min(120 * (speed * 1e-3) + 240, 360);
   return `hsl(${hue},100%,50%)`;
 };
 
@@ -32,7 +32,7 @@ class Display {
     this.client = client;
 
     this.canvas = document.querySelector('canvas');
-    this.ctx = this.canvas.getContext('2d', { alpha: false });
+    this.ctx = this.canvas.getContext('2d');
 
     this.resize()();
     this.reset();
@@ -45,6 +45,7 @@ class Display {
   }
 
   render() {
+    this.reset();
     this.mouse(this.client.mouse);
     this.renderParticles();
   }
