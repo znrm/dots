@@ -1,9 +1,27 @@
 import Vector from './vector';
+import Particle from './particle';
 
 class State {
   constructor(particles = []) {
     this.particles = particles;
     this.wall = true;
+  }
+
+  update() {
+    const nParticles = this.particles.length;
+
+    this.calculateInteractions(nParticles);
+    this.updateParticles(nParticles);
+    if (this.wall) this.walls(nParticles);
+  }
+
+  addParticle(particle = new Particle()) {
+    this.particles.push(particle);
+  }
+
+  toggleWalls() {
+    this.wall = !this.wall;
+    return this.wall;
   }
 
   cleanup() {
@@ -21,19 +39,11 @@ class State {
     this.particles.length = validParticles;
   }
 
-  update() {
-    const nParticles = this.particles.length;
-
-    this.calculateInteractions(nParticles);
-    this.updateParticles(nParticles);
-    if (this.wall) this.walls(nParticles);
-  }
-
-  updateParticles(nParticles) {
+  updateParticles(nParticles = this.particles.length) {
     for (let i = 0; i < nParticles; i += 1) this.particles[i].update();
   }
 
-  calculateInteractions(nParticles) {
+  calculateInteractions(nParticles = this.particles.length) {
     for (let i = 0; i < nParticles; i += 1) {
       for (let j = 0; j < nParticles; j += 1) {
         if (i !== j) this.particles[i].interact(this.particles[j]);
@@ -41,7 +51,7 @@ class State {
     }
   }
 
-  walls(nParticles) {
+  walls(nParticles = this.particles.length) {
     for (let i = 0; i < nParticles; i += 1) {
       const { pos, vel, size } = this.particles[i];
       const rightDist = 1 - size - pos.x;

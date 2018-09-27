@@ -1,28 +1,28 @@
 class Vector {
-  constructor(x, y) {
+  constructor(x = 0, y = 0) {
     this.x = x;
     this.y = y;
   }
 
-  add(that) {
+  add(that = new Vector()) {
     this.x += that.x;
     this.y += that.y;
     return this;
   }
 
-  subtract(that) {
+  subtract(that = new Vector()) {
     this.x -= that.x;
     this.y -= that.y;
     return this;
   }
 
-  scale(that) {
+  scale(that = 1) {
     this.x *= that;
     this.y *= that;
     return this;
   }
 
-  moveTo(x, y) {
+  moveTo(x = 0, y = 0) {
     this.x = x;
     this.y = y;
     return this;
@@ -35,19 +35,26 @@ class Vector {
     return this;
   }
 
-  distSq(that) {
+  normalizeL2() {
+    if (this.x || this.y) {
+      this.scale(1 / this.magnitudeL1());
+    }
+    return this;
+  }
+
+  distSq(that = new Vector()) {
     const dX = this.x - that.x;
     const dY = this.y - that.y;
     return dX * dX + dY * dY;
   }
 
-  dist(that) {
+  dist(that = new Vector()) {
     const dX = this.x - that.x;
     const dY = this.y - that.y;
     return Math.hypot(dX, dY);
   }
 
-  dot(that) {
+  dot(that = new Vector()) {
     return this.x * that.x + this.y * that.y;
   }
 
@@ -55,32 +62,25 @@ class Vector {
     return Math.hypot(this.x, this.y);
   }
 
-  static direction(from, to) {
+  magnitudeL1() {
+    return Math.abs(this.x) + Math.abs(this.y);
+  }
+
+  static direction(from = new Vector(), to = new Vector()) {
     return new Vector(0, 0)
       .add(from)
       .subtract(to)
       .normalize();
   }
 
-  static randomDir(scale = 1) {
-    return new Vector(
-      Math.random() - Math.random(),
-      Math.random() - Math.random()
-    )
+  static random(length = 1) {
+    return new Vector(Math.random() - 0.5, Math.random() - 0.5)
       .normalize()
-      .scale(scale);
+      .scale(length);
   }
 
-  static origin() {
-    return new Vector(0, 0);
-  }
-
-  static clone(that) {
+  static clone(that = new Vector()) {
     return new Vector(that.x, that.y);
-  }
-
-  static random() {
-    return new Vector(Math.random(), Math.random());
   }
 }
 

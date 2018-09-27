@@ -34,22 +34,17 @@ class Client {
   }
 
   clickAction() {
-    const { particles } = this.state;
     if (this.action === 'place') {
-      particles.push(this.place[this.mode](this.mouse));
+      this.state.addParticle(this.place[this.mode](this.mouse));
     }
   }
 
   continuousAction() {
-    const { particles } = this.state;
     if (this.action !== 'place') {
-      particles.push(this[this.action][this.mode](this.mouse, this.pointer));
+      this.state.addParticle(
+        this[this.action][this.mode](this.mouse, this.pointer)
+      );
     }
-  }
-
-  toggleWalls() {
-    this.state.wall = !this.state.wall;
-    return this.state.wall;
   }
 
   addEvents() {

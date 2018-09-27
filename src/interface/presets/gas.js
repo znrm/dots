@@ -7,7 +7,7 @@ class Gas extends Particle {
   }
 
   interact(particle) {
-    pushAway(this, particle, 0.0001);
+    pushAway(this, particle, 0.00025);
   }
 }
 

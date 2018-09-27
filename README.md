@@ -11,14 +11,13 @@ Dots is written in **Vanilla JavaScript (ES6)**. It additionally utilizes the HT
 
 ### Interface
 
-
-
-
 ### Simulator
 
 The simulator consists of three classes (Vector, Particle, and State) that handle varying levels of the system complexity.
 
-Vector is a simple and highly optimized object that represents a 2D vector. It includes all of the necessary vector operations underlying 2D particle motion such as adding, scaling, normalizing, and finding distances.
+`Vector`: simple and highly optimized, it represents a 2D vector and includes all of the necessary vector operations underlying 2D particle motion. Commonly used methods include adding, scaling, normalizing, and finding distances. Most vector operations are extremely simple, and adhere to patterns that are JIT optimization-friendly.
+
+Vector operations can be chained
 
 ```js
 class Vector {
@@ -34,11 +33,9 @@ class Vector {
   }
 ```
 
-- Particle:
-- State
--
+`Particle`
 
-The simulator is written to work well with the existing interface, but
+`State`
 
 ### Particles Class is Highly Extensible
 
@@ -53,8 +50,6 @@ class Gas extends Particle {
   }
 }
 ```
-
-
 
 ### User Interface
 
@@ -80,8 +75,6 @@ distSq(that) {
 ```
 
 ### Existing Bottlenecks
-
-
 
 #### n-Body Interactions
 

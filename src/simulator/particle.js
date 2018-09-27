@@ -2,8 +2,8 @@ import Vector from './vector';
 
 class Particle {
   constructor({
-    pos = new Vector(0, 0),
-    vel = new Vector(0, 0),
+    pos = new Vector(),
+    vel = new Vector(),
     mass = 0,
     charge = 0,
     radius = 0
@@ -33,15 +33,15 @@ class Particle {
     return this.radius * scale;
   }
 
-  accelerate(amount) {
+  accelerate(amount = new Vector()) {
     this.vel.add(amount);
   }
 
-  move(amount) {
+  move(amount = new Vector()) {
     this.pos.add(amount);
   }
 
-  grow(amount) {
+  grow(amount = 0) {
     this.mass += amount;
   }
 
@@ -49,8 +49,12 @@ class Particle {
     this.protected = false;
   }
 
-  isTouching(pos, offset) {
+  isTouching(pos = new Vector(), offset = 0) {
     return this.pos.distSq(pos) < (this.size + offset) ** 2;
+  }
+
+  interact() {
+    return null;
   }
 }
 

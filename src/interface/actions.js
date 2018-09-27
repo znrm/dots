@@ -5,31 +5,31 @@ import Gas from './presets/gas';
 import Network from './presets/network';
 
 const spreadPosition = (mouse, spread) =>
-  Vector.randomDir(spread * Math.random()).add(mouse);
+  Vector.random(spread * Math.random()).add(mouse);
 
 export const paint = {
   stars: mouse =>
     new Star({
       mass: 5e-7,
-      vel: Vector.randomDir(0.00001),
+      vel: Vector.random(0.00001),
       pos: spreadPosition(mouse, 0.03)
     }),
   gases: mouse =>
     new Gas({
       radius: 5e-3,
-      vel: Vector.randomDir(0.0001),
+      vel: Vector.random(0.0001),
       pos: spreadPosition(mouse, 0.1)
     }),
   automata: mouse =>
     new Automaton({
       radius: 6e-3,
-      vel: Vector.randomDir(0.001),
+      vel: Vector.random(0.001),
       pos: spreadPosition(mouse, 0.01)
     }),
   networks: mouse =>
     new Network({
       radius: 1e-1,
-      vel: Vector.randomDir(0.0002),
+      vel: Vector.random(0.0002),
       pos: spreadPosition(mouse, 0.15)
     })
 };
