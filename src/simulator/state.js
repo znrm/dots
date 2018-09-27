@@ -13,6 +13,7 @@ class State {
 
     this.calculateInteractions(nParticles);
     this.updateParticles(nParticles);
+
     if (this.wall) this.walls(nParticles);
     if (this.needsCleaning) this.cleanup(nParticles);
   }

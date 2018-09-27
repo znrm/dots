@@ -16,7 +16,7 @@ const sizeToRGB = size => {
 
 const speedToHSL = vel => {
   const speed = vel.dot(vel);
-  const hue = Math.min(120 * (speed * 1e4) + 240, 360);
+  const hue = Math.min(120 * (speed * 1.5e4) + 240, 360);
   return `hsl(${hue},100%,50%)`;
 };
 

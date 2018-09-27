@@ -18,7 +18,7 @@ class Particle {
   }
 
   get momentum() {
-    return new Vector(0, 0).add(this.vel).scale(this.mass);
+    return Vector.clone(this.vel).scale(this.mass);
   }
 
   get size() {

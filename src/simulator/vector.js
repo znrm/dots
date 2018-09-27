@@ -74,10 +74,10 @@ class Vector {
     return new Vector(0, length);
   }
 
-  static direction(from = new Vector(), to = new Vector()) {
+  static direction(start = new Vector(), end = new Vector()) {
     return new Vector(0, 0)
-      .add(from)
-      .subtract(to)
+      .add(start)
+      .subtract(end)
       .normalize();
   }
 

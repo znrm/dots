@@ -7,13 +7,13 @@ class Client {
     this.state.needsCleaning = true;
 
     this.mouse = new Vector(0, 0);
-    this.mouseHistory = Array.from({ length: 5 }, () => new Vector(0, 0));
+    this.mouseHistory = Array.from({ length: 4 }, () => new Vector(0, 0));
 
     this.pressing = false;
 
     this.particleType = 'stars';
     this.selectedAction = 'paint';
-    this.rate = 19;
+    this.msPerAction = 21;
 
     this.actions = actions;
 
@@ -70,7 +70,10 @@ class Client {
         e.clientY / window.innerHeight
       );
       this.pressing = true;
-      this.asyncActions = window.setInterval(this.handleActions(), this.rate);
+
+      // clear previous interval in case mouseup occurred off of window
+      window.clearInterval(this.asyncActions);
+      this.asyncActions = window.setInterval(this.handleActions(), this.msPerAction);
     };
   }
 
