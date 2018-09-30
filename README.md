@@ -9,14 +9,25 @@ Dots is written in **Vanilla JavaScript (ES6)**. It additionally utilizes the HT
 
 ## Features & Code Overview
 
+### Object-Orientation
+
+A defining feature of the Dots codebase is a very strong separation of concerns. This makes the code partiu
+
+Although the highly object-oriented approach introduces challenges such as additional difficulties managing mutable state, a disciplined and appropriate use of JavaScript's prototypal inheritance can avoid such issues entirely
+
+- A simulation based on already abstract representations of physical entities and processes is uniquely suitable for class-like object abstraction.
+
+-
+- Retaining objects and simply mutating existing properties can have performance improvements that are nontrivial in applications with animation.
+  -Javascript classes are optimizer-friendly
+
 ### Interface
 
 The interface
 
-- Timed and event-initiated CSS animations for a lightweight intro and user interface.
-- Proper frame
-
-A typical challenge of interactive JavaScript applications is properly handling the language's asynchronous nature.
+- Lightweight intro and interface facilitated by timing with Promises and event handlers
+- Proper rendering rate
+-
 
 ### Simulator
 
@@ -99,7 +110,7 @@ for (let i = 0; i < nParticles; i += 1) {
 
 #### Reducing Uniquely Expensive Computations
 
-Application profiling has consistently shown that one of the most computationally expensive  Finding the magnitude of a Calculating the square root is a uniquely expensive computation.
+Application profiling has consistently shown that one of the most computationally expensive Finding the magnitude of a Calculating the square root is a uniquely expensive computation.
 
 - Approximations for
 - Suitable approximations for the square root do not perform better than `Math.sqrt` or `Math.hypot`
@@ -115,7 +126,6 @@ distSq(that) {
   return dX * dX + dY * dY;
 }
 ```
-
 
 ### Future Directions
 

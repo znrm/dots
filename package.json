@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "webpack --watch --mode=development",
-    "build": "webpack --mode=production"
+    "build": "NODE_ENV=production webpack -p"
   },
   "keywords": [],
   "license": "MIT",

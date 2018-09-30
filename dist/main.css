@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css?family=Satisfy');
+
+html {
+  line-height: 1.15;
+  -webkit-text-size-adjust: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-size: 2vmin;
+  background-color: black;
+  height: 100vh;
+  width: 100vw;
+
+  font-family: 'Courier New', Courier, monospace;
+
+  touch-action: none;
+  user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+}
+
+html,
+body,
+ul,
+h1,
+h2,
+button {
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
+button {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.15;
+  margin: 0;
+  overflow: visible;
+  text-transform: none;
+  background: none;
+  border: none;
+  outline: none;
+  display: inline-block;
+  -webkit-appearance: button;
+  padding: 5px;
+  flex: 1;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  cursor: pointer;
+}
+
+button::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+
+button:hover {
+  color: rgba(255, 255, 255, 1);
+  font-weight: bold;
+}
+
+.box-container {
+  display: flex;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.1, 0.65, 0.3, 1);
+  position: absolute;
+  cursor: initial;
+}
+
+.option {
+  height: 100vh;
+  right: -95px;
+}
+
+.particle-type {
+  width: 100vw;
+  top: -80px;
+}
+
+.option:hover {
+  right: 0;
+}
+
+.particle-type:hover {
+  top: 0;
+}
+
+.box {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
+  box-sizing: border-box;
+
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.box-container:hover .box {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.particle-type .box {
+  flex-direction: row;
+  height: 80px;
+  margin: 20px auto;
+  max-width: 50%;
+}
+
+.option .box {
+  flex-direction: column;
+  justify-content: center;
+  min-height: 60%;
+  width: 90px;
+  margin: auto 20px;
+  padding: 5px;
+}
+
+
+.top-peek {
+  top: 0px;
+}
+
+.right-peek {
+  right: 0px;
+}
+
+.no-cursor {
+  cursor: none;
+}
+
+.welcome {
+  cursor: none;
+  vertical-align: middle;
+  color: rgb(255, 255, 255);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.title {
+  font-family: 'Satisfy', cursive;
+  font-weight: 100;
+  font-size: 15em;
+  text-align: center;
+  line-height: 100%;
+  max-width: 80%;
+}
+
+.select {
+  max-width: 50%;
+  font-size: 2em;
+  font-weight: lighter;
+  text-align: center;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    display: none;
+  }
+}
+
+@keyframes fade-in-out {
+  0% {
+    opacity: 0;
+  }
+  66% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.fade-in-out {
+  animation-name: fade-in-out;
+  animation-duration: 3s;
+  animation-timing-function: ease-in-out;
+}
+
+.fade-in {
+  animation-name: fade-in;
+  animation-duration: 1s;
+  animation-timing-function: ease;
+}
+
+.fade-out {
+  animation-name: fade-out;
+  animation-duration: 1s;
+  animation-timing-function: ease;
+}
+
+.logo {
+  font-family: 'Satisfy', cursive;
+  font-weight: 100;
+  font-size: 2em;
+  text-align: center;
+  line-height: 100%;
+  position: absolute;
+  padding: 1%;
+  top: 0;
+  right: 0;
+  color: white;
+}
+
+.hidden {
+  display: none;
+}

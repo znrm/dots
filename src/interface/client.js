@@ -13,7 +13,7 @@ class Client {
     this.msPerAction = 21;
 
     this.particleType = 'stars';
-    this.selectedAction = 'paint';
+    this.selectedAction = 'shoot';
 
     this.actions = actions;
 
@@ -59,11 +59,13 @@ class Client {
     canvas.onmousedown = this.mouseDown();
     canvas.ontouchstart = this.mouseDown();
 
-    document.onmousemove = this.mouseMove();
-    document.ontouchmove = this.mouseMove();
-
     canvas.onmouseup = this.mouseUp();
     canvas.ontouchend = this.mouseUp();
+
+    document.onmousemove = this.mouseMove();
+    document.addEventListener('touchmove', this.mouseMove(), {
+      passive: false
+    });
   }
 
   mouseDown() {

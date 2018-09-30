@@ -4,7 +4,7 @@ import buildInterface from './interface/ui_builder';
 import welcomeUser from './interface/intro';
 import State from './simulator/state';
 
-window.onload = () => {
+const onload = () => {
   buildInterface();
   welcomeUser();
 
@@ -21,3 +21,5 @@ window.onload = () => {
 
   run();
 };
+
+window.addEventListener('load', onload, { once: true });

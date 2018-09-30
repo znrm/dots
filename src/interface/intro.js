@@ -31,6 +31,18 @@ const waitForOptionSelection = () =>
     document.querySelector('.option').addEventListener('click', resolve);
   });
 
+const adjustForMobile = () => {
+
+  window.addEventListener(
+    'touchstart',
+    () => {
+      addClass('particle-type', 'top-peek')();
+      addClass('option', 'right-peek')();
+    },
+    { once: true }
+  );
+};
+
 const welcomeUser = () => {
   if (introsLeft()) {
     Promise.resolve()
@@ -56,12 +68,14 @@ const welcomeUser = () => {
       .then(fade('enjoy'))
       .then(sleep(1))
       .then(addClass('enjoy', 'hidden'))
-      .then(hide('welcome'));
+      .then(hide('welcome'))
+      .then(adjustForMobile);
   } else {
     Promise.resolve()
       .then(show('title'))
       .then(sleep(3))
-      .then(hide('welcome'));
+      .then(hide('welcome'))
+      .then(adjustForMobile);
   }
 };
 
