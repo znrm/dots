@@ -1,5 +1,5 @@
 import Vector from '../simulator/vector';
-import actions from './actions';
+import actions from './util/particle_actions';
 
 class Client {
   constructor(state) {
@@ -10,10 +10,10 @@ class Client {
     this.mouseHistory = Array.from({ length: 4 }, () => new Vector(0, 0));
 
     this.pressing = false;
+    this.msPerAction = 21;
 
     this.particleType = 'stars';
     this.selectedAction = 'paint';
-    this.msPerAction = 21;
 
     this.actions = actions;
 
@@ -38,7 +38,10 @@ class Client {
 
   continuousAction() {
     this.state.addParticle(
-      this.actions[this.selectedAction][this.particleType](this.mouse, this.pointer)
+      this.actions[this.selectedAction][this.particleType](
+        this.mouse,
+        this.pointer
+      )
     );
   }
 
@@ -65,27 +68,31 @@ class Client {
 
   mouseDown() {
     return e => {
-      this.mouse.moveTo(
-        e.clientX / window.innerWidth,
-        e.clientY / window.innerHeight
-      );
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      const y = e.touches ? e.touches[0].clientY : e.clientY;
+
+      this.mouse.moveTo(x / window.innerWidth, y / window.innerHeight);
       this.pressing = true;
 
       // clear previous interval in case mouseup occurred off of window
       window.clearInterval(this.asyncActions);
-      this.asyncActions = window.setInterval(this.handleActions(), this.msPerAction);
+      this.asyncActions = window.setInterval(
+        this.handleActions(),
+        this.msPerAction
+      );
     };
   }
 
   mouseMove() {
     return e => {
       e.preventDefault();
+      e.stopPropagation();
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      const y = e.touches ? e.touches[0].clientY : e.clientY;
+
       this.mouseHistory.shift();
       this.mouseHistory.push(Vector.clone(this.mouse));
-      this.mouse.moveTo(
-        e.clientX / window.innerWidth,
-        e.clientY / window.innerHeight
-      );
+      this.mouse.moveTo(x / window.innerWidth, y / window.innerHeight);
     };
   }
 

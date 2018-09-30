@@ -14,6 +14,7 @@ window.onload = () => {
 
   const run = () => {
     requestAnimationFrame(run);
+
     display.render();
     simulation.update();
   };

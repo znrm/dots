@@ -1,9 +1,9 @@
-import Vector from '../simulator/vector';
-import Star from './presets/star';
-import Automaton from './presets/automaton';
-import Gas from './presets/gas';
-import Network from './presets/network';
-import Particle from '../simulator/particle';
+import Vector from '../../simulator/vector';
+import Star from '../presets/star';
+import Automaton from '../presets/automaton';
+import Gas from '../presets/gas';
+import Network from '../presets/network';
+import Particle from '../../simulator/particle';
 
 const spreadPosition = (mouse, spread) =>
   Vector.random(spread * Math.random()).add(mouse);
