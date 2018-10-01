@@ -9,29 +9,40 @@ Dots is written in **Vanilla JavaScript (ES6)**. It additionally utilizes the HT
 
 ## Features & Code Overview
 
+A defining feature of the Dots codebase is a very strong separation of concerns. The application consists of an independent simulator and a visual interface built to showcase some of what's possible with it.
+
+This separation is characterized by the application loop that simply involves a rendering step for the display followed by an update of the simulation's state during each frame. Note that in this setup, user input is non-blocking and asynchronous, mediated exclusively by event handlers.
+
+```js
+const run = () => {
+  requestAnimationFrame(run);
+
+  display.render();
+  simulation.update();
+};
+```
+
 ### Object-Orientation
 
-A defining feature of the Dots codebase is a very strong separation of concerns. This makes the code partiu
+Another feature of Dots is that it relies heavily on Object-Oriented patterns. Although this approach introduces challenges such as additional difficulties managing mutable state, a disciplined and appropriate use of JavaScript's prototypal inheritance can avoid such issues entirely. Compared to other approaches, the OO approach has the following advantages for Dots:
 
-Although the highly object-oriented approach introduces challenges such as additional difficulties managing mutable state, a disciplined and appropriate use of JavaScript's prototypal inheritance can avoid such issues entirely
-
-- A simulation based on already abstract representations of physical entities and processes is uniquely suitable for class-like object abstraction.
-
--
+- A simulation based on abstract representations of physical entities and processes is uniquely suitable for class-like object abstraction.
 - Retaining objects and simply mutating existing properties can have performance improvements that are nontrivial in applications with animation.
-  -Javascript classes are optimizer-friendly
+- Self-contained classes are more easily extended by other programmers that may want to add additional functionality.
 
 ### Interface
 
-The interface
+The interface files consist of:
 
-- Lightweight intro and interface facilitated by timing with Promises and event handlers
-- Proper rendering rate
--
+- `ui_builder`: dynamically adds buttons corresponding to actions and particle-types.
+- `intro`: a lightweight animated intro with Promise-facilitated, timed instructions and event handlers triggering CSS-defined animations.
+- `Display` handles all visual, canvas-related, and window-specific functionality.
+- `Client` handles pointer events and user actions.
+- Several pre-made particles and other utility functions.
 
 ### Simulator
 
-The simulator consists of three classes (Vector, Particle, and State) that handle varying levels of the system complexity.
+The simulator files consists of three classes (Vector, Particle, and State) that handle varying levels of the system complexity along with some pre-built interactions.
 
 #### `Vector`
 
@@ -59,7 +70,8 @@ get momentum() {
 
 #### `State`
 
-The state concerns itself with managing a particle pool for which particle and environment interactions are calculated. The smallest single unit of time in the simulation is called with the `update` method, thereby deferring rate-dependent behavior to be solely determined by the result of interactions themselves. This opens up the possibility to define relativistic behavior if desired.
+The state concerns itself with managing a particle pool for which particle and environment interactions are calculated. The smallest single unit of time in the simulation is called with the `update` method, thereby deferring rate-dependent behavior to be solely determined by the result of interactions themselves.
+This opens up the possibility to define relativistic behavior if desired.
 
 ### Adding Particle Interactions
 
@@ -88,17 +100,19 @@ class Absorber extends Particle {
 
 ### Optimizations
 
-Particular attention has been paid to ensuring acceptable performance on modest hardware.
+Particular attention has been paid to ensuring acceptable performance on modest hardware. JavaScript interpreters attempt various JIT optimizations, so apart from typical optimizations that would be expected in any language (such as reduced memory load or need for garbage collection via pooling and recycling objects), the following three coding patterns are employed to uniquely improve JavaScript performance:
 
-- Reduced memory load and
+- Reliance on efficient operations that maximize JS interpreter's use of methods already implemented in native code.
+- Maintaining consistent input and output types for all functions, maximizing interpreter speculative optimization.
+- Maximizing interpreter inline caching by using modular functions that do the same thing repeatedly.
 
-Nevertheless, Dots attempts to balance efficiency with ease-of-use and flexibility. Most significantly, it maintains the object-oriented abstractions despite the fact that alternatives such as a single array to store particle properties could potentially prove more performant.
+Nevertheless, Dots also attempts to balance efficiency with ease-of-use and flexibility. Most significantly, it maintains the object-oriented abstractions despite the fact that alternatives such as a single array to store particle properties could potentially prove more performant.
 
 ### Existing Bottlenecks
 
 #### n-Body Interactions
 
-The most significant bottleneck for Dots is simply one of computational complexity. Simulating arbitrary n-Body interactions where the nature of the interaction is not known in advance has a classic example of an algorithm with O(n<sup>2</sup>) time complexity. If one is only concerned with
+The most significant bottleneck for Dots is simply one of computational complexity. Simulating arbitrary n-Body interactions where the nature of the interaction is not known in advance is a classic example of an algorithm with O(n<sup>2</sup>) time complexity.
 
 ```js
 for (let i = 0; i < nParticles; i += 1) {
@@ -108,12 +122,9 @@ for (let i = 0; i < nParticles; i += 1) {
 }
 ```
 
-#### Reducing Uniquely Expensive Computations
+#### Uniquely Expensive Computations
 
-Application profiling has consistently shown that one of the most computationally expensive Finding the magnitude of a Calculating the square root is a uniquely expensive computation.
-
-- Approximations for
-- Suitable approximations for the square root do not perform better than `Math.sqrt` or `Math.hypot`
+Application profiling has consistently shown that one of the most computationally expensive steps during each frame is calculating the square root, a uniquely expensive computation. Significant performance improvements were achieved simply by appropriately substituting the squared distance whenever possible.
 
 ```js
 dist(that) {
@@ -127,8 +138,15 @@ distSq(that) {
 }
 ```
 
+Unfortunately, vector normalization, primarily used for finding directional unit vectors, has no suitable alternative. Using the L<sup>1</sup> distance (taxicab distance) is a visibly poor substitute, and other, more suitable approximation such as Taylor polynomial expansions of the square root do not perform better in JavaScript than `Math.sqrt` or `Math.hypot`.
+
 ### Future Directions
 
+Future updates will prioritize the following:
+
+- Improve interface and event handlers for mobile compatibility.
 - Rewriting certain portions in Web Assembly for potential performance improvements.
 - An interface for non-interactive simulations to be calculated in advance.
 - Flexibility for users to decide how and what particles to make.
+
+**Feel free to reach out for any questions, requests, or contributions!**

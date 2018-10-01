@@ -19,7 +19,7 @@ const onload = () => {
     simulation.update();
   };
 
-  run();
+  requestAnimationFrame(run);
 };
 
 window.addEventListener('load', onload, { once: true });
