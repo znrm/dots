@@ -134,7 +134,7 @@ class Display {
   star(particle) {
     const { pos } = particle;
     const size = particle.visualSize(this.scale);
-    const color = sizeToRGBA(particle.size);
+    const color = sizeToRGBA(particle.size());
 
     this.ctx.fillStyle = color;
     this.ctx.shadowColor = color;

@@ -17,11 +17,11 @@ class Particle {
     this.protected = true;
   }
 
-  get momentum() {
+  momentum() {
     return Vector.clone(this.vel).scale(this.mass);
   }
 
-  get size() {
+  size() {
     return this.radius;
   }
 
@@ -50,7 +50,7 @@ class Particle {
   }
 
   isTouching(pos = new Vector(), offset = 0) {
-    return this.pos.distSq(pos) < (this.size + offset) ** 2;
+    return this.pos.distSq(pos) < (this.size() + offset) ** 2;
   }
 
   interact() {

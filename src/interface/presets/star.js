@@ -10,12 +10,13 @@ class Star extends Particle {
     return Math.sqrt(this.mass) * scale;
   }
 
-  get size() {
+  size() {
     return Math.sqrt(this.mass);
   }
 
   interact(particle) {
-    const { pos, size } = particle;
+    const { pos } = particle;
+    const size = particle.size();
 
     if (this.isTouching(pos, 0.1 * size) && this.protected) {
       inelasticCollide(this, particle);

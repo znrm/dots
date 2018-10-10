@@ -10,8 +10,8 @@ export const inelasticCollide = (
   source = new Particle(),
   target = new Particle()
 ) => {
-  const newVelocity = source.momentum
-    .add(target.momentum)
+  const newVelocity = source.momentum()
+    .add(target.momentum())
     .scale(1 / (source.mass + target.mass));
   source.vel.scale(0);
   source.accelerate(newVelocity);
@@ -24,7 +24,7 @@ export const moveAway = (
 ) => {
   target.move(
     Vector.direction(target.pos, source.pos).scale(
-      sizeMultiplier * (source.size + target.size) - source.pos.dist(target.pos)
+      sizeMultiplier * (source.size() + target.size()) - source.pos.dist(target.pos)
     )
   );
 };

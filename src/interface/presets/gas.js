@@ -2,7 +2,7 @@ import Particle from '../../simulator/particle';
 import { pushAway } from '../../simulator/interactions';
 
 class Gas extends Particle {
-  get size() {
+  size() {
     return 0.001;
   }
 

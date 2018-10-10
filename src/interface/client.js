@@ -32,7 +32,11 @@ class Client {
 
   clickAction() {
     if (this.selectedAction === 'place') {
-      this.state.addParticle(this.actions.place[this.particleType](this.mouse));
+      for (let i = 0; i < 10; i += 1) {
+        this.state.addParticle(
+          this.actions.place[this.particleType](this.mouse)
+        );
+      }
     }
   }
 

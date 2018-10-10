@@ -60,10 +60,10 @@ const unitDirectionalVector = (start, end) =>
 
 #### `Particle`
 
-Equally simple, the particle class contains properties and methods common to all particles. Where needed, properties that can be computed from existing properties are defined via getter methods.
+Equally simple, the particle class contains properties and methods common to all particles. Where needed, properties that can be computed from existing properties.
 
 ```js
-get momentum() {
+momentum() {
     return Vector.clone(this.vel).scale(this.mass);
   }
 ```

@@ -55,7 +55,8 @@ class State {
 
   walls(nParticles = this.particles.length) {
     for (let i = 0; i < nParticles; i += 1) {
-      const { pos, vel, size } = this.particles[i];
+      const { pos, vel } = this.particles[i];
+      const size = this.particles[i].size();
       const rightDist = 1 - size - pos.x;
       const bottomDist = 1 - size - pos.y;
       const leftDist = pos.x - size;
