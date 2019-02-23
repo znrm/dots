@@ -9,7 +9,10 @@ const buildButtons = (buttonNames, buttonContainerID) => {
 
 const buildInterface = () => {
   buildButtons(['paint', 'shoot', 'place', 'reset'], 'option-buttons');
-  buildButtons(['stars', 'gases', 'networks', 'automata'], 'particle-type-buttons');
+  buildButtons(
+    ['stars', 'gases', 'networks', 'automata'],
+    'particle-type-buttons'
+  );
 };
 
 export default buildInterface;

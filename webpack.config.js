@@ -4,10 +4,10 @@ module.exports = {
   entry: './src/entry.js',
   output: {
     filename: 'main.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'dist')
   },
   resolve: {
-    extensions: ['.js', '*'],
+    extensions: ['.js', '*']
   },
-  devtool: 'source-map',
+  devtool: 'source-map'
 };

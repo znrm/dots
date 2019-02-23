@@ -32,7 +32,6 @@ const waitForOptionSelection = () =>
   });
 
 const adjustForMobile = () => {
-
   window.addEventListener(
     'touchstart',
     () => {
