@@ -36,45 +36,45 @@ const adjustForMobile = () => {
     'touchstart',
     () => {
       addClass('particle-type', 'top-peek')();
-      addClass('option', 'right-peek')();
+      addClass('option', 'bottom-peek')();
     },
     { once: true }
   );
 };
 
+const runInSequence = (...asyncFns) =>
+  asyncFns.reduce((promise, next) => promise.then(next), Promise.resolve());
+
 const welcomeUser = () => {
   if (introsLeft()) {
-    Promise.resolve()
-      .then(show('title'))
-      .then(sleep(3))
-      .then(hide('title'))
-      .then(show('select-particle-type'))
-      .then(addClass('particle-type', 'top-peek'))
-      .then(waitForModeSelection)
-      .then(removeClass('particle-type', 'top-peek'))
-      .then(fade('select-particle-type'))
-      .then(sleep(1))
-      .then(hide('select-particle-type'))
-      .then(show('select-option'))
-      .then(addClass('option', 'right-peek'))
-      .then(waitForOptionSelection)
-      .then(removeClass('option', 'right-peek'))
-      .then(fade('select-option'))
-      .then(sleep(1))
-      .then(hide('select-option'))
-      .then(show('enjoy'))
-      .then(sleep(1))
-      .then(fade('enjoy'))
-      .then(sleep(1))
-      .then(addClass('enjoy', 'hidden'))
-      .then(hide('welcome'))
-      .then(adjustForMobile);
+    runInSequence(
+      show('title'),
+      sleep(2),
+      hide('title'),
+      show('select-particle-type'),
+      addClass('particle-type', 'top-peek'),
+      waitForModeSelection,
+      removeClass('particle-type', 'top-peek'),
+      fade('select-particle-type'),
+      sleep(1),
+      hide('select-particle-type'),
+      show('select-option'),
+      addClass('option', 'bottom-peek'),
+      waitForOptionSelection,
+      removeClass('option', 'bottom-peek'),
+      fade('select-option'),
+      sleep(1),
+      hide('select-option'),
+      show('enjoy'),
+      sleep(1),
+      fade('enjoy'),
+      sleep(1),
+      addClass('enjoy', 'hidden'),
+      hide('welcome'),
+      adjustForMobile
+    );
   } else {
-    Promise.resolve()
-      .then(show('title'))
-      .then(sleep(3))
-      .then(hide('welcome'))
-      .then(adjustForMobile);
+    runInSequence(show('title'), sleep(2), hide('welcome'), adjustForMobile);
   }
 };
 

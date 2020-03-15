@@ -10,7 +10,7 @@ class Client {
     this.mouseHistory = Array.from({ length: 4 }, () => new Vector(0, 0));
 
     this.pressing = false;
-    this.msPerAction = 21;
+    this.msPerAction = 30;
 
     this.particleType = 'stars';
     this.selectedAction = 'shoot';

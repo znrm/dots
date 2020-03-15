@@ -1,39 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="Dots"
+      content="An entertaining, surprisingly sophisticated particle playground."
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#000000" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="Dots" content="An entertaining, surprisingly sophisticated particle playground.">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#000000"/>
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>dots</title>
 
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="dist/main.css" />
+  </head>
 
-  <title>dots</title>
+  <body>
+    <header id="welcome" class="welcome">
+      <h2 id="select-particle-type" class="select fade-in hidden">
+        pick particle types above
+      </h2>
+      <h1 id="title" class="title hidden fade-in-out">dots</h1>
+      <h2 id="select-option" class="select fade-in hidden">
+        choose how particles are made below
+      </h2>
+      <h2 id="enjoy" class="select fade-in hidden">
+        click around and have fun!
+      </h2>
+    </header>
 
-  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-  <link rel="stylesheet" href="dist/main.css">
+    <div id="particle-type" class="particle-type box-container">
+      <ul id="particle-type-buttons" class="box"></ul>
+    </div>
 
+    <div id="option" class="option box-container">
+      <ul id="option-buttons" class="box"></ul>
+    </div>
+
+    <canvas class="no-cursor"></canvas>
+  </body>
   <script src="dist/main.js"></script>
-</head>
-
-<body>
-  <header id="welcome" class='welcome'>
-    <h2 id="select-particle-type" class='select fade-in hidden'>pick particle types above</h2>
-    <h1 id="title" class='title hidden fade-in-out'>dots</h1>
-    <h2 id="select-option" class='select fade-in hidden'>choose how particles are made on the right</h2>
-    <h2 id="enjoy" class='select fade-in hidden'>click around and have fun!</h2>
-  </header>
-
-  <div id="particle-type" class="particle-type box-container">
-    <ul id="particle-type-buttons" class="box"></ul>
-  </div>
-
-  <div id="option" class="option box-container">
-    <ul id="option-buttons" class="box"></ul>
-  </div>
-
-  <canvas class="no-cursor"></canvas>
-</body>
-
 </html>

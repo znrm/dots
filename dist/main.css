@@ -81,8 +81,8 @@ button:hover {
 }
 
 .option {
-  height: 100vh;
-  right: -95px;
+  width: 100vw;
+  bottom: -80px;
 }
 
 .particle-type {
@@ -91,7 +91,7 @@ button:hover {
 }
 
 .option:hover {
-  right: 0;
+  bottom: 0;
 }
 
 .particle-type:hover {
@@ -103,6 +103,10 @@ button:hover {
   display: flex;
   justify-content: space-around;
   box-sizing: border-box;
+  flex-direction: row;
+  height: 80px;
+  margin: 20px auto;
+  max-width: 50%;
 
   border-radius: 10px;
   background-color: rgba(255, 255, 255, 0.05);
@@ -114,29 +118,12 @@ button:hover {
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-.particle-type .box {
-  flex-direction: row;
-  height: 80px;
-  margin: 20px auto;
-  max-width: 50%;
-}
-
-.option .box {
-  flex-direction: column;
-  justify-content: center;
-  min-height: 60%;
-  width: 90px;
-  margin: auto 20px;
-  padding: 5px;
-}
-
-
 .top-peek {
-  top: 0px;
+  top: 0;
 }
 
-.right-peek {
-  right: 0px;
+.bottom-peek {
+  bottom: 0;
 }
 
 .no-cursor {
@@ -205,7 +192,7 @@ button:hover {
 
 .fade-in-out {
   animation-name: fade-in-out;
-  animation-duration: 3s;
+  animation-duration: 2s;
   animation-timing-function: ease-in-out;
 }
 
