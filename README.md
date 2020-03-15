@@ -15,10 +15,9 @@ This separation is characterized by the application loop that simply involves a 
 
 ```js
 const run = () => {
-  requestAnimationFrame(run);
-
   display.render();
   simulation.update();
+  requestAnimationFrame(run);
 };
 ```
 
