@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Satisfy');
+@import url("https://fonts.googleapis.com/css?family=Satisfy");
 
 html {
   line-height: 1.15;
@@ -15,7 +15,7 @@ body {
   height: 100vh;
   width: 100vw;
 
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", Courier, monospace;
 
   touch-action: none;
   user-select: none;
@@ -144,7 +144,7 @@ button:hover {
 }
 
 .title {
-  font-family: 'Satisfy', cursive;
+  font-family: "Satisfy", cursive;
   font-weight: 100;
   font-size: 15em;
   text-align: center;
@@ -209,7 +209,7 @@ button:hover {
 }
 
 .logo {
-  font-family: 'Satisfy', cursive;
+  font-family: "Satisfy", cursive;
   font-weight: 100;
   font-size: 2em;
   text-align: center;
