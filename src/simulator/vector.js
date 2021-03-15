@@ -35,13 +35,6 @@ class Vector {
     return this;
   }
 
-  normalizeL2() {
-    if (this.x || this.y) {
-      this.scale(1 / this.magnitudeL1());
-    }
-    return this;
-  }
-
   distSq(that = new Vector()) {
     const dX = this.x - that.x;
     const dY = this.y - that.y;
@@ -62,10 +55,6 @@ class Vector {
     return Math.hypot(this.x, this.y);
   }
 
-  magnitudeL1() {
-    return Math.abs(this.x) + Math.abs(this.y);
-  }
-
   static xAxis(length = 1) {
     return new Vector(length, 0);
   }
@@ -75,10 +64,7 @@ class Vector {
   }
 
   static direction(start = new Vector(), end = new Vector()) {
-    return new Vector(0, 0)
-      .add(start)
-      .subtract(end)
-      .normalize();
+    return new Vector(0, 0).add(start).subtract(end).normalize();
   }
 
   static random(length = 1) {
